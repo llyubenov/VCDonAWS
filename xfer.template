@@ -1,0 +1,479 @@
+{
+   "AWSTemplateFormatVersion" : "2010-09-09",
+   "Metadata": {
+       "AWS::CloudFormation::Interface": {
+           "ParameterGroups": [
+               {
+                   "Label": {
+                       "default": "Availability Zone Configuration"
+                   },
+                   "Parameters": [
+                       "AvailabilityZones",
+                       "NumberOfAZs"
+                   ]
+               },
+               {
+                   "Label": {
+                       "default": "Network Configuration"
+                   },
+                   "Parameters": [
+                       "VPCID",
+                       "PrivateSubnet1",
+                       "PrivateSubnet2",
+                       "PrivateSubnet1CIDR",
+                       "PrivateSubnet2CIDR"
+                   ]
+               },
+               {
+                   "Label": {
+                       "default": "xFer EC2 Configuration"
+                   },
+                   "Parameters": [
+                       "KeyPairNameEC2",
+                       "xFerEC2AMIOS",
+                       "xFerInstanceType",
+                       "BastionAccessSecurityGroup"
+                   ]
+               },
+           ],
+           "ParameterLabels": {
+               "AvailabilityZones": {
+                  "default": "Availability Zones"
+               },
+               "NumberOfAZs": {
+                   "default": "Number of Availability Zones"
+               },
+               "KeyPairNameEC2": {
+                   "default": "Key Pair Name for vCD/xFer EC2 Instances"
+               },
+               "EC2AMIOS": {
+                   "default": "vCD/xFer EC2 AMI Operating System"
+               },
+               "xFerEC2InstanceType": {
+                   "default": "xFer EC2 Instance Type"
+               },
+               "PrivateSubnet1": {
+                   "default": "Private Subnet 1"
+               },
+               "PrivateSubnet2": {
+                   "default": "Private Subnet 2"
+               },
+               "PrivateSubnet1CIDR": {
+                    "default": "Private subnet 1 CIDR"
+                },
+                "PrivateSubnet2CIDR": {
+                    "default": "Private subnet 2 CIDR"
+                },
+                "VPCID": {
+                    "default": "VPC ID"
+                },
+                "BastionAccessSecurityGroup": {
+                    "default": "Security Group to Allow SSH Access from Bastion hosts"
+                }
+           }
+       }
+   },
+   "Parameters": {
+       "AvailabilityZones": {
+           "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved.",
+           "Type": "List<AWS::EC2::AvailabilityZone::Name>"
+       },
+       "NumberOfAZs": {
+           "AllowedValues": [
+             "1","2"
+           ],
+           "Default": "2",
+           "Description": "Number of Availability Zones to use in the VPC. This must match your selections in the list of Availability Zones parameter.",
+           "Type": "String"
+       },
+       "KeyPairNameEC2": {
+           "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+           "Type": "AWS::EC2::KeyPair::KeyName"
+       },
+       "EC2AMIOS": {
+           "AllowedValues": [
+               "Amazon-Linux-HVM",
+               "CentOS-7-HVM"
+           ],
+           "Default": "Amazon-Linux-HVM",
+           "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
+           "Type": "String"
+       },
+       "xFerEC2InstanceType": {
+           "AllowedValues": [
+               "t2.micro",
+               "t2.medium",
+               "t2.large"
+           ],
+           "Default": "t2.medium",
+           "Description": "Amazon EC2 instances type",
+           "Type": "String"
+       },
+       "PrivateSubnet1": {
+           "Description": "ID of the public subnet 1 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
+           "Type": "AWS::EC2::Subnet::Id"
+       },
+       "PrivateSubnet2": {
+           "Description": "ID of the public subnet 2 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-e3246d8e)",
+           "Type": "AWS::EC2::Subnet::Id"
+       },
+       "PrivateSubnet1CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "172.16.2.0/24",
+            "Description": "CIDR block for private subnet 1 located in Availability Zone 1",
+            "Type": "String"
+        },
+        "PrivateSubnet2CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "172.16.4.0/24",
+            "Description": "CIDR block for private subnet 2 located in Availability Zone 2",
+            "Type": "String"
+        },
+        "VPCID": {
+            "Description": "ID of the VPC (e.g., vpc-0343606e)",
+            "Type": "AWS::EC2::VPC::Id"
+        },
+        "BastionAccessSecurityGroupID": {
+            "Description": "Security Group to Allow SSH Access from Bastion hosts",
+            "Type": "AWS::EC2::SecurityGroup::Id"
+        }
+   },
+   "Mappings": {
+       "AWSAMIRegionMap": {
+           "AMI": {
+               "AMZNLINUXHVM": "amzn-ami-hvm-2017.09.1.20171120-x86_64-gp2",
+               "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS 1708_11.01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-95096eef.4"
+           },
+           "us-east-1": {
+               "AMZNLINUXHVM": "ami-55ef662f",
+               "CENTOS7HVM": "ami-02e98f78"
+           },
+           "us-east-2": {
+               "AMZNLINUXHVM": "ami-15e9c770",
+               "CENTOS7HVM": "ami-e0eac385"
+           },
+           "us-west-1": {
+               "AMZNLINUXHVM": "ami-a51f27c5",
+               "CENTOS7HVM": "ami-b1a59fd1"
+           },
+           "us-west-2": {
+               "AMZNLINUXHVM": "ami-bf4193c7",
+               "CENTOS7HVM": "ami-b63ae0ce"
+           }
+       },
+       "LinuxAMINameMap": {
+           "Amazon-Linux-HVM": {
+               "Code": "AMZNLINUXHVM"
+           },
+           "CentOS-7-HVM": {
+               "Code": "CENTOS7HVM"
+           }
+       }
+   },
+   "Rules": {
+       "SubnetsInVPC": {
+           "Assertions": [
+               {
+                   "Assert": {
+                       "Fn::EachMemberIn": [
+                           {
+                               "Fn::ValueOfAll": [
+                                   "AWS::EC2::Subnet::Id",
+                                   "VpcId"
+                               ]
+                           },
+                           {
+                               "Fn::RefAll": "AWS::EC2::VPC::Id"
+                           }
+                       ]
+                   },
+                   "AssertDescription": "All subnets must exist in the VPC"
+               }
+           ]
+       }
+   },
+   "Resources" : {
+      "xFerS3AccessRole": {
+         "Type": "AWS::IAM::Role",
+         "Properties": {
+            "AssumeRolePolicyDocument": {
+               "Statement": [ {
+                  "Effect": "Allow",
+                  "Principal": {
+                     "Service": [ "ec2.amazonaws.com" ]
+                  },
+                  "Action": [ "sts:AssumeRole" ]
+               } ]
+            },
+            "Path": "/"
+         }
+      },
+      "xFerS3AccessPolicies": {
+         "Type": "AWS::IAM::Policy",
+         "Properties": {
+            "PolicyName": "xFer-S3-AccessPerms",
+            "PolicyDocument": {
+               "Statement": [ {
+                  "Effect": "Allow",
+                  "Action": "s3:*",
+                  "Resource": { "Fn::Join" : ["", [ "arn:aws:s3:::", { "Ref" : "xFerBucket" } ]
+                  ] }
+               } ]
+            },
+            "Roles": [ { "Ref": "xFerS3AccessRole" } ]
+         }
+      },
+      "S3AccessHostProfile": {
+          "Type": "AWS::IAM::InstanceProfile",
+          "Properties": {
+              "Roles": [
+                  {
+                      "Ref": "xFerS3AccessRole"
+                  }
+              ],
+              "Path": "/"
+          }
+      },
+      "xFerBucket" : {
+        "Type" : "AWS::S3::Bucket",
+        "Properties" : {
+          "BucketName": { "Fn::Join" : ["", [ { "Ref" : "VPCID" }, "-xfer" ]
+          ] }
+        }
+      },
+      "vCDxFer1": {
+        "Type": "AWS::EC2::Instance",
+        "Properties": {
+          "AvailabilityZone": {
+              "Fn::Select": [
+                  "0",
+                  {
+                      "Ref": "AvailabilityZones"
+                  }
+              ]
+          },
+          "ImageId": {
+              "Fn::FindInMap": [
+                  "AWSAMIRegionMap",
+                  {
+                      "Ref": "AWS::Region"
+                  },
+                  {
+                      "Fn::FindInMap": [
+                          "LinuxAMINameMap",
+                          {
+                              "Ref": "EC2AMIOS"
+                          },
+                          "Code"
+                      ]
+                  }
+              ]
+          },
+          "InstanceType": {
+              "Ref": "xFerEC2InstanceType"
+          },
+          "IamInstanceProfile": {
+              "Ref": "S3AccessHostProfile"
+          },
+          "SecurityGroupIds": [
+              {
+                  "Ref": "BastionAccessSecurityGroupID"
+              }
+          ],
+          "KeyName": {
+              "Ref": "KeyPairNameEC2"
+          },
+          "SubnetId": {
+              "Ref": "PrivateSubnet1"
+          },
+          "Tags": [
+              {
+                  "Key": "Name",
+                  "Value": "vCDxFer1"
+              }
+          ],
+          "UserData": {
+            "Fn::Base64": {
+              "Fn::Join": [
+                "",
+                [
+                  "#!/bin/bash\n",
+
+                  "# Update GuestOS\n",
+                  "yum update -y\n",
+                  "# Install necessary packages\n",
+                  "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel nfs-utils nfs-utils-lib -y\n",
+                  "# Clone S3FS repository from Git\n",
+                  "cd /home/ec2-user\n",
+                  "git clone https://github.com/s3fs-fuse/s3fs-fuse.git\n",
+                  "# Compile S3FS\n",
+                  "cd /home/ec2-user/s3fs-fuse\n",
+                  "./autogen.sh\n",
+                  "./configure --prefix=/usr --with-openssl\n",
+                  "make\n",
+                  "make install\n",
+                  "# Create the NFS export directory\n",
+                  "mkdir -p /home/ec2-user/xfer\n",
+                  "# Add S3 bucket mount point to fstab\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "echo 's3fs#",
+                        {
+                          "Ref": "xFerBucket"
+                        },
+                        " /home/ec2-user/xfer fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "# Mount the S3 Bucket\n",
+                  "mount /home/ec2-user/xfer\n",
+                  "# Enable NFS Service\n",
+                  "chkconfig nfs on\n",
+                  "# Configure NFS Export\n",
+                  "cat > /etc/exports <<- EOF\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "/home/ec2-user/xfer ",
+                        {
+                          "Ref": "PrivateSubnet1CIDR"
+                        },
+                        "(rw,fsid=0,no_root_squash)"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "EOF\n",
+                  "# Start NFS Services\n",
+                  "service rpcbind start\n",
+                  "service nfs start\n"
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "vCDxFer2": {
+        "Type": "AWS::EC2::Instance",
+        "Properties": {
+          "AvailabilityZone": {
+              "Fn::Select": [
+                  "1",
+                  {
+                      "Ref": "AvailabilityZones"
+                  }
+              ]
+          },
+          "ImageId": {
+              "Fn::FindInMap": [
+                  "AWSAMIRegionMap",
+                  {
+                      "Ref": "AWS::Region"
+                  },
+                  {
+                      "Fn::FindInMap": [
+                          "LinuxAMINameMap",
+                          {
+                              "Ref": "EC2AMIOS"
+                          },
+                          "Code"
+                      ]
+                  }
+              ]
+          },
+          "InstanceType": {
+              "Ref": "xFerEC2InstanceType"
+          },
+          "IamInstanceProfile": {
+              "Ref": "S3AccessHostProfile"
+          },
+          "SecurityGroupIds": [
+              {
+                  "Ref": "BastionAccessSecurityGroupID"
+              }
+          ],
+          "KeyName": {
+              "Ref": "KeyPairNameEC2"
+          },
+          "SubnetId": {
+              "Ref": "PrivateSubnet2"
+          },
+          "Tags": [
+              {
+                  "Key": "Name",
+                  "Value": "vCDxFer2"
+              }
+          ],
+          "UserData": {
+            "Fn::Base64": {
+              "Fn::Join": [
+                "",
+                [
+                  "#!/bin/bash\n",
+
+                  "# Update GuestOS\n",
+                  "yum update -y\n",
+                  "# Install necessary packages\n",
+                  "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel nfs-utils nfs-utils-lib -y\n",
+                  "# Clone S3FS repository from Git\n",
+                  "cd /home/ec2-user\n",
+                  "git clone https://github.com/s3fs-fuse/s3fs-fuse.git\n",
+                  "# Compile S3FS\n",
+                  "cd /home/ec2-user/s3fs-fuse\n",
+                  "./autogen.sh\n",
+                  "./configure --prefix=/usr --with-openssl\n",
+                  "make\n",
+                  "make install\n",
+                  "# Create the NFS export directory\n",
+                  "mkdir -p /home/ec2-user/xfer\n",
+                  "# Add S3 bucket mount point to fstab\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "echo 's3fs#",
+                        {
+                          "Ref": "xFerBucket"
+                        },
+                        " /home/ec2-user/xfer fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "# Mount the S3 Bucket\n",
+                  "mount /home/ec2-user/xfer\n",
+                  "# Enable NFS Service\n",
+                  "chkconfig nfs on\n",
+                  "# Configure NFS Export\n",
+                  "cat > /etc/exports <<- EOF\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "/home/ec2-user/xfer ",
+                        {
+                          "Ref": "PrivateSubnet2CIDR"
+                        },
+                        "(rw,fsid=0,no_root_squash)"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "EOF\n",
+                  "# Start NFS Services\n",
+                  "service rpcbind start\n",
+                  "service nfs start\n"
+                ]
+              ]
+            }
+          }
+        }
+      }
+  }
+}
