@@ -1,0 +1,453 @@
+{
+"AWSTemplateFormatVersion": "2010-09-09",
+"Description": "Multi-AZ PostgreSQL RDS Template",
+"Metadata": {
+  "AWS::CloudFormation::Interface": {
+    "ParameterGroups": [
+      {
+        "Label": {"default": "Network Configuration"},
+        "Parameters": [
+          "VPC",
+          "PrivateSubnet1",
+          "PrivateSubnet2",
+          "PrivateSubnet1CIDR",
+          "PrivateSubnet2CIDR"
+        ]
+      },
+      {
+        "Label": {"default": "RDS Configuration"},
+        "Parameters": [
+          "MultiAvailabilityZone",
+          "InstanceType",
+          "DBName",
+          "MasterUsername",
+          "MasterUserPassword",
+          "BackupRetentionPeriod",
+          "PreferredBackupWindow",
+          "PreferredMaintenanceWindow",
+          "SnapshotOnDelete",
+          "AllocatedStorage",
+          "ConfigureProvisionedIops",
+          "ProvisionedIopsValue",
+          "AutoMinorVersionUpgrade",
+          "TcpPort"
+        ]
+      },
+      {
+        "Label" : {"default" : "CloudWatch Monitoring"},
+        "Parameters" : [
+          "SetupAlarms",
+          "AlertSnsTopicArn"
+        ]
+      }
+    ],
+    "ParameterLabels": {
+      "InstanceType" : {
+        "default" : "Instance Type"
+      },
+      "DBName" : {
+        "default" : "vCD Postgres database name"
+      },
+      "PrivateSubnet1" : {
+        "default" : "Private Subnet 1"
+      },
+      "PrivateSubnet2" : {
+        "default" : "Private Subnet 2"
+      },
+      "PrivateSubnet1CIDR": {
+           "default": "Private subnet 1 CIDR"
+       },
+      "PrivateSubnet2CIDR": {
+           "default": "Private subnet 2 CIDR"
+      },
+      "AlertSnsTopicArn" : {
+        "default" : "Alert SNS Topic ARN"
+      },
+      "MasterUsername" : {
+        "default" : "Master Username"
+      },
+      "MasterUserPassword" : {
+        "default" : "Master User Password"
+      },
+      "BackupRetentionPeriod" : {
+        "default" : "Backup Retention Period"
+      },
+      "PreferredBackupWindow" : {
+        "default" : "Preferred Backup Window"
+      },
+      "PreferredMaintenanceWindow" : {
+        "default" : "Preferred Maintenance Window"
+      },
+      "AllocatedStorage" : {
+        "default" : "Allocated Storage Storage(GB) for the Database."
+      },
+      "ConfigureProvisionedIops" : {
+        "default" : "Configure Provisioned IOPS?"
+      },
+      "ProvisionedIopsValue" : {
+        "default" : "Provisioned IOPS Value"
+      },
+      "AutoMinorVersionUpgrade" : {
+        "default" : "Auto Minor Version Upgrade"
+      },
+      "TcpPort" : {
+        "default" : "TCP Port"
+      },
+      "MultiAvailabilityZone" : {
+        "default" : "Multi Availability Zone?"
+      },
+      "SetupAlarms" : {
+        "default" : "Setup Alarms?"
+      },
+      "SnapshotOnDelete" : {
+        "default" : "Snapshot On Delete?"
+      }
+    }
+  }
+},
+"Parameters": {
+  "VPC": {
+    "Description": "Select VPC.",
+    "Type": "AWS::EC2::VPC::Id"
+  },
+  "PrivateSubnet1": {
+    "Description": "Private Subnet 1 to Allow Routing.",
+    "Type": "AWS::EC2::Subnet::Id"
+  },
+  "PrivateSubnet2": {
+    "Description": "Private Subnet 2 to Allow Routing.",
+    "Type": "AWS::EC2::Subnet::Id"
+  },
+  "DBName": {
+    "Default": "vcddb",
+    "Description" : "vCD Postgres database name",
+    "Type": "String",
+    "MinLength": "1",
+    "MaxLength": "16",
+    "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
+    "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
+  },
+  "MasterUsername": {
+    "Description": "Database administration name. First character must be a letter and can not be 'root'.",
+    "Type": "String",
+    "Default": "dbmaster"
+  },
+  "MasterUserPassword": {
+    "NoEcho": "true",
+    "Description": "Database administration password. Minimum of 8 alphanumeric characters (pattern of [a-zA-Z0-9]).",
+    "Type": "String",
+    "MinLength": "8",
+    "AllowedPattern": "[a-zA-Z0-9!?]*",
+    "ConstraintDescription": "Must only contain upper and lowercase letters and numbers"
+  },
+  "BackupRetentionPeriod": {
+    "Description": "Enter Backup Retention Period in Days.",
+    "Type": "Number",
+    "Default": "7"
+  },
+  "MultiAvailabilityZone": {
+    "Description": "Enable Multi Availability Zones?",
+    "Type": "String",
+    "Default": "true",
+    "AllowedValues": [
+      "true",
+      "false"
+    ]
+  },
+  "TcpPort": {
+    "Description": "Enter RDS Listening TCP Port number.",
+    "Type": "Number",
+    "Default": "5432"
+  },
+  "AlertSnsTopicArn": {
+    "Description": "Enter Alert Notification SNS Topic ARN for RDS.",
+    "Type": "String",
+    "Default": "arn:aws:sns:us-west-2:000000000000:rds-alerts"
+  },
+  "PreferredBackupWindow": {
+    "Description": "Enter Preferred Backup Window Time (UTC).",
+    "Type": "String",
+    "Default": "17:00-19:00"
+  },
+  "PreferredMaintenanceWindow": {
+    "Description": "Enter Preferred Maintenance Window Time (UTC).",
+    "Type": "String",
+    "Default": "Sun:19:00-Sun:23:00"
+  },
+  "AllocatedStorage": {
+    "Default": "5",
+    "Description": "The size of the database (Gb)",
+    "Type": "Number",
+    "MinValue": "5",
+    "MaxValue": "6144",
+    "ConstraintDescription": "Must be between 5-6144"
+  },
+  "ConfigureProvisionedIops": {
+    "Description": "Configure Route 53 DNS Alias for RDS? Be sure a matching record doesn't already exist.",
+    "Type": "String",
+    "Default": "false",
+    "AllowedValues": [
+      "true",
+      "false"
+    ]
+  },
+  "SnapshotOnDelete": {
+    "Description": "Create a Snapshot on Delete?",
+    "Type": "String",
+    "Default": "false",
+    "AllowedValues": [
+      "true",
+      "false"
+    ]
+  },
+  "AutoMinorVersionUpgrade": {
+    "Description": "Allow Automatic Minor Version Upgrades?",
+    "Type": "String",
+    "Default": "true",
+    "AllowedValues": [
+      "true",
+      "false"
+    ]
+  },
+  "SetupAlarms": {
+    "Description": "Setup Cloudwatch Alarms?",
+    "Type": "String",
+    "Default": "true",
+    "AllowedValues": [
+      "true",
+      "false"
+    ]
+  },
+  "ProvisionedIopsValue": {
+    "Description": "(Skip if Not Using Provisioned IOPS) Set Provisioned IOPS 1000-30000.",
+    "Type": "Number",
+    "Default": "1000",
+    "MinValue": "1000",
+    "MaxValue": "30000"
+  },
+  "InstanceType": {
+    "Description": "Select Instance Type.",
+    "Type": "String",
+    "Default": "db.m4.large",
+    "AllowedValues": [
+      "db.t2.micro",
+      "db.t2.small",
+      "db.m4.large",
+      "db.m4.xlarge",
+      "db.m4.2xlarge"
+    ],
+    "ConstraintDescription": "Must be a valid EC2 instance type."
+  }
+},
+"Mappings": {
+  "Settings": {
+    "PostgreSQL": {
+      "Engine": "postgres",
+      "Version": "9.6.3"
+    }
+  }
+},
+"Conditions": {
+  "ConfigureAlarms": {"Fn::Equals": [{"Ref": "SetupAlarms"}, "true"]},
+  "ConfigureSnapshotOnDelete": {"Fn::Equals": [{"Ref": "SnapshotOnDelete"}, "true"]}
+},
+"Resources": {
+  "RDSAccessSecurityGroup": {
+    "Type": "AWS::EC2::SecurityGroup",
+    "Properties": {
+      "GroupDescription": "Instance to RDS Access",
+      "VpcId": {"Ref": "VPC"},
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-SG"]]}
+        }
+      ]
+    }
+  },
+  "AccessSecurityGroupIngress": {
+    "Type": "AWS::EC2::SecurityGroupIngress",
+    "DependsOn": "RDSAccessSecurityGroup",
+    "Properties": {
+      "GroupId": {"Ref": "RDSAccessSecurityGroup"},
+      "IpProtocol": "tcp",
+      "FromPort": {"Ref": "TcpPort"},
+      "ToPort": {"Ref": "TcpPort"},
+      "SourceSecurityGroupId": {"Ref": "RDSAccessSecurityGroup"}
+    }
+  },
+  "DBSubnetGroup": {
+    "Type": "AWS::RDS::DBSubnetGroup",
+    "Properties": {
+      "DBSubnetGroupDescription": {"Fn::Join": ["", ["RDS Subnet Group for ", {"Ref": "AWS::StackName"}]]},
+      "SubnetIds": [ {"Ref": "PrivateSubnet1"}, {"Ref": "PrivateSubnet2"} ],
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": {"Ref": "AWS::StackName"}
+        }
+      ]
+    }
+  },
+  "DBInstance": {
+    "Type": "AWS::RDS::DBInstance",
+    "DeletionPolicy": "Snapshot",
+    "DependsOn": ["DBSubnetGroup", "RDSAccessSecurityGroup"],
+    "Properties": {
+      "DBName" : {"Ref": "DBName"},
+      "AllocatedStorage": {"Ref": "AllocatedStorage"},
+      "AllowMajorVersionUpgrade": "false",
+      "AutoMinorVersionUpgrade": {"Ref": "AutoMinorVersionUpgrade"},
+      "BackupRetentionPeriod": {"Ref": "BackupRetentionPeriod"},
+      "DBInstanceClass": {"Ref": "InstanceType"},
+      "DBInstanceIdentifier": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-vcddb"]]},
+      "DBSubnetGroupName": {"Ref": "DBSubnetGroup"},
+      "Engine": {"Fn::FindInMap": ["Settings", "PostgreSQL", "Engine"]},
+      "EngineVersion": {"Fn::FindInMap": ["Settings", "PostgreSQL", "Version"]},
+      "MasterUsername": {"Ref": "MasterUsername"},
+      "MasterUserPassword": {"Ref": "MasterUserPassword"},
+      "MultiAZ": {"Ref": "MultiAvailabilityZone"},
+      "Port": {"Ref": "TcpPort"},
+      "PreferredBackupWindow": {"Ref": "PreferredBackupWindow"},
+      "PreferredMaintenanceWindow": {"Ref": "PreferredMaintenanceWindow"},
+      "PubliclyAccessible": "false",
+      "StorageEncrypted": "false",
+      "StorageType": "gp2",
+      "VPCSecurityGroups": [{"Ref": "RDSAccessSecurityGroup"}],
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-vcddb"]]}
+        }
+      ]
+    }
+  },
+  "AlarmCpu": {
+    "Condition": "ConfigureAlarms",
+    "Type": "AWS::CloudWatch::Alarm",
+    "DependsOn": [
+      "DBInstance"
+    ],
+    "Properties": {
+      "AlarmActions": [{"Ref": "AlertSnsTopicArn"}],
+      "AlarmDescription": "CPU Utilization on RDS Instance is too high",
+      "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+      "Dimensions": [
+        {
+          "Name": "DBInstanceIdentifier",
+          "Value": {"Ref": "DBInstance"}
+        }
+      ],
+      "EvaluationPeriods": "1",
+      "MetricName": "CPUUtilization",
+      "Namespace": "AWS/RDS",
+      "Period": "300",
+      "Statistic": "Average",
+      "Threshold": "50"
+    }
+  },
+  "AlarmFreeSpace": {
+    "Condition": "ConfigureAlarms",
+    "Type": "AWS::CloudWatch::Alarm",
+    "DependsOn": [
+      "DBInstance"
+    ],
+    "Properties": {
+      "AlarmActions": [{"Ref": "AlertSnsTopicArn"}],
+      "AlarmDescription": "1Gb left of storage available on RDS Instance",
+      "ComparisonOperator": "LessThanOrEqualToThreshold",
+      "Dimensions": [
+        {
+          "Name": "DBInstanceIdentifier",
+          "Value": {"Ref": "DBInstance"}
+        }
+      ],
+      "EvaluationPeriods": "1",
+      "MetricName": "FreeStorageSpace",
+      "Namespace": "AWS/RDS",
+      "Period": "300",
+      "Statistic": "Maximum",
+      "Threshold": "1024000000"
+    }
+  }
+},
+"Outputs": {
+  "VPC": {
+    "Description": "VPC Used",
+    "Value": {"Ref": "VPC"}
+  },
+  "RDSHostname" : {
+    "Description" : "RDS Hostname",
+    "Value" : {
+      "Fn::GetAtt" : ["DBInstance", "Endpoint.Address"]
+    }
+  },
+  "RDSPort" : {
+    "Description" : "RDS Port",
+    "Value" : { "Fn::GetAtt" : ["DBInstance", "Endpoint.Port"] }
+  },
+  "DBName": {
+    "Description": "Name of the vCD Database",
+    "Value": {"Ref": "DBName"}
+  },
+  "DBSubnetGroup": {
+    "Description": "DB Subnet Group Created.",
+    "Value": {"Ref": "DBSubnetGroup"}
+  },
+  "RDSAccessSecurityGroup": {
+    "Description": "RDS Access Security Group Created.",
+    "Value": {"Ref": "RDSAccessSecurityGroup"}
+  },
+  "AlarmCpu": {
+    "Condition": "ConfigureAlarms",
+    "Description": "CPU Alarm Created for RDS Instance/s.",
+    "Value": {"Ref": "AlarmCpu"}
+  },
+  "AlarmFreeSpace": {
+    "Condition": "ConfigureAlarms",
+    "Description": "Disk Free Space Alarm Created for RDS Instance/s.",
+    "Value": {"Ref": "AlarmFreeSpace"}
+  },
+  "PrivateSubnet1": {
+    "Description": "Private Subnet 1 Deployment",
+    "Value": {"Ref": "PrivateSubnet1"}
+  },
+  "PrivateSubnet2": {
+    "Description": "Private Subnet 2 Deployment",
+    "Value": {"Ref": "PrivateSubnet2"}
+  },
+  "BackupRetentionPeriod": {
+    "Description": "Backup Retention Period in Days",
+    "Value": {"Ref": "BackupRetentionPeriod"}
+  },
+  "MultiAvailabilityZone": {
+    "Description": "Enable Multi Availability Zones?",
+    "Value": {"Ref": "MultiAvailabilityZone"}
+  },
+  "SnapshotOnDelete": {
+    "Description": "Create Snapshot on Delete?",
+    "Value": {"Ref": "SnapshotOnDelete"}
+  },
+  "AlertSnsTopicArn": {
+    "Description": "SNS Topic ARN for Alerts",
+    "Value": {"Ref": "AlertSnsTopicArn"}
+  },
+  "PreferredBackupWindow": {
+    "Description": "Preferred Backup Window",
+    "Value": {"Ref": "PreferredBackupWindow"}
+  },
+  "PreferredMaintenanceWindow": {
+    "Description": "Preferred Maintenance Window",
+    "Value": {"Ref": "PreferredMaintenanceWindow"}
+  },
+  "AllocatedStorage": {
+    "Description": "Allocated Storage in GB",
+    "Value": {"Ref": "AllocatedStorage"}
+  },
+  "ConfigureProvisionedIops": {
+    "Description": "Configure Provisioned IOPS?",
+    "Value": {"Ref": "ConfigureProvisionedIops"}
+  }
+},
+
+}
