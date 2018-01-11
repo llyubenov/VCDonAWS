@@ -48,6 +48,23 @@
                         "EC2AMIOS",
                         "xFerInstanceType"
                     ]
+                },
+                {
+                    "Label": {
+                        "default": "RDS Configuration"
+                    },
+                    "Parameters": [
+                        "RDSInstanceType",
+                        "DBName",
+                        "MasterUsername",
+                        "MasterUserPassword",
+                        "BackupRetentionPeriod",
+                        "PreferredBackupWindow",
+                        "PreferredMaintenanceWindow",
+                        "AllocatedStorage",
+                        "AutoMinorVersionUpgrade",
+                        "TcpPort"
+                    ]
                 }
             ],
             "ParameterLabels": {
@@ -101,7 +118,13 @@
                },
                "xFerEC2InstanceType": {
                    "default": "xFer EC2 Instance Type"
-               }
+               },
+               "RDSInstanceType" : {
+                 "default" : "RDS Instance Type"
+               },
+               "DBName" : {
+                 "default" : "vCD Postgres database name"
+               },
             }
         }
     },
@@ -222,6 +245,78 @@
            "Default": "t2.medium",
            "Description": "xFer Amazon EC2 instances type",
            "Type": "String"
+       },
+       "DBName": {
+         "Default": "vcddb",
+         "Description" : "vCD Postgres database name",
+         "Type": "String",
+         "MinLength": "1",
+         "MaxLength": "16",
+         "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
+         "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
+       },
+       "MasterUsername": {
+         "Description": "Database administration name. First character must be a letter and can not be 'root'.",
+         "Type": "String",
+         "Default": "dbmaster"
+       },
+       "MasterUserPassword": {
+         "NoEcho": "true",
+         "Description": "Database administration password. Minimum of 8 alphanumeric characters (pattern of [a-zA-Z0-9]).",
+         "Type": "String",
+         "MinLength": "8",
+         "AllowedPattern": "[a-zA-Z0-9!?]*",
+         "ConstraintDescription": "Must only contain upper and lowercase letters and numbers"
+       },
+       "BackupRetentionPeriod": {
+         "Description": "Enter Backup Retention Period in Days.",
+         "Type": "Number",
+         "Default": "7"
+       },
+       "TcpPort": {
+         "Description": "Enter RDS Listening TCP Port number.",
+         "Type": "Number",
+         "Default": "5432"
+       },
+       "PreferredBackupWindow": {
+         "Description": "Enter Preferred Backup Window Time (UTC).",
+         "Type": "String",
+         "Default": "17:00-19:00"
+       },
+       "PreferredMaintenanceWindow": {
+         "Description": "Enter Preferred Maintenance Window Time (UTC).",
+         "Type": "String",
+         "Default": "Sun:19:00-Sun:23:00"
+       },
+       "AllocatedStorage": {
+         "Default": "5",
+         "Description": "Allocated Storage Storage(GB) for the Database.",
+         "Type": "Number",
+         "MinValue": "5",
+         "MaxValue": "6144",
+         "ConstraintDescription": "Must be between 5-6144"
+       },
+       "AutoMinorVersionUpgrade": {
+         "Description": "Allow Automatic Minor Version Upgrades?",
+         "Type": "String",
+         "Default": "true",
+         "AllowedValues": [
+           "true",
+           "false"
+         ]
+       },
+       "RDSInstanceType": {
+         "Description": "Select Instance Type.",
+         "Type": "String",
+         "Default": "db.m4.large",
+         "AllowedValues": [
+           "db.t2.micro",
+           "db.t2.small",
+           "db.m4.large",
+           "db.m4.xlarge",
+           "db.m4.2xlarge"
+         ],
+         "ConstraintDescription": "Must be a valid EC2 instance type."
        }
     },
     "Resources": {
@@ -362,6 +457,66 @@
                           "BastionStack",
                           "Outputs.PrivateInstanceSecurityGroupID"
                       ]
+                  }
+              }
+          }
+      },
+      "RDSStack": {
+          "DependsOn": "VPCStack",
+          "Type": "AWS::CloudFormation::Stack",
+          "Properties": {
+              "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/rds.template",
+              "Parameters": {
+                  "NumberOfAZs": {
+                      "Ref": "NumberOfAZs"
+                  },
+                  "PrivateSubnet1": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.PrivateSubnet1ID"
+                      ]
+                  },
+                  "PrivateSubnet2": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.PrivateSubnet2ID"
+                      ]
+                  },
+                  "VPCID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.VPCID"
+                      ]
+                  },
+                  "RDSInstanceType": {
+                      "Ref": "RDSInstanceType"
+                  },
+                  "DBName": {
+                      "Ref": "DBName"
+                  },
+                  "MasterUsername": {
+                      "Ref": "MasterUsername"
+                  },
+                  "MasterUserPassword": {
+                      "Ref": "MasterUserPassword"
+                  },
+                  "BackupRetentionPeriod": {
+                      "Ref": "BackupRetentionPeriod"
+                  },
+                  "PreferredBackupWindow": {
+                      "Ref": "PreferredBackupWindow"
+                  },
+                  "PreferredMaintenanceWindow": {
+                      "Ref": "PreferredMaintenanceWindow"
+                  },
+                  "AllocatedStorage": {
+                      "Ref": "AllocatedStorage"
+                  },
+                  "AutoMinorVersionUpgrade": {
+                      "Ref": "AutoMinorVersionUpgrade"
+                  },
+                  "TcpPort": {
+                      "Ref": "TcpPort"
                   }
               }
           }

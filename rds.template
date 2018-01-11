@@ -5,45 +5,41 @@
   "AWS::CloudFormation::Interface": {
     "ParameterGroups": [
       {
+        "Label": {"default": "Multi-AZ Configuration"},
+        "Parameters": [
+          "NumberOfAZs"
+        ]
+      },
+      {
         "Label": {"default": "Network Configuration"},
         "Parameters": [
-          "VPC",
+          "VPCID",
           "PrivateSubnet1",
-          "PrivateSubnet2",
-          "PrivateSubnet1CIDR",
-          "PrivateSubnet2CIDR"
+          "PrivateSubnet2"
         ]
       },
       {
         "Label": {"default": "RDS Configuration"},
         "Parameters": [
-          "MultiAvailabilityZone",
-          "InstanceType",
+          "RDSInstanceType",
           "DBName",
           "MasterUsername",
           "MasterUserPassword",
           "BackupRetentionPeriod",
           "PreferredBackupWindow",
           "PreferredMaintenanceWindow",
-          "SnapshotOnDelete",
           "AllocatedStorage",
-          "ConfigureProvisionedIops",
-          "ProvisionedIopsValue",
           "AutoMinorVersionUpgrade",
           "TcpPort"
-        ]
-      },
-      {
-        "Label" : {"default" : "CloudWatch Monitoring"},
-        "Parameters" : [
-          "SetupAlarms",
-          "AlertSnsTopicArn"
         ]
       }
     ],
     "ParameterLabels": {
-      "InstanceType" : {
-        "default" : "Instance Type"
+      "NumberOfAZs": {
+          "default": "Availability Zones"
+      },
+      "RDSInstanceType" : {
+        "default" : "RDS Instance Type"
       },
       "DBName" : {
         "default" : "vCD Postgres database name"
@@ -53,15 +49,6 @@
       },
       "PrivateSubnet2" : {
         "default" : "Private Subnet 2"
-      },
-      "PrivateSubnet1CIDR": {
-           "default": "Private subnet 1 CIDR"
-       },
-      "PrivateSubnet2CIDR": {
-           "default": "Private subnet 2 CIDR"
-      },
-      "AlertSnsTopicArn" : {
-        "default" : "Alert SNS Topic ARN"
       },
       "MasterUsername" : {
         "default" : "Master Username"
@@ -79,13 +66,7 @@
         "default" : "Preferred Maintenance Window"
       },
       "AllocatedStorage" : {
-        "default" : "Allocated Storage Storage(GB) for the Database."
-      },
-      "ConfigureProvisionedIops" : {
-        "default" : "Configure Provisioned IOPS?"
-      },
-      "ProvisionedIopsValue" : {
-        "default" : "Provisioned IOPS Value"
+        "default" : "Allocated Storage"
       },
       "AutoMinorVersionUpgrade" : {
         "default" : "Auto Minor Version Upgrade"
@@ -93,30 +74,32 @@
       "TcpPort" : {
         "default" : "TCP Port"
       },
-      "MultiAvailabilityZone" : {
-        "default" : "Multi Availability Zone?"
-      },
-      "SetupAlarms" : {
-        "default" : "Setup Alarms?"
-      },
-      "SnapshotOnDelete" : {
-        "default" : "Snapshot On Delete?"
+      "VPCID": {
+          "default": "VPC ID"
       }
     }
   }
 },
 "Parameters": {
-  "VPC": {
+  "VPCID": {
     "Description": "Select VPC.",
     "Type": "AWS::EC2::VPC::Id"
   },
   "PrivateSubnet1": {
-    "Description": "Private Subnet 1 to Allow Routing.",
+    "Description": "Private Subnet 1 to deploy the RDS Instance.",
     "Type": "AWS::EC2::Subnet::Id"
   },
   "PrivateSubnet2": {
-    "Description": "Private Subnet 2 to Allow Routing.",
+    "Description": "Private Subnet 2 to deploy the RDS Instance.",
     "Type": "AWS::EC2::Subnet::Id"
+  },
+  "NumberOfAZs": {
+      "AllowedValues": [
+        "1","2"
+      ],
+      "Default": "2",
+      "Description": "Number of Availability Zones. Select 2 for Multi-AZ Deployment.",
+      "Type": "String"
   },
   "DBName": {
     "Default": "vcddb",
@@ -145,24 +128,10 @@
     "Type": "Number",
     "Default": "7"
   },
-  "MultiAvailabilityZone": {
-    "Description": "Enable Multi Availability Zones?",
-    "Type": "String",
-    "Default": "true",
-    "AllowedValues": [
-      "true",
-      "false"
-    ]
-  },
   "TcpPort": {
     "Description": "Enter RDS Listening TCP Port number.",
     "Type": "Number",
     "Default": "5432"
-  },
-  "AlertSnsTopicArn": {
-    "Description": "Enter Alert Notification SNS Topic ARN for RDS.",
-    "Type": "String",
-    "Default": "arn:aws:sns:us-west-2:000000000000:rds-alerts"
   },
   "PreferredBackupWindow": {
     "Description": "Enter Preferred Backup Window Time (UTC).",
@@ -176,29 +145,11 @@
   },
   "AllocatedStorage": {
     "Default": "5",
-    "Description": "The size of the database (Gb)",
+    "Description": "Allocated Storage Storage(GB) for the Database.",
     "Type": "Number",
     "MinValue": "5",
     "MaxValue": "6144",
     "ConstraintDescription": "Must be between 5-6144"
-  },
-  "ConfigureProvisionedIops": {
-    "Description": "Configure Route 53 DNS Alias for RDS? Be sure a matching record doesn't already exist.",
-    "Type": "String",
-    "Default": "false",
-    "AllowedValues": [
-      "true",
-      "false"
-    ]
-  },
-  "SnapshotOnDelete": {
-    "Description": "Create a Snapshot on Delete?",
-    "Type": "String",
-    "Default": "false",
-    "AllowedValues": [
-      "true",
-      "false"
-    ]
   },
   "AutoMinorVersionUpgrade": {
     "Description": "Allow Automatic Minor Version Upgrades?",
@@ -209,23 +160,7 @@
       "false"
     ]
   },
-  "SetupAlarms": {
-    "Description": "Setup Cloudwatch Alarms?",
-    "Type": "String",
-    "Default": "true",
-    "AllowedValues": [
-      "true",
-      "false"
-    ]
-  },
-  "ProvisionedIopsValue": {
-    "Description": "(Skip if Not Using Provisioned IOPS) Set Provisioned IOPS 1000-30000.",
-    "Type": "Number",
-    "Default": "1000",
-    "MinValue": "1000",
-    "MaxValue": "30000"
-  },
-  "InstanceType": {
+  "RDSInstanceType": {
     "Description": "Select Instance Type.",
     "Type": "String",
     "Default": "db.m4.large",
@@ -248,15 +183,14 @@
   }
 },
 "Conditions": {
-  "ConfigureAlarms": {"Fn::Equals": [{"Ref": "SetupAlarms"}, "true"]},
-  "ConfigureSnapshotOnDelete": {"Fn::Equals": [{"Ref": "SnapshotOnDelete"}, "true"]}
+  "MultiAvailabilityZone": {"Fn::Equals": [{"Ref": "NumberOfAZs"},"2"]}
 },
 "Resources": {
   "RDSAccessSecurityGroup": {
     "Type": "AWS::EC2::SecurityGroup",
     "Properties": {
       "GroupDescription": "Instance to RDS Access",
-      "VpcId": {"Ref": "VPC"},
+      "VpcId": {"Ref": "VPCID"},
       "Tags": [
         {
           "Key": "Name",
@@ -299,14 +233,14 @@
       "AllowMajorVersionUpgrade": "false",
       "AutoMinorVersionUpgrade": {"Ref": "AutoMinorVersionUpgrade"},
       "BackupRetentionPeriod": {"Ref": "BackupRetentionPeriod"},
-      "DBInstanceClass": {"Ref": "InstanceType"},
+      "DBInstanceClass": {"Ref": "RDSInstanceType"},
       "DBInstanceIdentifier": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-vcddb"]]},
       "DBSubnetGroupName": {"Ref": "DBSubnetGroup"},
       "Engine": {"Fn::FindInMap": ["Settings", "PostgreSQL", "Engine"]},
       "EngineVersion": {"Fn::FindInMap": ["Settings", "PostgreSQL", "Version"]},
       "MasterUsername": {"Ref": "MasterUsername"},
       "MasterUserPassword": {"Ref": "MasterUserPassword"},
-      "MultiAZ": {"Ref": "MultiAvailabilityZone"},
+      "MultiAZ": {"Fn::If" : ["MultiAvailabilityZone","true","false"]},
       "Port": {"Ref": "TcpPort"},
       "PreferredBackupWindow": {"Ref": "PreferredBackupWindow"},
       "PreferredMaintenanceWindow": {"Ref": "PreferredMaintenanceWindow"},
@@ -321,61 +255,9 @@
         }
       ]
     }
-  },
-  "AlarmCpu": {
-    "Condition": "ConfigureAlarms",
-    "Type": "AWS::CloudWatch::Alarm",
-    "DependsOn": [
-      "DBInstance"
-    ],
-    "Properties": {
-      "AlarmActions": [{"Ref": "AlertSnsTopicArn"}],
-      "AlarmDescription": "CPU Utilization on RDS Instance is too high",
-      "ComparisonOperator": "GreaterThanOrEqualToThreshold",
-      "Dimensions": [
-        {
-          "Name": "DBInstanceIdentifier",
-          "Value": {"Ref": "DBInstance"}
-        }
-      ],
-      "EvaluationPeriods": "1",
-      "MetricName": "CPUUtilization",
-      "Namespace": "AWS/RDS",
-      "Period": "300",
-      "Statistic": "Average",
-      "Threshold": "50"
-    }
-  },
-  "AlarmFreeSpace": {
-    "Condition": "ConfigureAlarms",
-    "Type": "AWS::CloudWatch::Alarm",
-    "DependsOn": [
-      "DBInstance"
-    ],
-    "Properties": {
-      "AlarmActions": [{"Ref": "AlertSnsTopicArn"}],
-      "AlarmDescription": "1Gb left of storage available on RDS Instance",
-      "ComparisonOperator": "LessThanOrEqualToThreshold",
-      "Dimensions": [
-        {
-          "Name": "DBInstanceIdentifier",
-          "Value": {"Ref": "DBInstance"}
-        }
-      ],
-      "EvaluationPeriods": "1",
-      "MetricName": "FreeStorageSpace",
-      "Namespace": "AWS/RDS",
-      "Period": "300",
-      "Statistic": "Maximum",
-      "Threshold": "1024000000"
-    }
   }
 },
 "Outputs": {
-  "VPC": {
-    "Description": "VPC Used",
-    "Value": {"Ref": "VPC"}
-  },
   "RDSHostname" : {
     "Description" : "RDS Hostname",
     "Value" : {
@@ -398,39 +280,9 @@
     "Description": "RDS Access Security Group Created.",
     "Value": {"Ref": "RDSAccessSecurityGroup"}
   },
-  "AlarmCpu": {
-    "Condition": "ConfigureAlarms",
-    "Description": "CPU Alarm Created for RDS Instance/s.",
-    "Value": {"Ref": "AlarmCpu"}
-  },
-  "AlarmFreeSpace": {
-    "Condition": "ConfigureAlarms",
-    "Description": "Disk Free Space Alarm Created for RDS Instance/s.",
-    "Value": {"Ref": "AlarmFreeSpace"}
-  },
-  "PrivateSubnet1": {
-    "Description": "Private Subnet 1 Deployment",
-    "Value": {"Ref": "PrivateSubnet1"}
-  },
-  "PrivateSubnet2": {
-    "Description": "Private Subnet 2 Deployment",
-    "Value": {"Ref": "PrivateSubnet2"}
-  },
   "BackupRetentionPeriod": {
     "Description": "Backup Retention Period in Days",
     "Value": {"Ref": "BackupRetentionPeriod"}
-  },
-  "MultiAvailabilityZone": {
-    "Description": "Enable Multi Availability Zones?",
-    "Value": {"Ref": "MultiAvailabilityZone"}
-  },
-  "SnapshotOnDelete": {
-    "Description": "Create Snapshot on Delete?",
-    "Value": {"Ref": "SnapshotOnDelete"}
-  },
-  "AlertSnsTopicArn": {
-    "Description": "SNS Topic ARN for Alerts",
-    "Value": {"Ref": "AlertSnsTopicArn"}
   },
   "PreferredBackupWindow": {
     "Description": "Preferred Backup Window",
@@ -443,10 +295,6 @@
   "AllocatedStorage": {
     "Description": "Allocated Storage in GB",
     "Value": {"Ref": "AllocatedStorage"}
-  },
-  "ConfigureProvisionedIops": {
-    "Description": "Configure Provisioned IOPS?",
-    "Value": {"Ref": "ConfigureProvisionedIops"}
   }
 },
 
