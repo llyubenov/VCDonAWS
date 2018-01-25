@@ -30,9 +30,9 @@
                    },
                    "Parameters": [
                        "KeyPairNameEC2",
-                       "xFerEC2AMIOS",
+                       "EC2AMIOS",
                        "xFerInstanceType",
-                       "BastionAccessSecurityGroup"
+                       "PrivateInstanceSecurityGroupID"
                    ]
                },
            ],
@@ -67,7 +67,7 @@
                 "VPCID": {
                     "default": "VPC ID"
                 },
-                "BastionAccessSecurityGroup": {
+                "PrivateInstanceSecurityGroupID": {
                     "default": "Security Group to Allow SSH Access from Bastion hosts"
                 }
            }
@@ -135,7 +135,7 @@
             "Description": "ID of the VPC (e.g., vpc-0343606e)",
             "Type": "AWS::EC2::VPC::Id"
         },
-        "BastionAccessSecurityGroupID": {
+        "PrivateInstanceSecurityGroupID": {
             "Description": "Security Group to Allow SSH Access from Bastion hosts",
             "Type": "AWS::EC2::SecurityGroup::Id"
         }
@@ -218,8 +218,7 @@
                "Statement": [ {
                   "Effect": "Allow",
                   "Action": "s3:*",
-                  "Resource": { "Fn::Join" : ["", [ "arn:aws:s3:::", { "Ref" : "xFerBucket" } ]
-                  ] }
+                  "Resource": "*"
                } ]
             },
             "Roles": [ { "Ref": "xFerS3AccessRole" } ]
@@ -241,6 +240,43 @@
         "Properties" : {
           "BucketName": { "Fn::Join" : ["", [ { "Ref" : "VPCID" }, "-xfer" ]
           ] }
+        }
+      },
+      "CellsAccessSecurityGroup": {
+          "Type": "AWS::EC2::SecurityGroup",
+          "Properties": {
+              "GroupDescription": "Enables Access between vCD and xFer EC2 Instances",
+              "VpcId": {
+                  "Ref": "VPCID"
+              },
+              "Tags": [
+                {
+                  "Key": "Name",
+                  "Value": {
+                      "Fn::Join": [
+                        "", [
+                          {
+                            "Ref": "AWS::StackName"
+                          },
+                          "-SG"
+                        ]
+                      ]
+                  }
+                }
+              ]
+          }
+      },
+      "CellsAccessSecurityGroupIngress": {
+          "Type": "AWS::EC2::SecurityGroupIngress",
+          "DependsOn": "CellsAccessSecurityGroup",
+          "Properties": {
+              "GroupId": {
+                  "Ref": "CellsAccessSecurityGroup"
+              },
+              "IpProtocol": "-1",
+              "FromPort": "0",
+              "ToPort": "65535",
+              "SourceSecurityGroupId": {"Ref": "CellsAccessSecurityGroup"}
         }
       },
       "vCDxFer1": {
@@ -279,7 +315,10 @@
           },
           "SecurityGroupIds": [
               {
-                  "Ref": "BastionAccessSecurityGroupID"
+                  "Ref": "PrivateInstanceSecurityGroupID"
+              },
+              {
+                  "Ref": "CellsAccessSecurityGroup"
               }
           ],
           "KeyName": {
@@ -325,7 +364,7 @@
                         {
                           "Ref": "xFerBucket"
                         },
-                        " /home/ec2-user/xfer fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab"
+                        " /home/ec2-user/xfer fuse _netdev,allow_other,iam_role=auto,uid=500,gid=500 0 0' >> /etc/fstab"
                       ]
                     ]
                   },
@@ -395,7 +434,10 @@
           },
           "SecurityGroupIds": [
               {
-                  "Ref": "BastionAccessSecurityGroupID"
+                  "Ref": "PrivateInstanceSecurityGroupID"
+              },
+              {
+                  "Ref": "CellsAccessSecurityGroup"
               }
           ],
           "KeyName": {
@@ -441,7 +483,7 @@
                         {
                           "Ref": "xFerBucket"
                         },
-                        " /home/ec2-user/xfer fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab"
+                        " /home/ec2-user/xfer fuse _netdev,allow_other,iam_role=auto,uid=500,gid=500 0 0' >> /etc/fstab"
                       ]
                     ]
                   },
@@ -475,5 +517,25 @@
           }
         }
       }
+  },
+  "Outputs": {
+    "vCDxFer1IP" : {
+      "Description" : "vCDxFer1 Private IP",
+      "Value" : {
+        "Fn::GetAtt" : ["vCDxFer1", "PrivateIp"]
+      }
+    },
+    "vCDxFer2IP" : {
+      "Description" : "vCDxFer2 Private IP",
+      "Value" : {
+        "Fn::GetAtt" : ["vCDxFer2", "PrivateIp"]
+      }
+    },
+    "CellsAccessSecurityGroupID": {
+        "Value": {
+            "Ref": "CellsAccessSecurityGroup"
+        },
+        "Description": "Cells Access Security Group ID"
+    }
   }
 }

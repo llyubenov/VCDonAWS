@@ -276,7 +276,7 @@
     "Description": "DB Subnet Group Created.",
     "Value": {"Ref": "DBSubnetGroup"}
   },
-  "RDSAccessSecurityGroup": {
+  "RDSAccessSecurityGroupID": {
     "Description": "RDS Access Security Group Created.",
     "Value": {"Ref": "RDSAccessSecurityGroup"}
   },
