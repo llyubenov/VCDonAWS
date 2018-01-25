@@ -1,0 +1,313 @@
+{
+   "AWSTemplateFormatVersion" : "2010-09-09",
+   "Metadata": {
+       "AWS::CloudFormation::Interface": {
+           "ParameterGroups": [
+               {
+                   "Label": {
+                       "default": "Network Configuration"
+                   },
+                   "Parameters": [
+                       "VPCID",
+                       "PrivateSubnet1"
+                   ]
+               },
+               {
+                   "Label": {
+                       "default": "vCD EC2 Configuration"
+                   },
+                   "Parameters": [
+                       "KeyPairNameEC2",
+                       "EC2AMIOS",
+                       "vCDInstanceType",
+                       "PrivateInstanceSecurityGroupID",
+                       "CellsAccessSecurityGroupID",
+                       "RDSAccessSecurityGroupID",
+                       "xFer1IP"
+                   ]
+               },
+           ],
+           "ParameterLabels": {
+               "KeyPairNameEC2": {
+                   "default": "Key Pair Name for vCD/xFer EC2 Instances"
+               },
+               "EC2AMIOS": {
+                   "default": "vCD/xFer EC2 AMI Operating System"
+               },
+               "xFerEC2InstanceType": {
+                   "default": "xFer EC2 Instance Type"
+               },
+               "PrivateSubnet1": {
+                   "default": "Private Subnet 1"
+               },
+               "VPCID": {
+                   "default": "VPC ID"
+               },
+               "PrivateInstanceSecurityGroupID": {
+                   "default": "Security Group to Allow SSH Access from Bastion hosts"
+               },
+               "CellsAccessSecurityGroupID": {
+                   "default": "Security Group to Allow Access between xFer and vCD Cells"
+               },
+               "RDSAccessSecurityGroupID": {
+                   "default": "Security Group to Allow Access the vCD Postgres Database"
+               },
+               "xFer1IP": {
+                   "default": "xFer1 IP Address"
+               }
+           }
+       }
+   },
+   "Parameters": {
+       "KeyPairNameEC2": {
+           "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+           "Type": "AWS::EC2::KeyPair::KeyName"
+       },
+       "EC2AMIOS": {
+           "AllowedValues": [
+               "Amazon-Linux-HVM",
+               "CentOS-7-HVM"
+           ],
+           "Default": "Amazon-Linux-HVM",
+           "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
+           "Type": "String"
+       },
+       "MainVcdEC2InstanceType": {
+           "AllowedValues": [
+               "t2.small",
+               "m5.large",
+               "m5.xlarge"
+           ],
+           "Default": "m5.large",
+           "Description": "Amazon EC2 instances type",
+           "Type": "String"
+       },
+       "PrivateSubnet1": {
+           "Description": "ID of the public subnet 1 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
+           "Type": "AWS::EC2::Subnet::Id"
+       },
+        "VPCID": {
+            "Description": "ID of the VPC (e.g., vpc-0343606e)",
+            "Type": "AWS::EC2::VPC::Id"
+        },
+        "PrivateInstanceSecurityGroupID": {
+            "Description": "Security Group to Allow SSH Access from Bastion hosts",
+            "Type": "AWS::EC2::SecurityGroup::Id"
+        },
+        "CellsAccessSecurityGroupID": {
+            "Description": "Security Group to Allow Access between xFer and vCD Cells",
+            "Type": "AWS::EC2::SecurityGroup::Id"
+        },
+        "RDSAccessSecurityGroupID": {
+            "Description": "Security Group to Allow Access RDS Database",
+            "Type": "AWS::EC2::SecurityGroup::Id"
+        },
+        "vCDBuildBucketName": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "vcd-builds",
+            "Description": "Bucket name that holds the VCD build to be used by this stack.",
+            "Type": "String"
+        },
+        "vCDBuildName": {
+            "Default": "vmware-vcloud-director-distribution-9.0.0-7554058.bin",
+            "Description": "Specify the vCD build filename name.",
+            "Type": "String"
+        },
+        "xFer1IP": {
+            "Description": "Specify the xFer1 Private IP address.",
+            "Type": "String"
+        }
+
+   },
+   "Mappings": {
+       "AWSAMIRegionMap": {
+           "AMI": {
+               "AMZNLINUXHVM": "amzn-ami-hvm-2017.09.1.20171120-x86_64-gp2",
+               "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS 1708_11.01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-95096eef.4"
+           },
+           "us-east-1": {
+               "AMZNLINUXHVM": "ami-55ef662f",
+               "CENTOS7HVM": "ami-02e98f78"
+           },
+           "us-east-2": {
+               "AMZNLINUXHVM": "ami-15e9c770",
+               "CENTOS7HVM": "ami-e0eac385"
+           },
+           "us-west-1": {
+               "AMZNLINUXHVM": "ami-a51f27c5",
+               "CENTOS7HVM": "ami-b1a59fd1"
+           },
+           "us-west-2": {
+               "AMZNLINUXHVM": "ami-bf4193c7",
+               "CENTOS7HVM": "ami-b63ae0ce"
+           }
+       },
+       "LinuxAMINameMap": {
+           "Amazon-Linux-HVM": {
+               "Code": "AMZNLINUXHVM"
+           },
+           "CentOS-7-HVM": {
+               "Code": "CENTOS7HVM"
+           }
+       }
+   },
+   "Rules": {
+       "SubnetsInVPC": {
+           "Assertions": [
+               {
+                   "Assert": {
+                       "Fn::EachMemberIn": [
+                           {
+                               "Fn::ValueOfAll": [
+                                   "AWS::EC2::Subnet::Id",
+                                   "VpcId"
+                               ]
+                           },
+                           {
+                               "Fn::RefAll": "AWS::EC2::VPC::Id"
+                           }
+                       ]
+                   },
+                   "AssertDescription": "All subnets must exist in the VPC"
+               }
+           ]
+       }
+   },
+   "Resources" : {
+      "vCDS3AccessRole": {
+         "Type": "AWS::IAM::Role",
+         "Properties": {
+            "AssumeRolePolicyDocument": {
+               "Statement": [ {
+                  "Effect": "Allow",
+                  "Principal": {
+                     "Service": [ "ec2.amazonaws.com" ]
+                  },
+                  "Action": [ "sts:AssumeRole" ]
+               } ]
+            },
+            "Path": "/"
+         }
+      },
+      "vCDS3AccessPolicies": {
+         "Type": "AWS::IAM::Policy",
+         "Properties": {
+            "PolicyName": "vCD-S3-Access",
+            "PolicyDocument": {
+               "Statement": [ {
+                  "Effect": "Allow",
+                  "Action": [
+                      "s3:GetObject",
+                      "s3:ListAllMyBuckets",
+                      "s3:HeadBucket",
+                      "s3:ListObjects"
+                  ],
+                  "Resource": "*"
+               } ]
+            },
+            "Roles": [ { "Ref": "vCDS3AccessRole" } ]
+         }
+      },
+      "vCDS3AccessHostProfile": {
+          "Type": "AWS::IAM::InstanceProfile",
+          "Properties": {
+              "Roles": [
+                  {
+                      "Ref": "vCDS3AccessRole"
+                  }
+              ],
+              "Path": "/"
+          }
+      },
+      "vCDMain": {
+        "Type": "AWS::EC2::Instance",
+        "Properties": {
+          "ImageId": {
+              "Fn::FindInMap": [
+                  "AWSAMIRegionMap",
+                  {
+                      "Ref": "AWS::Region"
+                  },
+                  {
+                      "Fn::FindInMap": [
+                          "LinuxAMINameMap",
+                          {
+                              "Ref": "EC2AMIOS"
+                          },
+                          "Code"
+                      ]
+                  }
+              ]
+          },
+          "InstanceType": {
+              "Ref": "MainVcdEC2InstanceType"
+          },
+          "IamInstanceProfile": {
+              "Ref": "vCDS3AccessHostProfile"
+          },
+          "SecurityGroupIds": [
+              {
+                  "Ref": "PrivateInstanceSecurityGroupID"
+              },
+              {
+                  "Ref": "CellsAccessSecurityGroupID"
+              },
+              {
+                  "Ref": "RDSAccessSecurityGroupID"
+              }
+          ],
+          "KeyName": {
+              "Ref": "KeyPairNameEC2"
+          },
+          "SubnetId": {
+              "Ref": "PrivateSubnet1"
+          },
+          "UserData": {
+            "Fn::Base64": {
+              "Fn::Join": [
+                "",
+                [
+                  "#!/bin/bash\n",
+
+                  "# Update GuestOS\n",
+                  "yum update -y\n",
+                  "# Install necessary packages\n",
+                  "yum install nfs-utils nfs-utils-lib redhat-lsb -y\n",
+                  "# Enable NFS Service\n",
+                  "chkconfig nfs on\n",
+                  "# Start NFS Services\n",
+                  "service rpcbind start\n",
+                  "service nfs start\n",
+                  "# Create vCD Transfer directory\n",
+                  "mkdir -p /opt/vmware/vcloud-director/data/transfer\n",
+                  "# Add xFer NFS mount point to fstab\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "echo '",
+                        {
+                          "Ref": "xFer1IP"
+                        },
+                        ":/home/ec2-user/xfer /opt/vmware/vcloud-director/data/transfer    nfs4     rw,vers=3,rsize=32768,wsize=32768,hard,timeo=600  0 0' >> /etc/fstab"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "# Mount the NFs mount\n",
+                  "mount /opt/vmware/vcloud-director/data/transfer\n"
+                ]
+              ]
+            }
+          },
+          "Tags": [
+              {
+                  "Key": "Name",
+                  "Value": "vCDMain"
+              }
+          ]
+        }
+      }
+  }
+}
