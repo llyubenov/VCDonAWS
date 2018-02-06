@@ -41,16 +41,6 @@
                 },
                 {
                     "Label": {
-                        "default": "vCD/xFer EC2 Configuration"
-                    },
-                    "Parameters": [
-                        "KeyPairNameEC2",
-                        "EC2AMIOS",
-                        "xFerInstanceType"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "RDS Configuration"
                     },
                     "Parameters": [
@@ -64,6 +54,63 @@
                         "AllocatedStorage",
                         "AutoMinorVersionUpgrade",
                         "TcpPort"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Main vCD Cell Configuration"
+                    },
+                    "Parameters": [
+                        "KeyPairNameEC2",
+                        "EC2AMIOS",
+                        "MainVcdCellType"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Binaries Details"
+                    },
+                    "Parameters": [
+                        "vCDBuildBucketName",
+                        "vCDBuildName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Instance Configuration"
+                    },
+                    "Parameters": [
+                        "vCDAdmin",
+                        "vCDAdminFullName",
+                        "vCDAdminPasswd",
+                        "vCDAdminEmail",
+                        "vCDSystemName",
+                        "vCDInstalationId",
+                        "vCDSerialNumber",
+                        "VcdCertKeystorePasswd"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD ELB Certificate Configuration"
+                    },
+                    "Parameters": [
+                        "ELBCertificateArn"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD ELB Health Check Configuration"
+                    },
+                    "Parameters": [
+                        "ELBHealthCheckIntervalSeconds",
+                        "ELBHealthCheckProtocol",
+                        "ELBHealthCheckPort",
+                        "ELBHealthCheckPath",
+                        "ELBHealthCheckTimeoutSeconds",
+                        "ELBHealthyThresholdCount",
+                        "ELBUnhealthyThresholdCount",
+                        "ELBResponseCode"
                     ]
                 }
             ],
@@ -114,10 +161,7 @@
                     "default": "Key Pair Name for vCD/xFer EC2 Instances"
                 },
                 "EC2AMIOS": {
-                   "default": "vCD/xFer EC2 AMI Operating System"
-               },
-               "xFerEC2InstanceType": {
-                   "default": "xFer EC2 Instance Type"
+                   "default": "vCD EC2 AMI Operating System"
                },
                "RDSInstanceType" : {
                  "default" : "RDS Instance Type"
@@ -125,6 +169,78 @@
                "DBName" : {
                  "default" : "vCD Postgres database name"
                },
+               "MainVcdCellType": {
+                   "default": "Main vCD Cell Instance Type"
+               },
+               "vCDBuildBucketName" : {
+                 "default" : "S3 Bucket Name"
+               },
+               "vCDBuildName" : {
+                 "default" : "vCD Binary"
+               },
+               "DBEndpoint" : {
+                 "default" : "RDS Endpoint"
+               },
+               "DBName" : {
+                 "default" : "RDS database name"
+               },
+               "MasterUsername" : {
+                 "default" : "RDS Master Username"
+               },
+               "MasterUserPassword" : {
+                 "default" : "RDS Master User Password"
+               },
+               "VcdCertKeystorePasswd" : {
+                 "default" : "Keystore Password"
+               },
+               "vCDAdmin" : {
+                 "default" : "The system administrator's username"
+               },
+               "vCDAdminFullName" : {
+                 "default" : "The system administrator's full name"
+               },
+               "vCDAdminPasswd" : {
+                 "default" : "The system administrator password"
+               },
+               "vCDAdminEmail" : {
+                 "default" : "The system administrator's email address."
+               },
+               "vCDSystemName" : {
+                 "default" : "System name."
+               },
+               "vCDInstalationId" : {
+                 "default" : "Installation ID for this instance."
+               },
+               "vCDSerialNumber" : {
+                 "default" : "License Key."
+               },
+               "ELBCertificateArn": {
+                   "default": "ELB Certificate"
+               },
+               "ELBHealthCheckIntervalSeconds": {
+                   "default": "Health Check Interval Seconds"
+               },
+               "ELBHealthCheckProtocol": {
+                   "default": "Health Check Protocol"
+               },
+               "ELBHealthCheckPort": {
+                   "default": "Health Check Port"
+               },
+               "ELBHealthCheckPath": {
+                   "default": "Health Check Path"
+               },
+               "ELBHealthCheckTimeoutSeconds": {
+                   "default": "Health Check Timeout Seconds"
+               },
+               "ELBHealthyThresholdCount": {
+                   "default": "Healthy Threshold Count"
+               },
+               "ELBUnhealthyThresholdCount": {
+                   "default": "Unhealthy Threshold Count"
+               },
+               "ELBResponseCode": {
+                   "default": "Response Code/s"
+               }
             }
         }
     },
@@ -221,7 +337,8 @@
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
             "Description": "Allowed CIDR block for external SSH access to the bastions",
-            "Type": "String"
+            "Type": "String",
+            "Default": "0.0.0.0/0"
         },
         "KeyPairNameEC2": {
             "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
@@ -234,16 +351,6 @@
            ],
            "Default": "Amazon-Linux-HVM",
            "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
-           "Type": "String"
-       },
-       "xFerEC2InstanceType": {
-           "AllowedValues": [
-               "t2.micro",
-               "t2.medium",
-               "t2.large"
-           ],
-           "Default": "t2.medium",
-           "Description": "xFer Amazon EC2 instances type",
            "Type": "String"
        },
        "DBName": {
@@ -317,6 +424,118 @@
            "db.m4.2xlarge"
          ],
          "ConstraintDescription": "Must be a valid EC2 instance type."
+       },
+       "MainVcdCellType": {
+           "AllowedValues": [
+               "t2.small",
+               "m5.large",
+               "m5.xlarge"
+           ],
+           "Default": "m5.large",
+           "Description": "Must be a valid EC2 instance type.",
+           "Type": "String"
+       },
+       "vCDBuildBucketName": {
+           "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+           "ConstraintDescription": "Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+           "Default": "vcd-builds",
+           "Description": "Bucket name that holds the VCD build to be used by this stack.",
+           "Type": "String"
+       },
+       "vCDBuildName": {
+           "Default": "vmware-vcloud-director-distribution-9.0.0-7554058.bin",
+           "Description": "Specify the vCD binary filename name.",
+           "Type": "String"
+       },
+       "VcdCertKeystorePasswd": {
+         "NoEcho": "true",
+         "Description": "vCD Certificates Keystore Password. Minimum of 8 alphanumeric characters.",
+         "Type": "String",
+         "MinLength": "8"
+       },
+       "vCDAdmin": {
+         "Description": "The username of the system administrator user you are creating.",
+         "Type": "String",
+         "Default": "vcd_admin"
+       },
+       "vCDAdminFullName": {
+         "Description": "The full name of the system administrator user you are creating.",
+         "Type": "String",
+         "Default": "vCD Administrator Name"
+       },
+       "vCDAdminPasswd": {
+         "NoEcho": "true",
+         "Description": "The password for the system administrator user you are creating.",
+         "Type": "String",
+         "MinLength": "8"
+       },
+       "vCDAdminEmail": {
+         "Description": "The e-mail address for the system administrator you are creating.",
+         "Type": "String",
+         "Default": "vcd_admin@company.com"
+       },
+       "vCDSystemName": {
+         "Description": "",
+         "Type": "String",
+         "Default": "vCD System Name"
+       },
+       "vCDInstalationId": {
+         "Description": "The installation ID for this installation of vCloud Director.",
+         "Type": "String",
+         "MinLength": "1",
+         "MaxLength": "2",
+         "AllowedPattern" : "[1-6][0-9]*",
+         "Default": "1",
+         "ConstraintDescription" : "Must be an integer in the range 1-63."
+       },
+       "vCDSerialNumber": {
+         "Description": "The serial number (license key) for this vCD Instance.",
+         "Type": "String"
+       },
+       "ELBCertificateArn": {
+           "Default": "arn:aws:acm:us-west-2:331345527506:certificate/615c31f1-87fa-4033-86f1-f381870d988d",
+           "Description": "Specify the Certificate Arn to be used for the vCD Load balancer.",
+           "Type": "String"
+       },
+       "ELBHealthCheckIntervalSeconds": {
+           "Default": "10",
+           "Description": "The approximate number of seconds between health checks for an individual target.",
+           "Type": "String"
+       },
+       "ELBHealthCheckProtocol": {
+           "Default": "HTTPS",
+           "Description": "The protocol that the load balancer uses when performing health checks on the targets, such as HTTP or HTTPS.",
+           "Type": "String"
+       },
+       "ELBHealthCheckPort": {
+           "Default": "443",
+           "Description": "The port that the load balancer uses when performing health checks on the targets.",
+           "Type": "String"
+       },
+       "ELBHealthCheckPath": {
+           "Default": "/cloud/server_status",
+           "Description": "The ping path destination where Elastic Load Balancing sends health check requests.",
+           "Type": "String"
+       },
+       "ELBHealthCheckTimeoutSeconds": {
+           "Default": "5",
+           "Description": "The number of seconds to wait for a response before considering that a health check has failed.",
+           "Type": "String"
+       },
+       "ELBHealthyThresholdCount": {
+           "Default": "3",
+           "Description": "The number of consecutive successful health checks that are required before an unhealthy target is considered healthy.",
+           "Type": "String"
+       },
+       "ELBUnhealthyThresholdCount": {
+           "Default": "3",
+           "Description": "The number of consecutive failed health checks that are required before a target is considered unhealthy.",
+           "Type": "String"
+       },
+       "ELBResponseCode": {
+           "Default": "200",
+           "Description": "The HTTP codes that a healthy target uses when responding to a health check.",
+           "Type": "String"
        }
     },
     "Resources": {
@@ -402,65 +621,6 @@
               }
           }
       },
-      "xFerStack": {
-          "DependsOn": "BastionStack",
-          "Type": "AWS::CloudFormation::Stack",
-          "Properties": {
-              "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/xfer.template",
-              "Parameters": {
-                  "AvailabilityZones": {
-                    "Fn::Join": [
-                        ",",
-                        {
-                            "Ref": "AvailabilityZones"
-                        }
-                    ]
-                  },
-                  "NumberOfAZs": {
-                      "Ref": "NumberOfAZs"
-                  },
-                  "EC2AMIOS": {
-                      "Ref": "EC2AMIOS"
-                  },
-                  "xFerEC2InstanceType": {
-                      "Ref": "xFerEC2InstanceType"
-                  },
-                  "KeyPairNameEC2": {
-                      "Ref": "KeyPairNameEC2"
-                  },
-                  "PrivateSubnet1": {
-                      "Fn::GetAtt": [
-                          "VPCStack",
-                          "Outputs.PrivateSubnet1ID"
-                      ]
-                  },
-                  "PrivateSubnet2": {
-                      "Fn::GetAtt": [
-                          "VPCStack",
-                          "Outputs.PrivateSubnet2ID"
-                      ]
-                  },
-                  "PrivateSubnet1CIDR": {
-                      "Ref": "PrivateSubnet1CIDR"
-                  },
-                  "PrivateSubnet2CIDR": {
-                      "Ref": "PrivateSubnet2CIDR"
-                  },
-                  "VPCID": {
-                      "Fn::GetAtt": [
-                          "VPCStack",
-                          "Outputs.VPCID"
-                      ]
-                  },
-                  "BastionAccessSecurityGroupID": {
-                      "Fn::GetAtt": [
-                          "BastionStack",
-                          "Outputs.PrivateInstanceSecurityGroupID"
-                      ]
-                  }
-              }
-          }
-      },
       "RDSStack": {
           "DependsOn": "VPCStack",
           "Type": "AWS::CloudFormation::Stack",
@@ -517,6 +677,153 @@
                   },
                   "TcpPort": {
                       "Ref": "TcpPort"
+                  }
+              }
+          }
+      },
+      "vCDMainStack": {
+          "DependsOn": "RDSStack",
+          "Type": "AWS::CloudFormation::Stack",
+          "Properties": {
+              "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-main.template",
+              "Parameters": {
+                  "VPCID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.VPCID"
+                      ]
+                  },
+                  "PrivateSubnet1": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.PrivateSubnet1ID"
+                      ]
+                  },
+                  "EC2AMIOS": {
+                      "Ref": "EC2AMIOS"
+                  },
+                  "MainVcdCellType": {
+                      "Ref": "MainVcdCellType"
+                  },
+                  "KeyPairNameEC2": {
+                      "Ref": "KeyPairNameEC2"
+                  },
+                  "PrivateInstanceSecurityGroupID": {
+                      "Fn::GetAtt": [
+                          "BastionStack",
+                          "Outputs.PrivateInstanceSecurityGroupID"
+                      ]
+                  },
+                  "RDSAccessSecurityGroupID": {
+                      "Fn::GetAtt": [
+                          "RDSStack",
+                          "Outputs.RDSAccessSecurityGroupID"
+                      ]
+                  },
+                  "DBEndpoint": {
+                      "Fn::GetAtt": [
+                          "RDSStack",
+                          "Outputs.RDSEndpoint"
+                      ]
+                  },
+                  "DBName": {
+                      "Ref": "DBName"
+                  },
+                  "DBMasterUsername": {
+                      "Ref": "MasterUsername"
+                  },
+                  "DBMasterUserPassword": {
+                      "Ref": "MasterUserPassword"
+                  },
+                  "vCDBuildBucketName": {
+                      "Ref": "vCDBuildBucketName"
+                  },
+                  "vCDBuildName": {
+                      "Ref": "vCDBuildName"
+                  },
+                  "VcdCertKeystorePasswd": {
+                      "Ref": "VcdCertKeystorePasswd"
+                  },
+                  "vCDAdmin": {
+                      "Ref": "vCDAdmin"
+                  },
+                  "vCDAdminFullName": {
+                      "Ref": "vCDAdminFullName"
+                  },
+                  "vCDAdminPasswd": {
+                      "Ref": "vCDAdminPasswd"
+                  },
+                  "vCDAdminEmail": {
+                      "Ref": "vCDAdminEmail"
+                  },
+                  "vCDSystemName": {
+                      "Ref": "vCDSystemName"
+                  },
+                  "vCDInstalationId": {
+                      "Ref": "vCDInstalationId"
+                  },
+                  "vCDSerialNumber": {
+                      "Ref": "vCDSerialNumber"
+                  }
+              }
+          }
+      },
+      "vCDELBStack": {
+          "DependsOn": "VPCStack",
+          "Type": "AWS::CloudFormation::Stack",
+          "Properties": {
+              "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-elb.template",
+              "Parameters": {
+                  "VPCID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.VPCID"
+                      ]
+                  },
+                  "PublicSubnet1ID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.PublicSubnet1ID"
+                      ]
+                  },
+                  "PublicSubnet2ID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.PublicSubnet2ID"
+                      ]
+                  },
+                  "CellsAccessSecurityGroupID": {
+                      "Fn::GetAtt": [
+                          "vCDMainStack",
+                          "Outputs.CellsAccessSecurityGroupID"
+                      ]
+                  },
+                  "ELBCertificateArn": {
+                      "Ref": "ELBCertificateArn"
+                  },
+                  "ELBHealthCheckIntervalSeconds": {
+                      "Ref": "ELBHealthCheckIntervalSeconds"
+                  },
+                  "ELBHealthCheckProtocol": {
+                      "Ref": "ELBHealthCheckProtocol"
+                  },
+                  "ELBHealthCheckPort": {
+                      "Ref": "ELBHealthCheckPort"
+                  },
+                  "ELBHealthCheckPath" : {
+                      "Ref": "ELBHealthCheckPath"
+                  },
+                  "ELBHealthCheckTimeoutSeconds": {
+                      "Ref": "ELBHealthCheckTimeoutSeconds"
+                  },
+                  "ELBHealthyThresholdCount": {
+                      "Ref": "ELBHealthyThresholdCount"
+                  },
+                  "ELBUnhealthyThresholdCount": {
+                      "Ref": "ELBUnhealthyThresholdCount"
+                  },
+                  "ELBResponseCode" : {
+                      "Ref": "ELBResponseCode"
                   }
               }
           }

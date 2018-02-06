@@ -14,18 +14,51 @@
                },
                {
                    "Label": {
-                       "default": "vCD EC2 Configuration"
+                       "default": "Main vCD Cell Configuration"
                    },
                    "Parameters": [
                        "KeyPairNameEC2",
                        "EC2AMIOS",
-                       "vCDInstanceType",
+                       "MainVcdInstanceType",
                        "PrivateInstanceSecurityGroupID",
-                       "CellsAccessSecurityGroupID",
-                       "RDSAccessSecurityGroupID",
-                       "xFer1IP"
+                       "RDSAccessSecurityGroupID"
                    ]
                },
+               {
+                   "Label": {
+                       "default": "vCD Binaries Details"
+                   },
+                   "Parameters": [
+                       "vCDBuildBucketName",
+                       "vCDBuildName"
+                   ]
+               },
+               {
+                   "Label": {
+                       "default": "vCD Instance DB Configuration"
+                   },
+                   "Parameters": [
+                       "DBEndpoint",
+                       "DBName",
+                       "DBMasterUsername",
+                       "DBMasterUserPassword"
+                   ]
+               },
+               {
+                   "Label": {
+                       "default": "vCD Instance Configuration"
+                   },
+                   "Parameters": [
+                       "vCDAdmin",
+                       "vCDAdminFullName",
+                       "vCDAdminPasswd",
+                       "vCDAdminEmail",
+                       "vCDSystemName",
+                       "vCDInstalationId",
+                       "vCDSerialNumber",
+                       "VcdCertKeystorePasswd"
+                   ]
+               }
            ],
            "ParameterLabels": {
                "KeyPairNameEC2": {
@@ -34,8 +67,8 @@
                "EC2AMIOS": {
                    "default": "vCD/xFer EC2 AMI Operating System"
                },
-               "xFerEC2InstanceType": {
-                   "default": "xFer EC2 Instance Type"
+               "MainVcdCellType": {
+                   "default": "vCD EC2 Instance Type"
                },
                "PrivateSubnet1": {
                    "default": "Private Subnet 1"
@@ -46,14 +79,50 @@
                "PrivateInstanceSecurityGroupID": {
                    "default": "Security Group to Allow SSH Access from Bastion hosts"
                },
-               "CellsAccessSecurityGroupID": {
-                   "default": "Security Group to Allow Access between xFer and vCD Cells"
-               },
                "RDSAccessSecurityGroupID": {
                    "default": "Security Group to Allow Access the vCD Postgres Database"
                },
-               "xFer1IP": {
-                   "default": "xFer1 IP Address"
+               "vCDBuildBucketName" : {
+                 "default" : "S3 Bucket Name"
+               },
+               "vCDBuildName" : {
+                 "default" : "vCD Binary"
+               },
+               "DBEndpoint" : {
+                 "default" : "RDS Endpoint"
+               },
+               "DBName" : {
+                 "default" : "RDS database name"
+               },
+               "DBMasterUsername" : {
+                 "default" : "RDS Master Username"
+               },
+               "DBMasterUserPassword" : {
+                 "default" : "RDS Master User Password"
+               },
+               "VcdCertKeystorePasswd" : {
+                 "default" : "Keystore Password"
+               },
+               "vCDAdmin" : {
+                 "default" : "The system administrator's username"
+               },
+               "vCDAdminFullName" : {
+                 "default" : "The system administrator's full name"
+               },
+               "vCDAdminPasswd" : {
+                 "default" : "The system administrator password"
+               },
+               "vCDAdminEmail" : {
+                 "default" : "The system administrator's email address."
+               },
+               "vCDSystemName" : {
+                 "default" : "System name."
+               },
+               "vCDInstalationId" : {
+                 "default" : "Installation ID for this instance."
+               },
+               "vCDSerialNumber" : {
+                 "default" : "License Key."
                }
            }
        }
@@ -72,7 +141,7 @@
            "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
            "Type": "String"
        },
-       "MainVcdEC2InstanceType": {
+       "MainVcdCellType": {
            "AllowedValues": [
                "t2.small",
                "m5.large",
@@ -94,10 +163,6 @@
             "Description": "Security Group to Allow SSH Access from Bastion hosts",
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
-        "CellsAccessSecurityGroupID": {
-            "Description": "Security Group to Allow Access between xFer and vCD Cells",
-            "Type": "AWS::EC2::SecurityGroup::Id"
-        },
         "RDSAccessSecurityGroupID": {
             "Description": "Security Group to Allow Access RDS Database",
             "Type": "AWS::EC2::SecurityGroup::Id"
@@ -111,14 +176,76 @@
         },
         "vCDBuildName": {
             "Default": "vmware-vcloud-director-distribution-9.0.0-7554058.bin",
-            "Description": "Specify the vCD build filename name.",
+            "Description": "Specify the vCD binary filename name.",
             "Type": "String"
         },
-        "xFer1IP": {
-            "Description": "Specify the xFer1 Private IP address.",
-            "Type": "String"
+        "DBEndpoint": {
+          "Description": "vCD Postgres DB Endpoint Address.",
+          "Type": "String"
+        },
+        "DBName": {
+          "Default": "vcddb",
+          "Description" : "vCD Postgres database name",
+          "Type": "String",
+          "MinLength": "1",
+          "MaxLength": "16"
+        },
+        "DBMasterUsername": {
+          "Description": "Database administration name. First character must be a letter and can not be 'root'.",
+          "Type": "String",
+          "Default": "dbmaster"
+        },
+        "DBMasterUserPassword": {
+          "NoEcho": "true",
+          "Description": "Database administration password. Minimum of 8 alphanumeric characters.",
+          "Type": "String",
+          "MinLength": "8"
+        },
+        "VcdCertKeystorePasswd": {
+          "NoEcho": "true",
+          "Description": "vCD Certificates Keystore Password. Minimum of 8 alphanumeric characters.",
+          "Type": "String",
+          "MinLength": "8"
+        },
+        "vCDAdmin": {
+          "Description": "The username of the system administrator user you are creating.",
+          "Type": "String",
+          "Default": "vcd_admin"
+        },
+        "vCDAdminFullName": {
+          "Description": "The full name of the system administrator user you are creating.",
+          "Type": "String",
+          "Default": "vCD Administrator Name"
+        },
+        "vCDAdminPasswd": {
+          "NoEcho": "true",
+          "Description": "The password for the system administrator user you are creating.",
+          "Type": "String",
+          "MinLength": "8"
+        },
+        "vCDAdminEmail": {
+          "Description": "The e-mail address for the system administrator you are creating.",
+          "Type": "String",
+          "Default": "vcd_admin@company.com"
+        },
+        "vCDSystemName": {
+          "Description": "",
+          "Type": "String",
+          "Default": "vCD System Name"
+        },
+        "vCDInstalationId": {
+          "Description": "The installation ID for this installation of vCloud Director.",
+          "Type": "String",
+          "MinLength": "1",
+          "MaxLength": "2",
+          "AllowedPattern" : "[1-6][0-9]*",
+          "Default": "1",
+          "ConstraintDescription" : "Must be an integer in the range 1-63."
+        },
+        "vCDSerialNumber": {
+          "Description": "The serial number (license key) for this vCD Instance.",
+          "Type": "String"
         }
-
    },
    "Mappings": {
        "AWSAMIRegionMap": {
@@ -175,51 +302,90 @@
        }
    },
    "Resources" : {
-      "vCDS3AccessRole": {
-         "Type": "AWS::IAM::Role",
+     "xFerS3AccessRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+           "AssumeRolePolicyDocument": {
+              "Statement": [ {
+                 "Effect": "Allow",
+                 "Principal": {
+                    "Service": [ "ec2.amazonaws.com" ]
+                 },
+                 "Action": [ "sts:AssumeRole" ]
+              } ]
+           },
+           "Path": "/"
+        }
+     },
+     "xFerS3AccessPolicies": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {
+           "PolicyName": "xFer-S3-AccessPerms",
+           "PolicyDocument": {
+              "Statement": [ {
+                 "Effect": "Allow",
+                 "Action": "s3:*",
+                 "Resource": "*"
+              } ]
+           },
+           "Roles": [ { "Ref": "xFerS3AccessRole" } ]
+        }
+     },
+     "S3AccessHostProfile": {
+         "Type": "AWS::IAM::InstanceProfile",
          "Properties": {
-            "AssumeRolePolicyDocument": {
-               "Statement": [ {
-                  "Effect": "Allow",
-                  "Principal": {
-                     "Service": [ "ec2.amazonaws.com" ]
-                  },
-                  "Action": [ "sts:AssumeRole" ]
-               } ]
-            },
-            "Path": "/"
+             "Roles": [
+                 {
+                     "Ref": "xFerS3AccessRole"
+                 }
+             ],
+             "Path": "/"
          }
-      },
-      "vCDS3AccessPolicies": {
-         "Type": "AWS::IAM::Policy",
+     },
+     "xFerBucket" : {
+       "Type" : "AWS::S3::Bucket",
+       "Properties" : {
+         "BucketName": { "Fn::Join" : ["", [ { "Ref" : "VPCID" }, "-xfer" ]
+         ] }
+       }
+     },
+     "CellsAccessSecurityGroup": {
+         "Type": "AWS::EC2::SecurityGroup",
          "Properties": {
-            "PolicyName": "vCD-S3-Access",
-            "PolicyDocument": {
-               "Statement": [ {
-                  "Effect": "Allow",
-                  "Action": [
-                      "s3:GetObject",
-                      "s3:ListAllMyBuckets",
-                      "s3:HeadBucket",
-                      "s3:ListObjects"
-                  ],
-                  "Resource": "*"
-               } ]
-            },
-            "Roles": [ { "Ref": "vCDS3AccessRole" } ]
+             "GroupDescription": "Enables Access between vCD EC2 Instances",
+             "VpcId": {
+                 "Ref": "VPCID"
+             },
+             "Tags": [
+               {
+                 "Key": "Name",
+                 "Value": {
+                     "Fn::Join": [
+                       "", [
+                         {
+                           "Ref": "AWS::StackName"
+                         },
+                         "-SG"
+                       ]
+                     ]
+                 }
+               }
+             ]
          }
-      },
-      "vCDS3AccessHostProfile": {
-          "Type": "AWS::IAM::InstanceProfile",
-          "Properties": {
-              "Roles": [
-                  {
-                      "Ref": "vCDS3AccessRole"
-                  }
-              ],
-              "Path": "/"
-          }
-      },
+     },
+     "CellsAccessSecurityGroupIngress": {
+         "Type": "AWS::EC2::SecurityGroupIngress",
+         "DependsOn": "CellsAccessSecurityGroup",
+         "Properties": {
+             "GroupId": {
+                 "Ref": "CellsAccessSecurityGroup"
+             },
+             "IpProtocol": "-1",
+             "FromPort": "0",
+             "ToPort": "65535",
+             "SourceSecurityGroupId": {"Ref": "CellsAccessSecurityGroup"}
+       }
+     },
       "vCDMain": {
         "Type": "AWS::EC2::Instance",
         "Properties": {
@@ -241,17 +407,17 @@
               ]
           },
           "InstanceType": {
-              "Ref": "MainVcdEC2InstanceType"
+              "Ref": "MainVcdCellType"
           },
           "IamInstanceProfile": {
-              "Ref": "vCDS3AccessHostProfile"
+              "Ref": "S3AccessHostProfile"
           },
           "SecurityGroupIds": [
               {
                   "Ref": "PrivateInstanceSecurityGroupID"
               },
               {
-                  "Ref": "CellsAccessSecurityGroupID"
+                  "Ref": "CellsAccessSecurityGroup"
               },
               {
                   "Ref": "RDSAccessSecurityGroupID"
@@ -269,34 +435,243 @@
                 "",
                 [
                   "#!/bin/bash\n",
-
+                  "# Defina Variables\n",
+                  "vCDBuildBucketName=", {"Ref": "vCDBuildBucketName"}, "\n",
+                  "vCDBuildName=", {"Ref": "vCDBuildName"}, "\n",
+                  "DBEndpoint=", {"Ref": "DBEndpoint"}, "\n",
+                  "DBName=", {"Ref": "DBName"}, "\n",
+                  "DBMasterUsername=", {"Ref": "DBMasterUsername"}, "\n",
+                  "DBMasterUserPassword=", {"Ref": "DBMasterUserPassword"}, "\n",
+                  "VcdCertKeystorePasswd=", {"Ref": "VcdCertKeystorePasswd"}, "\n",
+                  "vCDAdmin=", {"Ref": "vCDAdmin"}, "\n",
+                  "vCDAdminFullName=", {"Ref": "vCDAdminFullName"}, "\n",
+                  "vCDAdminPasswd=", {"Ref": "vCDAdminPasswd"}, "\n",
+                  "vCDAdminEmail=", {"Ref": "vCDAdminEmail"}, "\n",
+                  "vCDSystemName=", {"Ref": "vCDSystemName"}, "\n",
+                  "vCDInstalationId=", {"Ref": "vCDInstalationId"}, "\n",
+                  "vCDSerialNumber=", {"Ref": "vCDSerialNumber"}, "\n",
                   "# Update GuestOS\n",
                   "yum update -y\n",
                   "# Install necessary packages\n",
-                  "yum install nfs-utils nfs-utils-lib redhat-lsb -y\n",
-                  "# Enable NFS Service\n",
-                  "chkconfig nfs on\n",
-                  "# Start NFS Services\n",
-                  "service rpcbind start\n",
-                  "service nfs start\n",
+                  "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel nfs-utils nfs-utils-lib redhat-lsb python36 python36-pip python36-devel -y\n",
+                  "# Install PIP\n",
+                  "easy_install-3.6 pip\n",
+                  "# Install vCD Cli\n",
+                  "/usr/local/bin/pip3 install --user vcd-cli\n",
+                  "# Clone S3FS repository from Git\n",
+                  "cd /home/ec2-user\n",
+                  "git clone https://github.com/s3fs-fuse/s3fs-fuse.git\n",
+                  "# Compile S3FS\n",
+                  "cd /home/ec2-user/s3fs-fuse\n",
+                  "./autogen.sh\n",
+                  "./configure --prefix=/usr --with-openssl\n",
+                  "make\n",
+                  "make install\n",
                   "# Create vCD Transfer directory\n",
                   "mkdir -p /opt/vmware/vcloud-director/data/transfer\n",
-                  "# Add xFer NFS mount point to fstab\n",
+                  "# Add S3 bucket mount point to fstab\n",
                   {
                     "Fn::Join": [
                       "",
                       [
-                        "echo '",
+                        "echo 's3fs#",
                         {
-                          "Ref": "xFer1IP"
+                          "Ref": "xFerBucket"
                         },
-                        ":/home/ec2-user/xfer /opt/vmware/vcloud-director/data/transfer    nfs4     rw,vers=3,rsize=32768,wsize=32768,hard,timeo=600  0 0' >> /etc/fstab"
+                        " /opt/vmware/vcloud-director/data/transfer fuse _netdev,allow_other,iam_role=auto,uid=501,gid=501 0 0' >> /etc/fstab"
                       ]
                     ]
                   },
                   "\n",
-                  "# Mount the NFs mount\n",
-                  "mount /opt/vmware/vcloud-director/data/transfer\n"
+                  "# Copy vCD binaries from specified S3 Bucket\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "aws s3 cp s3://",
+                        {
+                          "Ref": "vCDBuildBucketName"
+                        },
+			                  "/",
+			                  {
+                          "Ref": "vCDBuildName"
+                        },
+			                  " /tmp/",
+			                  {
+                          "Ref": "vCDBuildName"
+                        }
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "# Make vCD binaries executable\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "chmod +x /tmp/",
+                        {
+                          "Ref": "vCDBuildName"
+                        }
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "# Install vCD\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "echo Y | /tmp/",
+                        {
+                          "Ref": "vCDBuildName"
+                        }
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "# Mount the S3 Bucket\n",
+                  "mount /opt/vmware/vcloud-director/data/transfer/\n",
+                  "sleep 5\n",
+                  "# Generate Self-signed certificate for vCD\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "/opt/vmware/vcloud-director/bin/cell-management-tool generate-certs -j -p -o /tmp/certificates.ks -w ",
+                        {
+                          "Ref": "VcdCertKeystorePasswd"
+                        }
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "# Update Permission on Certificates Keystore file\n",
+                  "chmod 644 /tmp/certificates.ks\n",
+                  "# Get Instance IP Address \n",
+                  "ip=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')\n",
+                  "# Configure vCD Cell\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "echo Y | /opt/vmware/vcloud-director/bin/configure -cons $ip --console-proxy-port-https 8443 -ip $ip --primary-port-http 80 --primary-port-https 443 -dbhost ",
+                        {
+                          "Ref": "DBEndpoint"
+                        },
+                  			" -dbport 5432 -dbtype postgres -dbname ",
+                  			{
+                          "Ref": "DBName"
+                        },
+                  			" -dbuser ",
+                  			{
+                          "Ref": "DBMasterUsername"
+                        },
+                  			" -dbpassword ",
+                  			{
+                          "Ref": "DBMasterUserPassword"
+                        },
+                  			" -k /tmp/certificates.ks -w ",
+                  			{
+                          "Ref": "VcdCertKeystorePasswd"
+                        },
+			                  " -unattended"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF\n",
+                  "#Custom Changes Made for console proxy and DB connections\n",
+                  "consoleproxy.websockets.enabled = true\n",
+                  "consoleproxy.securenio.buffer.size = 17000\n",
+                  "database.pool.maxActive = 200\n",
+                  "vcloud.http.maxThreads = 150\n",
+                  "vcloud.http.minThreads = 32\n",
+                  "vcloud.http.acceptorThreads = 16\n",
+                  "hibernate.generate_statistics=true\n",
+                  "EOF\n",
+                  "# Start NFS Services\n",
+                  "service rpcbind start\n",
+                  "service nfs start\n",
+                  "# Initial vCD Instance Configuration\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "/opt/vmware/vcloud-director/bin/cell-management-tool system-setup --email ",
+                        {
+                          "Ref": "vCDAdminEmail"
+                        },
+			                  " --full-name '",
+			                  {
+                          "Ref": "vCDAdminFullName"
+                        },
+                  			"' --installation-id ",
+                  			{
+                          "Ref": "vCDInstalationId"
+                        },
+                  			" --password ",
+                  			{
+                          "Ref": "vCDAdminPasswd"
+                        },
+                  			" --system-name '",
+                  			{
+                          "Ref": "vCDSystemName"
+                        },
+                  			"' --serial-number ",
+                  			{
+                          "Ref": "vCDSerialNumber"
+                        },
+                  			" --user ",
+                  			{
+                          "Ref": "vCDAdmin"
+                        },
+			                  " -unattended"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "# Start vCD Services\n",
+                  "service vmware-vcd start\n",
+                  "sleep 120\n",
+                  "# Create Global Catalog Org\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "/root/.local/bin/vcd login $ip system ",
+                        {
+                          "Ref": "vCDAdmin"
+                        },
+                        " -p ",
+                        {
+                          "Ref": "vCDAdminPasswd"
+                        },
+                        " -w -i"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "/root/.local/bin/vcd org create global_catalog 'Global Catalog Org' -e\n",
+                  "# Move vCD binaries to vCD Transfer store\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "mv /tmp/",
+                        {
+                          "Ref": "vCDBuildName"
+                        },
+                        " /opt/vmware/vcloud-director/data/transfer/",
+                        {
+                          "Ref": "vCDBuildName"
+                        }
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "# Move vCD certificates keystore to vCD Transfer store\n",
+                  "mv /tmp/certificates.ks /opt/vmware/vcloud-director/data/transfer/certificates.ks\n"
                 ]
               ]
             }
@@ -309,5 +684,31 @@
           ]
         }
       }
+  },
+  "Outputs": {
+    "xFerBucketName": {
+        "Description": "xFer S3 Bucket Name",
+        "Value": {
+            "Ref": "xFerBucket"
+        }
+    },
+    "xFerBucketDomainName" : {
+      "Description" : "xFer S3 Bucket Domain Name",
+      "Value" : {
+        "Fn::GetAtt" : ["xFerBucket", "DomainName"]
+      }
+    },
+    "vCDMain" : {
+      "Description" : "vCDMain Private IP",
+      "Value" : {
+        "Fn::GetAtt" : ["vCDMain", "PrivateIp"]
+      }
+    },
+    "CellsAccessSecurityGroupID": {
+        "Description": "Cells Access Security Group ID",
+        "Value": {
+            "Ref": "CellsAccessSecurityGroup"
+        }
+    }
   }
 }
