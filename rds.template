@@ -258,8 +258,8 @@
   }
 },
 "Outputs": {
-  "RDSHostname" : {
-    "Description" : "RDS Hostname",
+  "RDSEndpoint" : {
+    "Description" : "RDS Endpoint",
     "Value" : {
       "Fn::GetAtt" : ["DBInstance", "Endpoint.Address"]
     }
