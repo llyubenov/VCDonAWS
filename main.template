@@ -532,7 +532,6 @@
            "Type": "String"
        },
        "ELBCertificateArn": {
-           "Default": "arn:aws:acm:us-west-2:331345527506:certificate/615c31f1-87fa-4033-86f1-f381870d988d",
            "Description": "Specify the Certificate Arn in ACM, which will be used for the vCD Load balancer.",
            "Type": "String"
        },
