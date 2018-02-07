@@ -34,9 +34,7 @@
                         "KeyPairNameBastion",
                         "RemoteAccessCIDR",
                         "BastionAMIOS",
-                        "BastionInstanceType",
-                        "EnableTCPForwarding",
-                        "EnableX11Forwarding"
+                        "BastionInstanceType"
                     ]
                 },
                 {
@@ -64,6 +62,19 @@
                         "KeyPairNameEC2",
                         "EC2AMIOS",
                         "MainVcdCellType"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Cells Configuration"
+                    },
+                    "Parameters": [
+                        "KeyPairNameEC2",
+                        "EC2AMIOS",
+                        "vCDUICellType",
+                        "NumVCDUICells",
+                        "vCDConsoleCellType",
+                        "NumVCDConsoleCells"
                     ]
                 },
                 {
@@ -115,53 +126,47 @@
                 }
             ],
             "ParameterLabels": {
-                "AvailabilityZones": {
-                    "default": "Availability Zones"
-                },
-                "NumberOfAZs": {
-                    "default": "Number of Availability Zones"
-                },
-                "PrivateSubnet1CIDR": {
-                    "default": "Private subnet 1 CIDR"
-                },
-                "PrivateSubnet2CIDR": {
-                    "default": "Private subnet 2 CIDR"
-                },
-                "PublicSubnet1CIDR": {
-                    "default": "Public subnet 1 CIDR"
-                },
-                "PublicSubnet2CIDR": {
-                    "default": "Public subnet 2 CIDR"
-                },
-                "VPCCIDR": {
-                    "default": "VPC CIDR"
-                },
-                "VPCTenancy": {
-                    "default": "VPC Tenancy"
-                },
-                "BastionAMIOS": {
-                    "default": "Bastion AMI Operating System"
-                },
-                "BastionInstanceType": {
-                    "default": "Bastion Instance Type"
-                },
-                "EnableTCPForwarding": {
-                    "default": "Enable TCP Forwarding"
-                },
-                "EnableX11Forwarding": {
-                    "default": "Enable X11 Forwarding"
-                },
-                "KeyPairNameBastion": {
-                    "default": "Key Pair Name for Bastion Host/s"
-                },
-                "RemoteAccessCIDR": {
-                    "default": "Allowed Bastion External Access CIDR"
-                },
-                "KeyPairNameEC2": {
-                    "default": "Key Pair Name for vCD/xFer EC2 Instances"
-                },
-                "EC2AMIOS": {
-                   "default": "vCD EC2 AMI Operating System"
+               "AvailabilityZones": {
+                 "default": "Availability Zones"
+               },
+               "NumberOfAZs": {
+                 "default": "Number of Availability Zones"
+               },
+               "PrivateSubnet1CIDR": {
+                 "default": "Private subnet 1 CIDR"
+               },
+               "PrivateSubnet2CIDR": {
+                 "default": "Private subnet 2 CIDR"
+               },
+               "PublicSubnet1CIDR": {
+                 "default": "Public subnet 1 CIDR"
+               },
+               "PublicSubnet2CIDR": {
+                 "default": "Public subnet 2 CIDR"
+               },
+               "VPCCIDR": {
+                 "default": "VPC CIDR"
+               },
+               "VPCTenancy": {
+                 "default": "VPC Tenancy"
+               },
+               "BastionAMIOS": {
+                 "default": "Bastion AMI Operating System"
+               },
+               "BastionInstanceType": {
+                 "default": "Bastion Instance Type"
+               },
+               "KeyPairNameBastion": {
+                 "default": "Key Pair Name for Bastion Host/s"
+               },
+               "RemoteAccessCIDR": {
+                 "default": "Allowed Bastion External Access CIDR"
+               },
+               "KeyPairNameEC2": {
+                 "default": "Key Pair Name for all vCD Cells"
+               },
+               "EC2AMIOS": {
+                 "default": "vCD EC2 AMI Operating System"
                },
                "RDSInstanceType" : {
                  "default" : "RDS Instance Type"
@@ -170,7 +175,7 @@
                  "default" : "vCD Postgres database name"
                },
                "MainVcdCellType": {
-                   "default": "Main vCD Cell Instance Type"
+                 "default": "Main vCD Cell Instance Type"
                },
                "vCDBuildBucketName" : {
                  "default" : "S3 Bucket Name"
@@ -213,6 +218,18 @@
                },
                "vCDSerialNumber" : {
                  "default" : "License Key."
+               },
+               "vCDUICellType": {
+                   "default": "vCD UI Cells Instance Type"
+               },
+               "vCDConsoleCellType": {
+                   "default": "vCD Console Cells Instance Type"
+               },
+               "NumVCDUICells": {
+                   "default": "Number of vCD UI Cells"
+               },
+               "NumVCDConsoleCells": {
+                   "default": "Number of vCD Console Cells"
                },
                "ELBCertificateArn": {
                    "default": "ELB Certificate"
@@ -309,24 +326,6 @@
                 "t2.micro",
                 "t2.small",
                 "t2.medium"
-            ]
-        },
-        "EnableTCPForwarding": {
-            "Type": "String",
-            "Description": "Enable/Disable TCP Forwarding",
-            "Default": "false",
-            "AllowedValues": [
-                "true",
-                "false"
-            ]
-        },
-        "EnableX11Forwarding": {
-            "Type": "String",
-            "Description": "Enable/Disable X11 Forwarding",
-            "Default": "false",
-            "AllowedValues": [
-                "true",
-                "false"
             ]
         },
         "KeyPairNameBastion": {
@@ -432,7 +431,7 @@
                "m5.xlarge"
            ],
            "Default": "m5.large",
-           "Description": "Must be a valid EC2 instance type.",
+           "Description": "Amazon EC2 instance type.",
            "Type": "String"
        },
        "vCDBuildBucketName": {
@@ -492,9 +491,49 @@
          "Description": "The serial number (license key) for this vCD Instance.",
          "Type": "String"
        },
+       "vCDUICellType": {
+           "AllowedValues": [
+               "t2.small",
+               "m5.large",
+               "m5.xlarge"
+           ],
+           "Default": "m5.xlarge",
+           "Description": "Amazon EC2 instances type",
+           "Type": "String"
+       },
+       "vCDConsoleCellType": {
+           "AllowedValues": [
+               "t2.small",
+               "m5.large",
+               "m5.xlarge"
+           ],
+           "Default": "m5.large",
+           "Description": "Amazon EC2 instances type",
+           "Type": "String"
+       },
+       "NumVCDUICells": {
+           "AllowedValues": [
+               "1",
+               "2",
+               "4"
+           ],
+           "Default": "2",
+           "Description": "Enter the number of vCD UI Cells to create.",
+           "Type": "String"
+       },
+       "NumVCDConsoleCells": {
+           "AllowedValues": [
+               "1",
+               "2",
+               "4"
+           ],
+           "Default": "2",
+           "Description": "Enter the number of vCD Console Cells to create.",
+           "Type": "String"
+       },
        "ELBCertificateArn": {
            "Default": "arn:aws:acm:us-west-2:331345527506:certificate/615c31f1-87fa-4033-86f1-f381870d988d",
-           "Description": "Specify the Certificate Arn to be used for the vCD Load balancer.",
+           "Description": "Specify the Certificate Arn in ACM, which will be used for the vCD Load balancer.",
            "Type": "String"
        },
        "ELBHealthCheckIntervalSeconds": {
@@ -584,12 +623,6 @@
                   },
                   "BastionInstanceType": {
                       "Ref": "BastionInstanceType"
-                  },
-                  "EnableTCPForwarding": {
-                      "Ref": "EnableTCPForwarding"
-                  },
-                  "EnableX11Forwarding": {
-                      "Ref": "EnableX11Forwarding"
                   },
                   "KeyPairName": {
                       "Ref": "KeyPairNameBastion"
@@ -753,7 +786,7 @@
                           "Outputs.VPCID"
                       ]
                   },
-                  "PrivateSubnet1": {
+                  "PrivateSubnet1ID": {
                       "Fn::GetAtt": [
                           "VPCStack",
                           "Outputs.PrivateSubnet1ID"
@@ -824,6 +857,98 @@
                   },
                   "vCDSerialNumber": {
                       "Ref": "vCDSerialNumber"
+                  }
+              }
+          }
+      },
+      "vCDCellsStack": {
+          "DependsOn": [
+              "vCDMainStack",
+              "vCDELBStack"
+          ],
+          "Type": "AWS::CloudFormation::Stack",
+          "Properties": {
+              "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-cells.template",
+              "Parameters": {
+                  "VPCID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.VPCID"
+                      ]
+                  },
+                  "PrivateSubnet1ID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.PrivateSubnet1ID"
+                      ]
+                  },
+                  "PrivateSubnet2ID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.PrivateSubnet2ID"
+                      ]
+                  },
+                  "EC2AMIOS": {
+                      "Ref": "EC2AMIOS"
+                  },
+                  "vCDUICellType": {
+                      "Ref": "vCDUICellType"
+                  },
+                  "vCDConsoleCellType": {
+                      "Ref": "vCDConsoleCellType"
+                  },
+                  "KeyPairNameEC2": {
+                      "Ref": "KeyPairNameEC2"
+                  },
+                  "PrivateInstanceSecurityGroupID": {
+                      "Fn::GetAtt": [
+                          "BastionStack",
+                          "Outputs.PrivateInstanceSecurityGroupID"
+                      ]
+                  },
+                  "RDSAccessSecurityGroupID": {
+                      "Fn::GetAtt": [
+                          "RDSStack",
+                          "Outputs.RDSAccessSecurityGroupID"
+                      ]
+                  },
+                  "CellsAccessSecurityGroupID": {
+                      "Fn::GetAtt": [
+                          "vCDMainStack",
+                          "Outputs.RDSAccessSecurityGroupID"
+                      ]
+                  },
+                  "vCDBuildBucketName": {
+                      "Ref": "vCDBuildBucketName"
+                  },
+                  "vCDBuildName": {
+                      "Ref": "vCDBuildName"
+                  },
+                  "VcdCertKeystorePasswd": {
+                      "Ref": "VcdCertKeystorePasswd"
+                  },
+                  "NumVCDUICells": {
+                      "Ref": "NumVCDUICells"
+                  },
+                  "NumVCDConsoleCells": {
+                      "Ref": "NumVCDConsoleCells"
+                  },
+                  "xFerBucketName": {
+                      "Fn::GetAtt": [
+                          "vCDMainStack",
+                          "Outputs.xFerBucketName"
+                      ]
+                  },
+                  "vCDUITargetGroup": {
+                      "Fn::GetAtt": [
+                          "vCDELBStack",
+                          "Outputs.vCDUITargetGroup"
+                      ]
+                  },"vCDConsoleTargetGroup": {
+                      "Fn::GetAtt": [
+                          "vCDELBStack",
+                          "Outputs.vCDConsoleTargetGroup"
+                      ]
                   }
               }
           }

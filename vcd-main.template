@@ -9,7 +9,7 @@
                    },
                    "Parameters": [
                        "VPCID",
-                       "PrivateSubnet1"
+                       "PrivateSubnet1ID"
                    ]
                },
                {
@@ -62,15 +62,15 @@
            ],
            "ParameterLabels": {
                "KeyPairNameEC2": {
-                   "default": "Key Pair Name for vCD/xFer EC2 Instances"
+                   "default": "Key Pair Name for all vCD Cells"
                },
                "EC2AMIOS": {
-                   "default": "vCD/xFer EC2 AMI Operating System"
+                   "default": "vCD EC2 AMI Operating System"
                },
                "MainVcdCellType": {
                    "default": "vCD EC2 Instance Type"
                },
-               "PrivateSubnet1": {
+               "PrivateSubnet1ID": {
                    "default": "Private Subnet 1"
                },
                "VPCID": {
@@ -151,7 +151,7 @@
            "Description": "Amazon EC2 instances type",
            "Type": "String"
        },
-       "PrivateSubnet1": {
+       "PrivateSubnet1ID": {
            "Description": "ID of the public subnet 1 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
            "Type": "AWS::EC2::Subnet::Id"
        },
@@ -427,7 +427,7 @@
               "Ref": "KeyPairNameEC2"
           },
           "SubnetId": {
-              "Ref": "PrivateSubnet1"
+              "Ref": "PrivateSubnet1ID"
           },
           "UserData": {
             "Fn::Base64": {
@@ -436,24 +436,10 @@
                 [
                   "#!/bin/bash\n",
                   "# Defina Variables\n",
-                  "vCDBuildBucketName=", {"Ref": "vCDBuildBucketName"}, "\n",
-                  "vCDBuildName=", {"Ref": "vCDBuildName"}, "\n",
-                  "DBEndpoint=", {"Ref": "DBEndpoint"}, "\n",
-                  "DBName=", {"Ref": "DBName"}, "\n",
-                  "DBMasterUsername=", {"Ref": "DBMasterUsername"}, "\n",
-                  "DBMasterUserPassword=", {"Ref": "DBMasterUserPassword"}, "\n",
-                  "VcdCertKeystorePasswd=", {"Ref": "VcdCertKeystorePasswd"}, "\n",
-                  "vCDAdmin=", {"Ref": "vCDAdmin"}, "\n",
-                  "vCDAdminFullName=", {"Ref": "vCDAdminFullName"}, "\n",
-                  "vCDAdminPasswd=", {"Ref": "vCDAdminPasswd"}, "\n",
-                  "vCDAdminEmail=", {"Ref": "vCDAdminEmail"}, "\n",
-                  "vCDSystemName=", {"Ref": "vCDSystemName"}, "\n",
-                  "vCDInstalationId=", {"Ref": "vCDInstalationId"}, "\n",
-                  "vCDSerialNumber=", {"Ref": "vCDSerialNumber"}, "\n",
                   "# Update GuestOS\n",
                   "yum update -y\n",
                   "# Install necessary packages\n",
-                  "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel nfs-utils nfs-utils-lib redhat-lsb python36 python36-pip python36-devel -y\n",
+                  "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel redhat-lsb python36 python36-pip python36-devel -y\n",
                   "# Install PIP\n",
                   "easy_install-3.6 pip\n",
                   "# Install vCD Cli\n",
@@ -590,9 +576,6 @@
                   "vcloud.http.acceptorThreads = 16\n",
                   "hibernate.generate_statistics=true\n",
                   "EOF\n",
-                  "# Start NFS Services\n",
-                  "service rpcbind start\n",
-                  "service nfs start\n",
                   "# Initial vCD Instance Configuration\n",
                   {
                     "Fn::Join": [
@@ -691,27 +674,33 @@
   },
   "Outputs": {
     "xFerBucketName": {
-        "Description": "xFer S3 Bucket Name",
-        "Value": {
-            "Ref": "xFerBucket"
-        }
+          "Description": "xFer S3 Bucket Name",
+          "Value": {
+              "Ref": "xFerBucket"
+          }
     },
     "xFerBucketDomainName" : {
-      "Description" : "xFer S3 Bucket Domain Name",
-      "Value" : {
-        "Fn::GetAtt" : ["xFerBucket", "DomainName"]
-      }
+        "Description" : "xFer S3 Bucket Domain Name",
+        "Value" : {
+          "Fn::GetAtt" : ["xFerBucket", "DomainName"]
+        }
     },
     "vCDMain" : {
-      "Description" : "vCDMain Private IP",
-      "Value" : {
-        "Fn::GetAtt" : ["vCDMain", "PrivateIp"]
-      }
+        "Description" : "vCDMain Private IP",
+        "Value" : {
+          "Fn::GetAtt" : ["vCDMain", "PrivateIp"]
+        }
     },
     "CellsAccessSecurityGroupID": {
         "Description": "Cells Access Security Group ID",
         "Value": {
             "Ref": "CellsAccessSecurityGroup"
+        }
+    },
+    "S3AccessHostProfile": {
+        "Description": "IAM Host profile to allow access to S3",
+        "Value": {
+            "Ref": "S3AccessHostProfile"
         }
     }
   }

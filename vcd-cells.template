@@ -1,0 +1,722 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This template is intended to be deployed into an existing VPC with two public subnets. It will create two auto-scaling groups, one for vCD UI Cells and one for vCD Console Proxy Cells.",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "VPCID",
+                        "PrivateSubnet1ID",
+                        "PrivateSubnet2ID"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Cells Configuration"
+                    },
+                    "Parameters": [
+                        "KeyPairNameEC2",
+                        "EC2AMIOS",
+                        "vCDUICellType",
+                        "NumVCDUICells",
+                        "vCDConsoleCellType",
+                        "NumVCDConsoleCells",
+                        "PrivateInstanceSecurityGroupID",
+                        "RDSAccessSecurityGroupID",
+                        "CellsAccessSecurityGroupID"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Binary Details"
+                    },
+                    "Parameters": [
+                        "vCDBuildBucketName",
+                        "vCDBuildName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Configuration Parameters"
+                    },
+                    "Parameters": [
+                        "VcdCertKeystorePasswd",
+                        "xFerBucketName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD ELB Parameters"
+                    },
+                    "Parameters": [
+                        "vCDUITargetGroup",
+                        "vCDConsoleTargetGroup"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "KeyPairNameEC2": {
+                    "default": "Key Pair Name for all vCD Cells"
+                },
+                "EC2AMIOS": {
+                    "default": "vCD EC2 AMI Operating System"
+                },
+                "PrivateSubnet1ID": {
+                    "default": "Private Subnet 1"
+                },
+                "PrivateSubnet2ID": {
+                    "default": "Private Subnet 2"
+                },
+                "VPCID": {
+                    "default": "VPC ID"
+                },
+                "PrivateInstanceSecurityGroupID": {
+                    "default": "SSH Access from Bastion hosts"
+                },
+                "RDSAccessSecurityGroupID": {
+                    "default": "Access to RDS Database"
+                },
+                "CellsAccessSecurityGroupID": {
+                    "default": "Access to vCD Cells"
+                },
+                "vCDBuildBucketName" : {
+                  "default" : "S3 Bucket Name"
+                },
+                "vCDBuildName" : {
+                  "default" : "vCD Binary"
+                },
+                "VcdCertKeystorePasswd" : {
+                  "default" : "vCD Keystore Password"
+                },
+                "xFerBucketName" : {
+                  "default" : "S3 xFer Bucket"
+                },
+                "vCDUICellType": {
+                    "default": "vCD UI Cells Instance Type"
+                },
+                "vCDConsoleCellType": {
+                    "default": "vCD Console Cells Instance Type"
+                },
+                "NumVCDUICells": {
+                    "default": "Number of vCD UI Cells"
+                },
+                "NumVCDConsoleCells": {
+                    "default": "Number of vCD Console Cells"
+                },
+                "vCDUITargetGroup": {
+                    "default": "vCD UI ELB Target Group"
+                },
+                "vCDUITargetGroup": {
+                    "default": "vCD Console ELB Target Group"
+                }
+            }
+        }
+    },
+    "Parameters": {
+        "KeyPairNameEC2": {
+            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "EC2AMIOS": {
+            "AllowedValues": [
+                "Amazon-Linux-HVM",
+                "CentOS-7-HVM"
+            ],
+            "Default": "Amazon-Linux-HVM",
+            "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
+            "Type": "String"
+        },
+        "vCDUICellType": {
+            "AllowedValues": [
+                "t2.small",
+                "m5.large",
+                "m5.xlarge"
+            ],
+            "Default": "m5.xlarge",
+            "Description": "Amazon EC2 instances type",
+            "Type": "String"
+        },
+        "vCDConsoleCellType": {
+            "AllowedValues": [
+                "t2.small",
+                "m5.large",
+                "m5.xlarge"
+            ],
+            "Default": "m5.large",
+            "Description": "Amazon EC2 instances type",
+            "Type": "String"
+        },
+        "PrivateSubnet1ID": {
+            "Description": "ID of the public subnet 1 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "PrivateSubnet2ID": {
+            "Description": "ID of the public subnet 2 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+         "VPCID": {
+             "Description": "ID of the VPC (e.g., vpc-0343606e)",
+             "Type": "AWS::EC2::VPC::Id"
+         },
+         "PrivateInstanceSecurityGroupID": {
+             "Description": "Security Group to Allow SSH Access from Bastion hosts",
+             "Type": "AWS::EC2::SecurityGroup::Id"
+         },
+         "RDSAccessSecurityGroupID": {
+             "Description": "Security Group to Allow Access to vCD Postgres RDS Database.",
+             "Type": "AWS::EC2::SecurityGroup::Id"
+         },
+         "CellsAccessSecurityGroupID": {
+             "Description": "Select the Security Group that allows access to VCD cells.",
+             "Type": "AWS::EC2::SecurityGroup::Id"
+         },
+         "vCDBuildBucketName": {
+             "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+             "ConstraintDescription": "Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+             "Default": "vcd-builds",
+             "Description": "Bucket name that holds the VCD build to be used by this stack.",
+             "Type": "String"
+         },
+         "vCDBuildName": {
+             "Default": "vmware-vcloud-director-distribution-9.0.0-7554058.bin",
+             "Description": "Specify the vCD binary filename name.",
+             "Type": "String"
+         },
+         "VcdCertKeystorePasswd": {
+           "NoEcho": "true",
+           "Description": "vCD Certificates Keystore Password. Minimum of 8 alphanumeric characters.",
+           "Type": "String",
+           "MinLength": "8"
+         },
+         "NumVCDUICells": {
+             "AllowedValues": [
+                 "1",
+                 "2",
+                 "4"
+             ],
+             "Default": "2",
+             "Description": "Enter the number of vCD UI Cells to create.",
+             "Type": "String"
+         },
+         "NumVCDConsoleCells": {
+             "AllowedValues": [
+                 "1",
+                 "2",
+                 "4"
+             ],
+             "Default": "2",
+             "Description": "Enter the number of vCD Console Cells to create.",
+             "Type": "String"
+         },
+         "xFerBucketName": {
+             "Description": "Name of the S3 Bucket used for vCD transfer store.",
+             "Type": "String"
+         },
+         "vCDUITargetGroup": {
+             "Description": "Arn of the vCD UI ELB Target Group.",
+             "Type": "String"
+         },
+         "vCDConsoleTargetGroup": {
+             "Description": "Arn of the vCD Console ELB Target Group.",
+             "Type": "String"
+         }
+    },
+    "Rules": {
+        "SubnetsInVPC": {
+            "Assertions": [
+                {
+                    "Assert": {
+                        "Fn::EachMemberIn": [
+                            {
+                                "Fn::ValueOfAll": [
+                                    "AWS::EC2::Subnet::Id",
+                                    "VpcId"
+                                ]
+                            },
+                            {
+                                "Fn::RefAll": "AWS::EC2::VPC::Id"
+                            }
+                        ]
+                    },
+                    "AssertDescription": "All subnets must exist in the VPC"
+                }
+            ]
+        }
+    },
+    "Mappings": {
+        "AWSAMIRegionMap": {
+            "AMI": {
+                "AMZNLINUXHVM": "amzn-ami-hvm-2017.09.1.20171120-x86_64-gp2",
+                "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS 1708_11.01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-95096eef.4"
+            },
+            "us-east-1": {
+                "AMZNLINUXHVM": "ami-55ef662f",
+                "CENTOS7HVM": "ami-02e98f78"
+            },
+            "us-east-2": {
+                "AMZNLINUXHVM": "ami-15e9c770",
+                "CENTOS7HVM": "ami-e0eac385"
+            },
+            "us-west-1": {
+                "AMZNLINUXHVM": "ami-a51f27c5",
+                "CENTOS7HVM": "ami-b1a59fd1"
+            },
+            "us-west-2": {
+                "AMZNLINUXHVM": "ami-bf4193c7",
+                "CENTOS7HVM": "ami-b63ae0ce"
+            }
+        },
+        "LinuxAMINameMap": {
+            "Amazon-Linux-HVM": {
+                "Code": "AMZNLINUXHVM"
+            },
+            "CentOS-7-HVM": {
+                "Code": "CENTOS7HVM"
+            }
+        }
+    },
+    "Resources": {
+        "CellsS3AccessRole": {
+           "Type": "AWS::IAM::Role",
+           "Properties": {
+              "AssumeRolePolicyDocument": {
+                 "Statement": [ {
+                    "Effect": "Allow",
+                    "Principal": {
+                       "Service": [ "ec2.amazonaws.com" ]
+                    },
+                    "Action": [ "sts:AssumeRole" ]
+                 } ]
+              },
+              "Path": "/"
+           }
+        },
+        "CellsS3AccessPolicies": {
+           "Type": "AWS::IAM::Policy",
+           "Properties": {
+              "PolicyName": "S3-AccessPerms",
+              "PolicyDocument": {
+                 "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": "s3:*",
+                    "Resource": "*"
+                 } ]
+              },
+              "Roles": [ { "Ref": "CellsS3AccessRole" } ]
+           }
+        },
+        "CellsS3AccessHostProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Roles": [
+                    {
+                        "Ref": "CellsS3AccessRole"
+                    }
+                ],
+                "Path": "/"
+            }
+        },
+        "vCDUIAutoScalingGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "LaunchConfigurationName": {
+                    "Ref": "vCDUILaunchConfiguration"
+                },
+                "VPCZoneIdentifier": [
+                    {
+                        "Ref": "PrivateSubnet1ID"
+                    },
+                    {
+                        "Ref": "PrivateSubnet2ID"
+                    }
+                ],
+                "MinSize": {
+                    "Ref": "NumVCDUICells"
+                },
+                "MaxSize": {
+                    "Ref": "NumVCDUICells"
+                },
+                "Cooldown": "300",
+                "DesiredCapacity": {
+                    "Ref": "NumVCDUICells"
+                },
+                "TargetGroupARNs" : [
+                    {
+                      "Ref" : "vCDUITargetGroup"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "vCD UI Cell",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            }
+        },
+        "vCDConsoleAutoScalingGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "LaunchConfigurationName": {
+                    "Ref": "vCDConsoleLaunchConfiguration"
+                },
+                "VPCZoneIdentifier": [
+                    {
+                        "Ref": "PrivateSubnet1ID"
+                    },
+                    {
+                        "Ref": "PrivateSubnet2ID"
+                    }
+                ],
+                "MinSize": {
+                    "Ref": "NumVCDConsoleCells"
+                },
+                "MaxSize": {
+                    "Ref": "NumVCDConsoleCells"
+                },
+                "Cooldown": "300",
+                "DesiredCapacity": {
+                    "Ref": "NumVCDConsoleCells"
+                },
+                "TargetGroupARNs" : [
+                    {
+                      "Ref" : "vCDConsoleTargetGroup"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "vCD Console Cell",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            }
+        },
+        "vCDUILaunchConfiguration": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "KeyName": {
+                    "Ref": "KeyPairNameEC2"
+                },
+                "IamInstanceProfile": {
+                    "Ref": "CellsS3AccessHostProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "LinuxAMINameMap",
+                                {
+                                    "Ref": "EC2AMIOS"
+                                },
+                                "Code"
+                            ]
+                        }
+                    ]
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "PrivateInstanceSecurityGroupID"
+                    },
+                    {
+                        "Ref": "CellsAccessSecurityGroupID"
+                    },
+                    {
+                        "Ref": "RDSAccessSecurityGroupID"
+                    }
+                ],
+                "InstanceType": {
+                    "Ref": "vCDUICellType"
+                },
+                "UserData": {
+                  "Fn::Base64": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "#!/bin/bash\n",
+                        "# Update GuestOS\n",
+                        "yum update -y\n",
+                        "# Install necessary packages\n",
+                        "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel redhat-lsb python36 python36-pip python36-devel -y\n",
+                        "# Clone S3FS repository from Git\n",
+                        "cd /home/ec2-user\n",
+                        "git clone https://github.com/s3fs-fuse/s3fs-fuse.git\n",
+                        "# Compile S3FS\n",
+                        "cd /home/ec2-user/s3fs-fuse\n",
+                        "./autogen.sh\n",
+                        "./configure --prefix=/usr --with-openssl\n",
+                        "make\n",
+                        "make install\n",
+                        "# Create vCD Transfer directory\n",
+                        "mkdir -p /opt/vmware/vcloud-director/data/transfer\n",
+                        "# Add S3 bucket mount point to fstab\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "echo 's3fs#",
+                              {
+                                "Ref": "xFerBucketName"
+                              },
+                              " /opt/vmware/vcloud-director/data/transfer fuse _netdev,allow_other,iam_role=auto,uid=501,gid=501 0 0' >> /etc/fstab"
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "# Copy vCD binaries from specified S3 Bucket\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "aws s3 cp s3://",
+                              {
+                                "Ref": "vCDBuildBucketName"
+                              },
+      			                  "/",
+      			                  {
+                                "Ref": "vCDBuildName"
+                              },
+      			                  " /tmp/",
+      			                  {
+                                "Ref": "vCDBuildName"
+                              }
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "# Make vCD binaries executable\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "chmod +x /tmp/",
+                              {
+                                "Ref": "vCDBuildName"
+                              }
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "# Install vCD\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "echo Y | /tmp/",
+                              {
+                                "Ref": "vCDBuildName"
+                              }
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "# Mount the S3 Bucket\n",
+                        "mount /opt/vmware/vcloud-director/data/transfer/\n",
+                        "sleep 5\n",
+                        "# Get Instance IP Address \n",
+                        "ip=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')\n",
+                        "# Configure vCD Cell\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "echo Y | /opt/vmware/vcloud-director/bin/configure -r /opt/vmware/vcloud-director/data/transfer/responses.properties -cons $ip --console-proxy-port-https 8443 -ip $ip --primary-port-http 80 --primary-port-https 443 ",
+                        			" -k /opt/vmware/vcloud-director/data/transfer/certificates.ks -w ",
+                        			{
+                                "Ref": "VcdCertKeystorePasswd"
+                              },
+      			                  " -unattended"
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF\n",
+                        "#Custom Changes Made for console proxy and DB connections\n",
+                        "consoleproxy.websockets.enabled = true\n",
+                        "consoleproxy.securenio.buffer.size = 17000\n",
+                        "database.pool.maxActive = 200\n",
+                        "vcloud.http.maxThreads = 150\n",
+                        "vcloud.http.minThreads = 32\n",
+                        "vcloud.http.acceptorThreads = 16\n",
+                        "hibernate.generate_statistics=true\n",
+                        "EOF\n",
+                        "# Start vCD Services\n",
+                        "service vmware-vcd start\n",
+                        "sleep 120\n"
+                      ]
+                    ]
+                  }
+                }
+            }
+        },
+        "vCDConsoleLaunchConfiguration": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Properties": {
+                "KeyName": {
+                    "Ref": "KeyPairNameEC2"
+                },
+                "IamInstanceProfile": {
+                    "Ref": "CellsS3AccessHostProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "LinuxAMINameMap",
+                                {
+                                    "Ref": "EC2AMIOS"
+                                },
+                                "Code"
+                            ]
+                        }
+                    ]
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "PrivateInstanceSecurityGroupID"
+                    },
+                    {
+                        "Ref": "CellsAccessSecurityGroupID"
+                    },
+                    {
+                        "Ref": "RDSAccessSecurityGroupID"
+                    }
+                ],
+                "InstanceType": {
+                    "Ref": "vCDConsoleCellType"
+                },
+                "UserData": {
+                  "Fn::Base64": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "#!/bin/bash\n",
+                        "# Update GuestOS\n",
+                        "yum update -y\n",
+                        "# Install necessary packages\n",
+                        "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel nfs-utils nfs-utils-lib redhat-lsb python36 python36-pip python36-devel -y\n",
+                        "# Clone S3FS repository from Git\n",
+                        "cd /home/ec2-user\n",
+                        "git clone https://github.com/s3fs-fuse/s3fs-fuse.git\n",
+                        "# Compile S3FS\n",
+                        "cd /home/ec2-user/s3fs-fuse\n",
+                        "./autogen.sh\n",
+                        "./configure --prefix=/usr --with-openssl\n",
+                        "make\n",
+                        "make install\n",
+                        "# Create vCD Transfer directory\n",
+                        "mkdir -p /opt/vmware/vcloud-director/data/transfer\n",
+                        "# Add S3 bucket mount point to fstab\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "echo 's3fs#",
+                              {
+                                "Ref": "xFerBucketName"
+                              },
+                              " /opt/vmware/vcloud-director/data/transfer fuse _netdev,allow_other,iam_role=auto,uid=501,gid=501 0 0' >> /etc/fstab"
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "# Copy vCD binaries from specified S3 Bucket\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "aws s3 cp s3://",
+                              {
+                                "Ref": "vCDBuildBucketName"
+                              },
+      			                  "/",
+      			                  {
+                                "Ref": "vCDBuildName"
+                              },
+      			                  " /tmp/",
+      			                  {
+                                "Ref": "vCDBuildName"
+                              }
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "# Make vCD binaries executable\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "chmod +x /tmp/",
+                              {
+                                "Ref": "vCDBuildName"
+                              }
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "# Install vCD\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "echo Y | /tmp/",
+                              {
+                                "Ref": "vCDBuildName"
+                              }
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "# Mount the S3 Bucket\n",
+                        "mount /opt/vmware/vcloud-director/data/transfer/\n",
+                        "sleep 5\n",
+                        "# Get Instance IP Address \n",
+                        "ip=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')\n",
+                        "# Configure vCD Cell\n",
+                        {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "echo Y | /opt/vmware/vcloud-director/bin/configure -r /opt/vmware/vcloud-director/data/transfer/responses.properties -cons $ip --console-proxy-port-https 8443 -ip $ip --primary-port-http 80 --primary-port-https 443 ",
+                        			" -k /opt/vmware/vcloud-director/data/transfer/certificates.ks -w ",
+                        			{
+                                "Ref": "VcdCertKeystorePasswd"
+                              },
+      			                  " -unattended"
+                            ]
+                          ]
+                        },
+                        "\n",
+                        "cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF\n",
+                        "#Custom Changes Made for console proxy and DB connections\n",
+                        "consoleproxy.websockets.enabled = true\n",
+                        "consoleproxy.securenio.buffer.size = 17000\n",
+                        "database.pool.maxActive = 200\n",
+                        "vcloud.http.maxThreads = 150\n",
+                        "vcloud.http.minThreads = 32\n",
+                        "vcloud.http.acceptorThreads = 16\n",
+                        "hibernate.generate_statistics=true\n",
+                        "EOF\n",
+                        "# Start vCD Services\n",
+                        "service vmware-vcd start\n",
+                        "sleep 120\n"
+                      ]
+                    ]
+                  }
+                }
+            }
+        }
+    }
+}
