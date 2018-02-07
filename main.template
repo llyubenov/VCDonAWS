@@ -621,6 +621,66 @@
               }
           }
       },
+      "vCDELBStack": {
+          "DependsOn": "VPCStack",
+          "Type": "AWS::CloudFormation::Stack",
+          "Properties": {
+              "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-elb.template",
+              "Parameters": {
+                  "VPCID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.VPCID"
+                      ]
+                  },
+                  "PublicSubnet1ID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.PublicSubnet1ID"
+                      ]
+                  },
+                  "PublicSubnet2ID": {
+                      "Fn::GetAtt": [
+                          "VPCStack",
+                          "Outputs.PublicSubnet2ID"
+                      ]
+                  },
+                  "CellsAccessSecurityGroupID": {
+                      "Fn::GetAtt": [
+                          "vCDMainStack",
+                          "Outputs.CellsAccessSecurityGroupID"
+                      ]
+                  },
+                  "ELBCertificateArn": {
+                      "Ref": "ELBCertificateArn"
+                  },
+                  "ELBHealthCheckIntervalSeconds": {
+                      "Ref": "ELBHealthCheckIntervalSeconds"
+                  },
+                  "ELBHealthCheckProtocol": {
+                      "Ref": "ELBHealthCheckProtocol"
+                  },
+                  "ELBHealthCheckPort": {
+                      "Ref": "ELBHealthCheckPort"
+                  },
+                  "ELBHealthCheckPath" : {
+                      "Ref": "ELBHealthCheckPath"
+                  },
+                  "ELBHealthCheckTimeoutSeconds": {
+                      "Ref": "ELBHealthCheckTimeoutSeconds"
+                  },
+                  "ELBHealthyThresholdCount": {
+                      "Ref": "ELBHealthyThresholdCount"
+                  },
+                  "ELBUnhealthyThresholdCount": {
+                      "Ref": "ELBUnhealthyThresholdCount"
+                  },
+                  "ELBResponseCode" : {
+                      "Ref": "ELBResponseCode"
+                  }
+              }
+          }
+      },
       "RDSStack": {
           "DependsOn": "VPCStack",
           "Type": "AWS::CloudFormation::Stack",
@@ -764,66 +824,6 @@
                   },
                   "vCDSerialNumber": {
                       "Ref": "vCDSerialNumber"
-                  }
-              }
-          }
-      },
-      "vCDELBStack": {
-          "DependsOn": "VPCStack",
-          "Type": "AWS::CloudFormation::Stack",
-          "Properties": {
-              "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-elb.template",
-              "Parameters": {
-                  "VPCID": {
-                      "Fn::GetAtt": [
-                          "VPCStack",
-                          "Outputs.VPCID"
-                      ]
-                  },
-                  "PublicSubnet1ID": {
-                      "Fn::GetAtt": [
-                          "VPCStack",
-                          "Outputs.PublicSubnet1ID"
-                      ]
-                  },
-                  "PublicSubnet2ID": {
-                      "Fn::GetAtt": [
-                          "VPCStack",
-                          "Outputs.PublicSubnet2ID"
-                      ]
-                  },
-                  "CellsAccessSecurityGroupID": {
-                      "Fn::GetAtt": [
-                          "vCDMainStack",
-                          "Outputs.CellsAccessSecurityGroupID"
-                      ]
-                  },
-                  "ELBCertificateArn": {
-                      "Ref": "ELBCertificateArn"
-                  },
-                  "ELBHealthCheckIntervalSeconds": {
-                      "Ref": "ELBHealthCheckIntervalSeconds"
-                  },
-                  "ELBHealthCheckProtocol": {
-                      "Ref": "ELBHealthCheckProtocol"
-                  },
-                  "ELBHealthCheckPort": {
-                      "Ref": "ELBHealthCheckPort"
-                  },
-                  "ELBHealthCheckPath" : {
-                      "Ref": "ELBHealthCheckPath"
-                  },
-                  "ELBHealthCheckTimeoutSeconds": {
-                      "Ref": "ELBHealthCheckTimeoutSeconds"
-                  },
-                  "ELBHealthyThresholdCount": {
-                      "Ref": "ELBHealthyThresholdCount"
-                  },
-                  "ELBUnhealthyThresholdCount": {
-                      "Ref": "ELBUnhealthyThresholdCount"
-                  },
-                  "ELBResponseCode" : {
-                      "Ref": "ELBResponseCode"
                   }
               }
           }
