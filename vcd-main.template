@@ -656,7 +656,7 @@
                   "# Copy vCD certificates keystore to vCD Transfer store\n",
                   "cp /tmp/certificates.ks /opt/vmware/vcloud-director/data/transfer/certificates.ks\n",
                   "# Copy vCD Response files to vCD Transfer store\n",
-                  "cp /opt/vmware/cloud-director/etc/responses.properties /opt/vmware/vcloud-director/data/transfer/responses.properties\n",
+                  "cp /opt/vmware/vcloud-director/etc/responses.properties /opt/vmware/vcloud-director/data/transfer/responses.properties\n",
                   "# Update Permission on vCD Response file\n",
                   "chmod 644 /opt/vmware/vcloud-director/data/transfer/responses.properties\n"
                 ]
