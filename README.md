@@ -1,7 +1,7 @@
 # vCloud Director (vCD) on AWS - CloudFormation Templates
 
 This repository contains AWS CloudFormation Templates that deploy scaleable multi cell vCloud Director Environment leveraging AWS services.
-The vCD stack can be leveraged in conjunction with the VMware Cloud on AWS service offering, or in a numerous different scenarios as well.
+The project was created for pure testing purposes with a long term goal to be leveraged in conjunction with the VMware Cloud on AWS service offering.
 This vCD Stack is deployed in a Multi-AZ fashion by placing the stack components across Two Availability Zones in a Single AWS Region.
 
 ![picture](https://github.com/llyubenov/VCDonAWS/blob/master/VCDonAWS.jpg)
@@ -12,8 +12,8 @@ Leveraging Nested CloudFormation templates allows us also to have smaller templa
 ## Templates
 The nested templates are broken down into different categories :
 
-* [Orchestrator (main.template)](#orchestrator)
-* [Infrastructure (vpc.template)](#infrastructure)
+* [Orchestrator](#orchestrator)
+* [Infrastructure](#infrastructure)
 * [Bastion Hosts](#bastion-hosts)
 * [Database](#database)
 * [vCD deployment](#vcd-deployment)
