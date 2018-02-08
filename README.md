@@ -12,20 +12,21 @@ Leveraging Nested CloudFormation templates allows us also to have smaller templa
 ## Templates
 The nested templates are broken down into different categories :
 
-* [Orchestrator](#orchestrator)
-* [Infrastructure (vpc)](#infrastructure)
-* [Database (rds)](#database)
-* [vCD deployment (vcd_main)](#database)
-* [Load Balancing (elb)](#loadbalancing)
-* [Autoscaling (vcd_cells)](#autoscaling)
+* [Orchestrator (main.template)](#orchestrator)
+* [Infrastructure (vpc.template)](#infrastructure)
+* [Bastion Hosts (linux-bastion.template)](#infrastructure)
+* [Database (rds.template)](#database)
+* [vCD deployment (vcd-main.template)](#database)
+* [Load Balancing (vcd-elb.template)](#loadbalancing)
+* [Autoscaling (vcd-cells.template)](#autoscaling)
 
 ### Orchestrator
-[Back to Top](# vCloud Director (vCD) on AWS - CloudFormation Templates)
+[Back to Top](#orchestrator)
 
 
 ### Infrastructure (vpc)
-[Back to Top](# vCloud Director (vCD) on AWS - CloudFormation Templates)
+[Back to Top](#infrastructure)
 
 
 ### Database (rds)
-[Back to Top](# vCloud Director (vCD) on AWS - CloudFormation Templates)
+[Back to Top](#database)
