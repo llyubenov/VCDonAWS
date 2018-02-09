@@ -10,14 +10,14 @@ The vCD Stack infrastructure is laid out leveraging Nested CloudFormation templa
 Leveraging Nested CloudFormation templates allows us also to have smaller templates with less repeatable code in them.
 
 ## Prerequisites
-In order to be able to successfully deploy the vCD stack, there are a few prerequisites that needs to be performed before you can deploy this stack:
-* <b>EC2 Key Pairs</b> - You need to create two sets of EC2 key pars (highly recommended). One to be assigned for the Bastion host/s and another for the vCD Cell.
+Before you are able to successfully deploy this templates, there are a few prerequisites that needs to be performed before you can deploy this stack:
+* <b>EC2 Key Pairs</b> - You need to create two sets of EC2 key pars (highly recommended). One to be assigned for the Bastion host/s and another for the vCD Cells EC2 Instances.
 * <b>ELB Certificate</b> - The Application ELB for the vCD UI requires a certificate to be upload to ACM before you try to deploy this stack. You need to provide the ARN for this certificate when deploying this stack.
-* <b>vCD Binaries</b> - This stack requires the vCD binaries to be uploaded on a S3 bucket. You need to procvide the name of the S3 bucket and the binary name when deploying this stack.
-
+* <b>vCD Binaries</b> - This stack requires the vCD binaries to be uploaded on a S3 bucket. You need to provide the name of the S3 bucket and the binary name when deploying this stack.
+* <b>vCD License Key</b> - This stack requires vCD license key to be provided in order for the stack to successfully deploy.
 
 ## Templates
-The nested templates are broken down into different categories :
+The nested templates are broken down into different categories:
 
 * [Orchestrator](#orchestrator)
 * [Infrastructure](#infrastructure)
@@ -82,7 +82,6 @@ This is master templates that calls all nested templates.
 ### Infrastructure
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
 
-
 <table width="100%">
     <tr>
         <th align="left" colspan="2"><h4><a href="https://github.com/llyubenov/VCDonAWS/blob/master/vpc.template">vpc.template</a></h4></th>
@@ -133,7 +132,6 @@ This is master templates that calls all nested templates.
 ### Bastion Hosts
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
 
-
 <table width="100%">
     <tr>
         <th align="left" colspan="2"><h4><a href="https://github.com/llyubenov/VCDonAWS/blob/master/linux-bastion.template">linux-bastion.template</a></h4></th>
@@ -182,7 +180,6 @@ This is master templates that calls all nested templates.
 ### Database
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
 
-
 <table width="100%">
     <tr>
         <th align="left" colspan="2"><h4><a href="https://github.com/llyubenov/VCDonAWS/blob/master/rds.template">rds.template</a></h4></th>
@@ -229,7 +226,6 @@ This is master templates that calls all nested templates.
 
 ### vCD deployment
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
-
 
 <table width="100%">
     <tr>
@@ -278,7 +274,6 @@ This is master templates that calls all nested templates.
 
 ### Load Balancing
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
-
 
 <table width="100%">
     <tr>
