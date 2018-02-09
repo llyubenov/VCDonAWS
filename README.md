@@ -9,6 +9,8 @@ This vCD Stack is deployed in a Multi-AZ fashion by placing the stack components
 The vCD Stack infrastructure is laid out leveraging Nested CloudFormation templates, which allows us to break the deployment of the necessary infrastructure into a smaller chunks.
 Leveraging Nested CloudFormation templates allows us also to have smaller templates with less repeatable code in them.
 
+## Prerequisites
+
 ## Templates
 The nested templates are broken down into different categories :
 
@@ -20,7 +22,6 @@ The nested templates are broken down into different categories :
 * [Load Balancing](#load-balancing)
 * [Autoscaling](#autoscaling)
 
-### Prerequisites
 
 ### Orchestrator
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
@@ -233,4 +234,4 @@ This is a nested templated that can be run as a stand alone templates as well.
 ### Autoscaling
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
 
-## To-Do List
+## TO-DO List
