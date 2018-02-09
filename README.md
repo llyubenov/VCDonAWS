@@ -77,7 +77,6 @@ This is master templates that calls all nested templates.
 ### Infrastructure
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
 
-This is a nested templated that can be run as a stand alone templates as well.
 
 <table width="100%">
     <tr>
@@ -129,7 +128,6 @@ This is a nested templated that can be run as a stand alone templates as well.
 ### Bastion Hosts
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
 
-This is a nested templated that can be run as a stand alone templates as well.
 
 <table width="100%">
     <tr>
@@ -179,7 +177,6 @@ This is a nested templated that can be run as a stand alone templates as well.
 ### Database
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
 
-This is a nested templated that can be run as a stand alone templates as well.
 
 <table width="100%">
     <tr>
@@ -228,8 +225,100 @@ This is a nested templated that can be run as a stand alone templates as well.
 ### vCD deployment
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
 
+
+<table width="100%">
+    <tr>
+        <th align="left" colspan="2"><h4><a href="https://github.com/llyubenov/VCDonAWS/blob/master/vcd-main.template">vcd-main.template</a></h4></th>
+    </tr>
+    <tr>
+        <td width="100%" valign="top">
+            <p>Deploys the Primary vCD cell</p>
+            <h6>This template deploys</h6>
+            <ol>
+             <li>EC2 Instance</li>
+             <li>vCD Cells Access Security Group</li>
+             <li>S3 Bucket for vCD Transfer Store</li>
+             <li>Configures first vCD Cell</li>
+             </br>
+             </br>
+            </ol>
+            <h6>Public S3 URL</h6>
+            <ol>
+             <oi>https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-main.template</li>
+            </ol>
+        </td>
+        <td  nowrap width="200" valign="top">
+            <table>
+                <tr>
+                    <th align="left">Launch</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://console.aws.amazon.com/cloudformation/home?#/stacks/new?&templateURL=https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-main.template" target="_blank"><img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"></a>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <th align="left">View in Designer</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://console.aws.amazon.com/cloudformation/designer/home?region=us-west-2&templateURL=https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-main.template" target="_blank"><img src="https://github.com/llyubenov/VCDonAWS/blob/master/Diagrams/vcd-main.png" width:100% alt="View in Designer"></a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
 ### Load Balancing
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
+
+
+<table width="100%">
+    <tr>
+        <th align="left" colspan="2"><h4><a href="https://github.com/llyubenov/VCDonAWS/blob/master/vcd-elb.template">vcd-elb.template</a></h4></th>
+    </tr>
+    <tr>
+        <td width="100%" valign="top">
+            <p>Deploys Elastic Load Balancers for vCD</p>
+            <h6>This template deploys</h6>
+            <ol>
+             <li>vCD UI Elastic Load Balancer</li>
+             <li>vCD Console Proxy Elastic Load Balancer</li>
+             </br>
+             </br>
+            </ol>
+            <h6>Public S3 URL</h6>
+            <ol>
+             <oi>https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-elb.template</li>
+            </ol>
+        </td>
+        <td  nowrap width="200" valign="top">
+            <table>
+                <tr>
+                    <th align="left">Launch</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://console.aws.amazon.com/cloudformation/home?#/stacks/new?&templateURL=https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-elb.template" target="_blank"><img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"></a>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <th align="left">View in Designer</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://console.aws.amazon.com/cloudformation/designer/home?region=us-west-2&templateURL=https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-elb.template" target="_blank"><img src="https://github.com/llyubenov/VCDonAWS/blob/master/Diagrams/vcd-elb.png" width:100% alt="View in Designer"></a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 
 ### Autoscaling
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
