@@ -11,7 +11,7 @@ Leveraging Nested CloudFormation templates allows us also to have smaller templa
 
 ## Prerequisites
 In order to be able to successfully deploy the vCD stack, there are a few prerequisites that needs to be performed before you can deploy this stack:
-* [EC2 Key Pairs]
+* <b>EC2 Key Pairs</b>
 * [ELB Certificate]
 * [vCD Binaries]
 
