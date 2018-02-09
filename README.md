@@ -133,7 +133,7 @@ This is a nested templated that can be run as a stand alone templates as well.
     </tr>
     <tr>
         <td width="100%" valign="top">
-            <p>This template is based of the <th align="left" colspan="2"><h4><a href="https://aws.amazon.com/quickstart/architecture/linux-bastion/">Linux Bastion Hosts on AWS</a></h4></th> Quick starts template.</p>
+            <p>This template is based of the <a href="https://aws.amazon.com/quickstart/architecture/linux-bastion/">Linux Bastion Hosts on AWS</a> - Quick starts template.</p>
             <h6>This template deploys</h6>
             <ol>
              <li>Bastion host/s</li>
