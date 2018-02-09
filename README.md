@@ -31,7 +31,8 @@ This is master templates that calls all nested templates.
     </tr>
     <tr>
         <td width="100%" valign="top">
-            <h6>Creates the Complete vCD Stack</h6>
+            <p>Creates the Complete vCD Stack</p>
+            <h6>The template deploy the following nested templates</h6>
             <ol>
              <li>VPC</li>
              <li>Bastion Host/s</li>
@@ -58,7 +59,7 @@ This is master templates that calls all nested templates.
             </table>
             <table>
                 <tr>
-                    <th align="left">View in CF Designer</th>
+                    <th align="left">View in Designer</th>
                 </tr>
                 <tr>
                     <td>
@@ -110,7 +111,7 @@ This is a nested templated that can be run as a stand alone templates as well.
             </table>
             <table>
                 <tr>
-                    <th align="left">View in CF Designer</th>
+                    <th align="left">View in Designer</th>
                 </tr>
                 <tr>
                     <td>
@@ -159,7 +160,7 @@ This is a nested templated that can be run as a stand alone templates as well.
             </table>
             <table>
                 <tr>
-                    <th align="left">View in CF Designer</th>
+                    <th align="left">View in Designer</th>
                 </tr>
                 <tr>
                     <td>
