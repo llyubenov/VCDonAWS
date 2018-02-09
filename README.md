@@ -11,9 +11,9 @@ Leveraging Nested CloudFormation templates allows us also to have smaller templa
 
 ## Prerequisites
 In order to be able to successfully deploy the vCD stack, there are a few prerequisites that needs to be performed before you can deploy this stack:
-* <b>EC2 Key Pairs</b>
-* [ELB Certificate]
-* [vCD Binaries]
+* <b>EC2 Key Pairs</b> - You need to create two sets of EC2 key pars (highly recommended). One to be assigned for the Bastion host/s and another for the vCD Cell.
+* <b>ELB Certificate</b> - The Application ELB for the vCD UI requires a certificate to be upload to ACM before you try to deploy this stack. You need to provide the ARN for this certificate when deploying this stack.
+* <b>vCD Binaries</b> - This stack requires the vCD binaries to be uploaded on a S3 bucket. You need to procvide the name of the S3 bucket and the binary name when deploying this stack.
 
 
 ## Templates
