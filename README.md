@@ -137,10 +137,11 @@ This is a nested templated that can be run as a stand alone templates as well.
             <p>This template is based of the <a href="https://aws.amazon.com/quickstart/architecture/linux-bastion/">Linux Bastion Hosts on AWS</a> - Quick starts template.</p>
             <h6>This template deploys</h6>
             <ol>
-             <li>Bastion host/s</li>
              <li>Security Groups</li>
              <li>EIP/s</li>
-             <li>Bastion host/s in Auto Scaling group </li>
+             <li>Bastion host/s in Auto Scaling Group</li>
+             <li>Bastion host/s Access Security Group</li>
+             <li>Private instances Access Security Group</li>
             </ol>
             <h6>Public S3 URL</h6>
             <ol>
@@ -174,6 +175,50 @@ This is a nested templated that can be run as a stand alone templates as well.
 
 ### Database
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
+
+This is a nested templated that can be run as a stand alone templates as well.
+
+<table width="100%">
+    <tr>
+        <th align="left" colspan="2"><h4><a href="https://github.com/llyubenov/VCDonAWS/blob/master/rds.template">rds.template</a></h4></th>
+    </tr>
+    <tr>
+        <td width="100%" valign="top">
+            <p>Deploys the Postgres RDS in single or multi-az deployment</p>
+            <h6>This template deploys</h6>
+            <ol>
+             <li>RDS Security Group</li>
+             <li>Postgres RDS</li>
+            </ol>
+            <h6>Public S3 URL</h6>
+            <ol>
+             <oi>https://s3-us-west-2.amazonaws.com/vcd-cf-templates/rds.template</li>
+            </ol>
+        </td>
+        <td  nowrap width="200" valign="top">
+            <table>
+                <tr>
+                    <th align="left">Launch</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://console.aws.amazon.com/cloudformation/home?#/stacks/new?&templateURL=https://s3-us-west-2.amazonaws.com/vcd-cf-templates/rds.template" target="_blank"><img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"></a>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <th align="left">View in Designer</th>
+                </tr>
+                <tr>
+                    <td>
+                        <a href="https://console.aws.amazon.com/cloudformation/designer/home?region=us-west-2&templateURL=https://s3-us-west-2.amazonaws.com/vcd-cf-templates/rds.template" target="_blank"><img src="https://github.com/llyubenov/VCDonAWS/blob/master/Diagrams/rds.png" width:100% alt="View in Designer"></a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 
 ### vCD deployment
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
