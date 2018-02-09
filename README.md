@@ -20,6 +20,8 @@ The nested templates are broken down into different categories :
 * [Load Balancing](#load-balancing)
 * [Autoscaling](#autoscaling)
 
+### Prerequisites
+
 ### Orchestrator
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
 
@@ -230,3 +232,5 @@ This is a nested templated that can be run as a stand alone templates as well.
 
 ### Autoscaling
 [Back to Top](#vcloud-director-vcd-on-aws---cloudformation-templates)
+
+## To-Do List
