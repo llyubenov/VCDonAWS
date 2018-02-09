@@ -10,6 +10,11 @@ The vCD Stack infrastructure is laid out leveraging Nested CloudFormation templa
 Leveraging Nested CloudFormation templates allows us also to have smaller templates with less repeatable code in them.
 
 ## Prerequisites
+In order to be able to successfully deploy the vCD stack, there are a few prerequisites that needs to be performed before you can deploy this stack:
+* [EC2 Key Pairs]
+* [ELB Certificate]
+* [vCD Binaries]
+
 
 ## Templates
 The nested templates are broken down into different categories :
