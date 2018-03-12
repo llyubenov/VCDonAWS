@@ -144,10 +144,9 @@
        "MainVcdCellType": {
            "AllowedValues": [
                "t2.small",
-               "m5.large",
-               "m5.xlarge"
+               "m5.large"
            ],
-           "Default": "m5.large",
+           "Default": "t2.small",
            "Description": "Amazon EC2 instances type",
            "Type": "String"
        },
