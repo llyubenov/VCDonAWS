@@ -617,28 +617,6 @@
                     ]
                   },
                   "\n",
-                  "# Start vCD Services\n",
-                  "service vmware-vcd start\n",
-                  "sleep 120\n",
-                  "# Create Global Catalog Org\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "/root/.local/bin/vcd login $ip system ",
-                        {
-                          "Ref": "vCDAdmin"
-                        },
-                        " -p ",
-                        {
-                          "Ref": "vCDAdminPasswd"
-                        },
-                        " -w -i"
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "/root/.local/bin/vcd org create global_catalog 'Global Catalog Org' -e\n",
                   "# Move vCD binaries to vCD Transfer store\n",
                   {
                     "Fn::Join": [
@@ -661,7 +639,29 @@
                   "# Copy vCD Response files to vCD Transfer store\n",
                   "cp /opt/vmware/vcloud-director/etc/responses.properties /opt/vmware/vcloud-director/data/transfer/responses.properties\n",
                   "# Update Permission on vCD Response file\n",
-                  "chmod 644 /opt/vmware/vcloud-director/data/transfer/responses.properties\n"
+                  "chmod 644 /opt/vmware/vcloud-director/data/transfer/responses.properties\n",
+                  "# Start vCD Services\n",
+                  "service vmware-vcd start\n",
+                  "sleep 120\n",
+                  "# Create Global Catalog Org\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "/root/.local/bin/vcd login $ip system ",
+                        {
+                          "Ref": "vCDAdmin"
+                        },
+                        " -p '",
+                        {
+                          "Ref": "vCDAdminPasswd"
+                        },
+                        "' -w -i"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "/root/.local/bin/vcd org create global_catalog 'Global Catalog Org' -e\n",
                 ]
               ]
             }
