@@ -661,7 +661,7 @@
                     ]
                   },
                   "\n",
-                  "/root/.local/bin/vcd org create global_catalog 'Global Catalog Org' -e\n",
+                  "/root/.local/bin/vcd org create global_catalog 'Global Catalog Org' -e\n"
                 ]
               ]
             }
