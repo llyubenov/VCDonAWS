@@ -631,7 +631,11 @@
                               {
                                 "Ref": "xFerBucketName"
                               },
-                              " /opt/vmware/vcloud-director/data/transfer fuse _netdev,allow_other,iam_role=auto,uid=501,gid=501 0 0' >> /etc/fstab"
+                              " /opt/vmware/vcloud-director/data/transfer fuse _netdev,allow_other,iam_role=auto,uid=501,gid=501,url=http://s3-", 
+                              {
+                                "Ref": "AWS::Region"
+                              },
+                              ".amazonaws.com 0 0' >> /etc/fstab"
                             ]
                           ]
                         },
