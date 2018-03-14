@@ -556,7 +556,7 @@
            "Type": "String"
        },
        "ELBHealthCheckTimeoutSeconds": {
-           "Default": "5",
+           "Default": "10",
            "Description": "The number of seconds to wait for a response before considering that a health check has failed.",
            "Type": "String"
        },
