@@ -617,23 +617,6 @@
                     ]
                   },
                   "\n",
-                  "# Move vCD binaries to vCD Transfer store\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "mv /tmp/",
-                        {
-                          "Ref": "vCDBuildName"
-                        },
-                        " /opt/vmware/vcloud-director/data/transfer/",
-                        {
-                          "Ref": "vCDBuildName"
-                        }
-                      ]
-                    ]
-                  },
-                  "\n",
                   "# Copy vCD certificates keystore to vCD Transfer store\n",
                   "cp /tmp/certificates.ks /opt/vmware/vcloud-director/data/transfer/certificates.ks\n",
                   "# Copy vCD Response files to vCD Transfer store\n",
@@ -642,26 +625,7 @@
                   "chmod 644 /opt/vmware/vcloud-director/data/transfer/responses.properties\n",
                   "# Start vCD Services\n",
                   "service vmware-vcd start\n",
-                  "sleep 120\n",
-                  "# Create Global Catalog Org\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "/root/.local/bin/vcd login $ip system ",
-                        {
-                          "Ref": "vCDAdmin"
-                        },
-                        " -p '",
-                        {
-                          "Ref": "vCDAdminPasswd"
-                        },
-                        "' -w -i"
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "/root/.local/bin/vcd org create global_catalog 'Global Catalog Org' -e\n"
+                  "sleep 120\n"
                 ]
               ]
             }
