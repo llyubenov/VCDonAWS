@@ -296,6 +296,5 @@
     "Description": "Allocated Storage in GB",
     "Value": {"Ref": "AllocatedStorage"}
   }
-},
-
+}
 }

@@ -102,7 +102,7 @@
             "Default": "172.16.0.0/16",
             "Description": "CIDR block for the VPC",
             "Type": "String"
-        },
+        }
     },
     "Resources": {
         "VPC": {
@@ -295,7 +295,7 @@
                     "Ref": "PrivateSubnet1RouteTable"
                 },
                 "DestinationCidrBlock": "0.0.0.0/0",
-                "NatGatewayId": {"Ref": "NATGateway1"},
+                "NatGatewayId": {"Ref": "NATGateway1"}
             }
         },
         "PrivateSubnet1RouteTableAssociation": {
@@ -334,7 +334,7 @@
                     "Ref": "PrivateSubnet2RouteTable"
                 },
                 "DestinationCidrBlock": "0.0.0.0/0",
-                "NatGatewayId": {"Ref": "NATGateway2"},
+                "NatGatewayId": {"Ref": "NATGateway2"}
             }
         },
         "PrivateSubnet2RouteTableAssociation": {
@@ -405,14 +405,14 @@
             "DependsOn": "VPCGatewayAttachment",
             "Type": "AWS::EC2::EIP",
             "Properties": {
-                "Domain": "vpc",
+                "Domain": "vpc"
             }
         },
         "NAT2EIP": {
             "DependsOn": "VPCGatewayAttachment",
             "Type": "AWS::EC2::EIP",
             "Properties": {
-                "Domain": "vpc",
+                "Domain": "vpc"
             }
         },
         "NATGateway1": {
@@ -495,7 +495,7 @@
                             "Fn::Join" : [
                                 "",
                                 [ 
-                                    { "Ref" : "VPCID" }, 
+                                    { "Ref" : "AWS::StackName" }, 
                                     "-xfer" 
                                 ]
                             ] 
