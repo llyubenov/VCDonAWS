@@ -110,7 +110,7 @@
                 "vCDUITargetGroup": {
                     "default": "vCD UI ELB Target Group"
                 },
-                "vCDUITargetGroup": {
+                "vCDConsoleTargetGroup": {
                     "default": "vCD Console ELB Target Group"
                 }
             }
