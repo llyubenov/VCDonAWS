@@ -483,7 +483,27 @@
                     "Ref": "VPC"
                 }
             }
-        }
+        },
+        "VPG" : {
+            "Type" : "AWS::EC2::VPNGateway",
+            "Properties" : {
+               "Type" : "ipsec.1",
+               "Tags" : [ 
+                    { 
+                        "Key" : "Name", 
+                        "Value" : { 
+                            "Fn::Join" : [
+                                "",
+                                [ 
+                                    { "Ref" : "VPCID" }, 
+                                    "-xfer" 
+                                ]
+                            ] 
+                        }
+                    }
+                ]
+            }
+         }
     },
     "Outputs": {
         "NAT1EIP": {
