@@ -141,7 +141,7 @@
                 ]
             }
         },
-        "VPCGatewayAttachment": {
+        "InternetGatewayAttachment": {
             "Type": "AWS::EC2::VPCGatewayAttachment",
             "Properties": {
                 "VpcId": {
@@ -484,7 +484,7 @@
                 }
             }
         },
-        "VPG" : {
+        "VPNGateway" : {
             "Type" : "AWS::EC2::VPNGateway",
             "Properties" : {
                "Type" : "ipsec.1",
@@ -496,12 +496,19 @@
                                 "",
                                 [ 
                                     { "Ref" : "AWS::StackName" }, 
-                                    "-xfer" 
+                                    "-vgw" 
                                 ]
                             ] 
                         }
                     }
                 ]
+            }
+         },
+         "AttachVPNGateway" : {
+            "Type" : "AWS::EC2::VPCGatewayAttachment",
+            "Properties" : {
+               "VpcId" : { "Ref" : "VPC" },
+               "VpnGatewayId" : { "Ref" : "VPNGateway" }
             }
          }
     },
