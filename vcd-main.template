@@ -344,7 +344,7 @@
      "xFerBucket" : {
        "Type" : "AWS::S3::Bucket",
        "Properties" : {
-         "BucketName": { "Fn::Join" : ["", [ { "Ref" : "VPCID" }, "-xfer" ]
+         "BucketName": { "Fn::Join" : ["", [ { "Ref" : "AWS::StackName" }, "-xfer" ]
          ] }
        }
      },
