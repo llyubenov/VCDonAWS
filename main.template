@@ -430,7 +430,7 @@
                "m5.large",
                "m5.xlarge"
            ],
-           "Default": "m5.large",
+           "Default": "t2.small",
            "Description": "Amazon EC2 instance type.",
            "Type": "String"
        },
