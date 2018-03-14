@@ -125,7 +125,7 @@
             "Type": "String"
         },
         "ELBHealthCheckTimeoutSeconds": {
-            "Default": "5",
+            "Default": "10",
             "Description": "The number of seconds to wait for a response before considering that a health check has failed.",
             "Type": "String"
         },
@@ -168,40 +168,41 @@
         }
     },
     "Resources": {
-      "VCDLBSecurityGroup": {
-        "Type": "AWS::EC2::SecurityGroup",
-        "Properties": {
-          "GroupDescription": "Public Access to VCD Load Balancer",
-          "VpcId": {"Ref": "VPCID"},
-          "Tags": [
-            {
-              "Key": "Name",
-              "Value": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-vCDLB-SG"]]}
+        "VCDLBSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+            "GroupDescription": "Public Access to VCD Load Balancer",
+            "VpcId": {"Ref": "VPCID"},
+            "Tags": [
+                {
+                "Key": "Name",
+                "Value": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-vCDLB-SG"]]}
+                }
+            ]
             }
-          ]
-        }
-      },
-      "VCDLBSecurityGroupIngress1": {
-        "Type": "AWS::EC2::SecurityGroupIngress",
-        "DependsOn": "VCDLBSecurityGroup",
-        "Properties": {
-          "GroupId": {"Ref": "VCDLBSecurityGroup"},
-          "CidrIp": "0.0.0.0/0",
-          "IpProtocol": "tcp",
-          "FromPort": "443",
-          "ToPort": "443"
+        },
+        "VCDLBSecurityGroupIngress1": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "DependsOn": "VCDLBSecurityGroup",
+            "Properties": {
+            "GroupId": {"Ref": "VCDLBSecurityGroup"},
+            "CidrIp": "0.0.0.0/0",
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443"
+            }
         },
         "VCDLBSecurityGroupIngress2": {
             "Type": "AWS::EC2::SecurityGroupIngress",
-            "DependsOn": "VCDLBSecurityGroupIngress1",
+            "DependsOn": "VCDLBSecurityGroup",
             "Properties": {
-              "GroupId": {"Ref": "VCDLBSecurityGroup"},
-              "IpProtocol": "tcp",
-              "FromPort": "8443",
-              "ToPort": "8443",
-              "SourceSecurityGroupId": {"Ref": "CellsAccessSecurityGroupID"}
-        }
-      },
+            "GroupId": {"Ref": "VCDLBSecurityGroup"},
+            "CidrIp": "0.0.0.0/0",
+            "IpProtocol": "tcp",
+            "FromPort": "8443",
+            "ToPort": "8443"
+            }
+        },
         "vCDUILoadBalancer": {
             "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
             "Properties": {
@@ -225,19 +226,19 @@
                 "Type" : "application",
                 "IpAddressType" : "ipv4",
                 "Tags": [
-                  {
+                    {
                     "Key": "Name",
                     "Value": {
                         "Fn::Join": [
-                          "", [
+                            "", [
                             {
-                              "Ref": "AWS::StackName"
+                                "Ref": "AWS::StackName"
                             },
                             "-vCDUI"
-                          ]
+                            ]
                         ]
                     }
-                  }
+                    }
                 ]
             }
         },
