@@ -387,9 +387,7 @@
                 "HealthCheckPort": {
                     "Ref": "ELBHealthCheckPort"
                 },
-                "HealthCheckPath" : {
-                    "Ref": "/"
-                },
+                "HealthCheckPath" : "/",
                 "HealthyThresholdCount": {
                     "Ref": "ELBHealthyThresholdCount"
                 },
