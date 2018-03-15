@@ -181,26 +181,17 @@
             ]
             }
         },
-        "VCDLBSecurityGroupIngress1": {
+        "VCDLBSecurityGroupIngress": {
             "Type": "AWS::EC2::SecurityGroupIngress",
             "DependsOn": "VCDLBSecurityGroup",
             "Properties": {
-            "GroupId": {"Ref": "VCDLBSecurityGroup"},
-            "CidrIp": "0.0.0.0/0",
-            "IpProtocol": "tcp",
-            "FromPort": "443",
-            "ToPort": "443"
-            }
-        },
-        "VCDLBSecurityGroupIngress2": {
-            "Type": "AWS::EC2::SecurityGroupIngress",
-            "DependsOn": "VCDLBSecurityGroup",
-            "Properties": {
-            "GroupId": {"Ref": "VCDLBSecurityGroup"},
-            "CidrIp": "0.0.0.0/0",
-            "IpProtocol": "tcp",
-            "FromPort": "8443",
-            "ToPort": "8443"
+                "GroupId": {
+                    "Ref": "VCDLBSecurityGroup"
+                },
+                "CidrIp": "0.0.0.0/0",
+                "IpProtocol": "tcp",
+                "FromPort": "443",
+                "ToPort": "443"
             }
         },
         "vCDUILoadBalancer": {

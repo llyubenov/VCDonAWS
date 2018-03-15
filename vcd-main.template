@@ -372,19 +372,32 @@
              ]
          }
      },
-     "CellsAccessSecurityGroupIngress": {
-         "Type": "AWS::EC2::SecurityGroupIngress",
-         "DependsOn": "CellsAccessSecurityGroup",
-         "Properties": {
-             "GroupId": {
-                 "Ref": "CellsAccessSecurityGroup"
-             },
-             "IpProtocol": "-1",
-             "FromPort": "0",
-             "ToPort": "65535",
-             "SourceSecurityGroupId": {"Ref": "CellsAccessSecurityGroup"}
-       }
+     "CellsAccessSecurityGroupIngress1": {
+        "Type": "AWS::EC2::SecurityGroupIngress",
+        "DependsOn": "CellsAccessSecurityGroup",
+        "Properties": {
+            "GroupId": {
+                "Ref": "CellsAccessSecurityGroup"
+            },
+            "IpProtocol": "-1",
+            "FromPort": "0",
+            "ToPort": "65535",
+            "SourceSecurityGroupId": {"Ref": "CellsAccessSecurityGroup"}
+    }
      },
+     "CellsAccessSecurityGroupIngress2": {
+        "Type": "AWS::EC2::SecurityGroupIngress",
+        "DependsOn": "CellsAccessSecurityGroup",
+        "Properties": {
+            "GroupId": {
+                "Ref": "CellsAccessSecurityGroup"
+            },
+            "CidrIp": "0.0.0.0/0",
+            "IpProtocol": "tcp",
+            "FromPort": "8443",
+            "ToPort": "8443"
+        }
+    },
       "vCDMain": {
         "Type": "AWS::EC2::Instance",
         "Properties": {
