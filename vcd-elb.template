@@ -206,12 +206,6 @@
         "vCDUILoadBalancer": {
             "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
             "Properties": {
-                "LoadBalancerAttributes" : [ 
-                    {
-                        "Key" : "load_balancing.cross_zone.enabled",
-                        "Value" : "true"
-                    }
-                ],
                 "Subnets": [
                     {
                         "Ref": "PublicSubnet1ID"
@@ -251,6 +245,12 @@
         "vCDConsoleLoadBalancer": {
             "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
             "Properties": {
+                "LoadBalancerAttributes" : [ 
+                    {
+                        "Key" : "load_balancing.cross_zone.enabled",
+                        "Value" : "true"
+                    }
+                ],
                 "Subnets": [
                     {
                         "Ref": "PublicSubnet1ID"
