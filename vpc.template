@@ -367,7 +367,7 @@
             }
         },
         "PublicSubnetRoute": {
-            "DependsOn": "VPCGatewayAttachment",
+            "DependsOn": "InternetGatewayAttachment",
             "Type": "AWS::EC2::Route",
             "Properties": {
                 "RouteTableId": {
@@ -402,21 +402,21 @@
             }
         },
         "NAT1EIP": {
-            "DependsOn": "VPCGatewayAttachment",
+            "DependsOn": "InternetGatewayAttachment",
             "Type": "AWS::EC2::EIP",
             "Properties": {
                 "Domain": "vpc"
             }
         },
         "NAT2EIP": {
-            "DependsOn": "VPCGatewayAttachment",
+            "DependsOn": "InternetGatewayAttachment",
             "Type": "AWS::EC2::EIP",
             "Properties": {
                 "Domain": "vpc"
             }
         },
         "NATGateway1": {
-            "DependsOn": "VPCGatewayAttachment",
+            "DependsOn": "InternetGatewayAttachment",
             "Type": "AWS::EC2::NatGateway",
             "Properties": {
                 "AllocationId": {
@@ -431,7 +431,7 @@
             }
         },
         "NATGateway2": {
-            "DependsOn": "VPCGatewayAttachment",
+            "DependsOn": "InternetGatewayAttachment",
             "Type": "AWS::EC2::NatGateway",
             "Properties": {
                 "AllocationId": {
