@@ -319,7 +319,7 @@
                 "VpcId": {
                     "Ref": "VPCID"
                 },
-                "Port": 443,
+                "Port": 8443,
                 "Protocol": "HTTPS",
                 "HealthCheckIntervalSeconds": {
                     "Ref": "ELBHealthCheckIntervalSeconds"
@@ -388,7 +388,7 @@
                     "Ref": "ELBHealthCheckPort"
                 },
                 "HealthCheckPath" : {
-                    "Ref": "ELBHealthCheckPath"
+                    "Ref": "/"
                 },
                 "HealthyThresholdCount": {
                     "Ref": "ELBHealthyThresholdCount"
