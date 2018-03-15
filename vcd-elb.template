@@ -105,7 +105,7 @@
             "Type": "String"
         },
         "ELBHealthCheckIntervalSeconds": {
-            "Default": "15",
+            "Default": "30",
             "Description": "The approximate number of seconds between health checks for an individual target.",
             "Type": "String"
         },
