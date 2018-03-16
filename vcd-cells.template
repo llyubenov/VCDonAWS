@@ -22,8 +22,10 @@
                         "KeyPairNameEC2",
                         "EC2AMIOS",
                         "vCDUICellType",
+                        "vCDUIVolumeSize",
                         "NumVCDUICells",
                         "vCDConsoleCellType",
+                        "vCDConsoleVolumeSize",
                         "NumVCDConsoleCells",
                         "PrivateInstanceSecurityGroupID",
                         "RDSAccessSecurityGroupID",
@@ -112,6 +114,12 @@
                 },
                 "vCDConsoleTargetGroup": {
                     "default": "vCD Console ELB Target Group"
+                },
+                "vCDUIVolumeSize": {
+                    "Default": "vCD UI Cells root volume size"
+                },
+                "vCDConsoleVolumeSize": {
+                    "Default": "vCD Console Cells root volume size"
                 }
             }
         }
@@ -148,6 +156,16 @@
             ],
             "Default": "m5.large",
             "Description": "Amazon EC2 instances type",
+            "Type": "String"
+        },
+        "vCDUIVolumeSize": {
+            "Default": "40",
+            "Description": "Amazon EC2 Instance Root Volume Size GB",
+            "Type": "String"
+        },
+        "vCDConsoleVolumeSize": {
+            "Default": "40",
+            "Description": "Amazon EC2 Instance Root Volume Size GB",
             "Type": "String"
         },
         "PrivateSubnet1ID": {
@@ -422,6 +440,18 @@
                         }
                     ]
                 },
+                "BlockDeviceMappings": [
+                    {
+                      "DeviceName": "/dev/xvda",
+                      "Ebs": {
+                        "VolumeType": "gp2",
+                        "DeleteOnTermination": "false",
+                        "VolumeSize": {
+                            "Ref": "vCDUIVolumeSize"
+                        }
+                      }
+                    }
+                ],
                 "SecurityGroups": [
                     {
                         "Ref": "PrivateInstanceSecurityGroupID"
@@ -587,6 +617,18 @@
                         }
                     ]
                 },
+                "BlockDeviceMappings": [
+                    {
+                      "DeviceName": "/dev/xvda",
+                      "Ebs": {
+                        "VolumeType": "gp2",
+                        "DeleteOnTermination": "false",
+                        "VolumeSize": {
+                            "Ref": "vCDConsoleVolumeSize"
+                        }
+                      }
+                    }
+                ],
                 "SecurityGroups": [
                     {
                         "Ref": "PrivateInstanceSecurityGroupID"

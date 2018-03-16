@@ -61,7 +61,8 @@
                     "Parameters": [
                         "KeyPairNameEC2",
                         "EC2AMIOS",
-                        "MainVcdCellType"
+                        "MainVcdCellType",
+                        "MainVcdVolumeSize"
                     ]
                 },
                 {
@@ -72,8 +73,10 @@
                         "KeyPairNameEC2",
                         "EC2AMIOS",
                         "vCDUICellType",
+                        "vCDUIVolumeSize",
                         "NumVCDUICells",
                         "vCDConsoleCellType",
+                        "vCDConsoleVolumeSize",
                         "NumVCDConsoleCells"
                     ]
                 },
@@ -254,6 +257,15 @@
                },
                "ELBResponseCode": {
                    "default": "Response Code/s"
+               },
+               "MainVcdVolumeSize": {
+                   "default": "Main vCD root volume size"
+               },
+               "vCDUIVolumeSize": {
+                   "default": "vCD UI Cells root volume size"
+               },
+               "vCDConsoleVolumeSize": {
+                   "default": "vCD Console Cells root volume size"
                }
             }
         }
@@ -571,7 +583,22 @@
            "Default": "200",
            "Description": "The HTTP codes that a healthy target uses when responding to a health check.",
            "Type": "String"
-       }
+       },
+       "vCDUIVolumeSize": {
+            "Default": "40",
+            "Description": "Amazon EC2 Instance Root Volume Size GB",
+            "Type": "String"
+        },
+        "vCDConsoleVolumeSize": {
+            "Default": "40",
+            "Description": "Amazon EC2 Instance Root Volume Size GB",
+            "Type": "String"
+        },
+        "MainVcdVolumeSize": {
+            "Default": "20",
+            "Description": "Amazon EC2 Instance Root Volume Size GB",
+            "Type": "String"
+        }
     },
     "Resources": {
       "VPCStack": {
