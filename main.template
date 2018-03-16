@@ -820,7 +820,10 @@
                   },
                   "vCDSerialNumber": {
                       "Ref": "vCDSerialNumber"
-                  }
+                  },
+                  "MainVcdVolumeSize": {
+                      "Ref": "MainVcdVolumeSize"
+                }
               }
           }
       },
@@ -970,11 +973,18 @@
                           "vCDELBStack",
                           "Outputs.vCDUITargetGroup"
                       ]
-                  },"vCDConsoleTargetGroup": {
+                  },
+                  "vCDConsoleTargetGroup": {
                       "Fn::GetAtt": [
                           "vCDELBStack",
                           "Outputs.vCDConsoleTargetGroup"
                       ]
+                  },
+                  "vCDConsoleVolumeSize": {
+                      "Ref": "vCDConsoleVolumeSize"
+                  },
+                  "vCDUIVolumeSize": {
+                    "Ref": "vCDUIVolumeSize"
                   }
               }
           }
