@@ -20,6 +20,7 @@
                        "KeyPairNameEC2",
                        "EC2AMIOS",
                        "MainVcdInstanceType",
+                       "MainVcdVolumeSize",
                        "PrivateInstanceSecurityGroupID",
                        "RDSAccessSecurityGroupID"
                    ]
@@ -66,6 +67,9 @@
                },
                "EC2AMIOS": {
                    "default": "vCD EC2 AMI Operating System"
+               },
+               "MainVcdVolumeSize": {
+                "Default": "Main vCD root volume size"
                },
                "MainVcdCellType": {
                    "default": "vCD EC2 Instance Type"
@@ -139,6 +143,11 @@
            ],
            "Default": "Amazon-Linux-HVM",
            "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
+           "Type": "String"
+       },
+       "MainVcdVolumeSize": {
+           "Default": "20",
+           "Description": "Amazon EC2 Instance Root Volume Size",
            "Type": "String"
        },
        "MainVcdCellType": {
@@ -418,6 +427,18 @@
                   }
               ]
           },
+          "BlockDeviceMappings": [
+            {
+              "DeviceName": "/dev/xvda",
+              "Ebs": {
+                "VolumeType": "gp2",
+                "DeleteOnTermination": "false",
+                "VolumeSize": {
+                    "Ref": "MainVcdVolumeSize"
+                }
+              }
+            }
+          ],
           "InstanceType": {
               "Ref": "MainVcdCellType"
           },
