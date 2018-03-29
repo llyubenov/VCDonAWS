@@ -377,7 +377,7 @@
                  "Resource": "*"
               } ]
            },
-           "Roles": [ { "Ref": "xvCDAccessRole" } ]
+           "Roles": [ { "Ref": "vCDAccessRole" } ]
         }
      },
      "CloudWatchPolicies": {
