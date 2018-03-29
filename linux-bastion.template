@@ -173,7 +173,7 @@
             "Type": "AWS::EC2::VPC::Id"
         },
         "LogRetentionDays": {
-            "Description": "CloudWatch Logs Retention in Day",
+            "Description": "CloudWatch Logs Retention in Days",
             "Default": "7",
             "Type": "Number" 
         }
