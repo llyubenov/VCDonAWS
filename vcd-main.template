@@ -416,7 +416,7 @@
            "Roles": [ { "Ref": "CloudWatchAccessRole" } ]
         }
      },
-     "vCDHostProfile": {
+     "vCDInstanceProfile": {
          "Type": "AWS::IAM::InstanceProfile",
          "Properties": {
              "Roles": [
@@ -523,7 +523,7 @@
               "Ref": "MainVcdCellType"
           },
           "IamInstanceProfile": {
-              "Ref": "vCDHostProfile"
+              "Ref": "vCDInstanceProfile"
           },
           "SecurityGroupIds": [
               {
@@ -854,6 +854,12 @@
         "Description" : "vCDMain Private IP",
         "Value" : {
           "Fn::GetAtt" : ["vCDMain", "PrivateIp"]
+        }
+    },
+    "vCDInstanceProfile" : {
+        "Description" : "IAM Instance profile",
+        "Value": {
+            "Ref": "vCDInstanceProfile"
         }
     },
     "CellsAccessSecurityGroupID": {
