@@ -1001,6 +1001,12 @@
                   "vCDUIVolumeSize": {
                     "Ref": "vCDUIVolumeSize"
                   },
+                  "vCDInstanceProfile": {
+                    "Fn::GetAtt": [
+                        "vCDMainStack",
+                        "Outputs.vCDInstanceProfile"
+                    ]
+                  },
                   "LogRetentionDays": {
                     "Ref": "LogRetentionDays"
                   },
