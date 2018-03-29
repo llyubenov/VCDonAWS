@@ -22,7 +22,8 @@
                        "MainVcdInstanceType",
                        "MainVcdVolumeSize",
                        "PrivateInstanceSecurityGroupID",
-                       "RDSAccessSecurityGroupID"
+                       "RDSAccessSecurityGroupID",
+                       "LogRetentionDays"
                    ]
                },
                {
@@ -69,7 +70,7 @@
                    "default": "vCD EC2 AMI Operating System"
                },
                "MainVcdVolumeSize": {
-                "Default": "Main vCD root volume size GB"
+                "Default": "Main vCD root volume size"
                },
                "MainVcdCellType": {
                    "default": "vCD EC2 Instance Type"
@@ -127,7 +128,10 @@
                },
                "vCDSerialNumber" : {
                  "default" : "License Key."
-               }
+               },
+               "LogRetentionDays": {
+                "default": "CloudWatch Log Retention"
+               }  
            }
        }
    },
@@ -147,7 +151,7 @@
        },
        "MainVcdVolumeSize": {
            "Default": "20",
-           "Description": "Amazon EC2 Instance Root Volume Size",
+           "Description": "Amazon EC2 Instance Root Volume Size GB",
            "Type": "String"
        },
        "MainVcdCellType": {
@@ -253,6 +257,11 @@
         "vCDSerialNumber": {
           "Description": "The serial number (license key) for this vCD Instance.",
           "Type": "String"
+        },
+        "LogRetentionDays": {
+            "Description": "CloudWatch Logs Retention in Days",
+            "Default": "7",
+            "Type": "Number" 
         }
    },
    "Mappings": {
@@ -310,6 +319,38 @@
        }
    },
    "Resources" : {
+     "MessagesLogGroup": {
+        "Type": "AWS::Logs::LogGroup",
+        "Properties": {
+            "RetentionInDays": {
+                "Ref": "LogRetentionDays"
+            }
+        }
+     },
+     "CellLogGroup": {
+        "Type": "AWS::Logs::LogGroup",
+        "Properties": {
+            "RetentionInDays": {
+                "Ref": "LogRetentionDays"
+            }
+        }
+     },
+     "ConsoleProxyLogGroup": {
+        "Type": "AWS::Logs::LogGroup",
+        "Properties": {
+            "RetentionInDays": {
+                "Ref": "LogRetentionDays"
+            }
+        }
+     },
+     "vCloudContainerDebugLogGroup": {
+        "Type": "AWS::Logs::LogGroup",
+        "Properties": {
+            "RetentionInDays": {
+                "Ref": "LogRetentionDays"
+            }
+        }
+     },
      "xFerS3AccessRole": {
         "Type": "AWS::IAM::Role",
         "Properties": {
@@ -339,12 +380,51 @@
            "Roles": [ { "Ref": "xFerS3AccessRole" } ]
         }
      },
-     "S3AccessHostProfile": {
+     "CloudWatchAccessRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+           "AssumeRolePolicyDocument": {
+              "Statement": [ {
+                 "Effect": "Allow",
+                 "Principal": {
+                    "Service": [ "ec2.amazonaws.com" ]
+                 },
+                 "Action": [ "sts:AssumeRole" ]
+              } ]
+           },
+           "Path": "/"
+        }
+     },
+     "CloudWatchPolicies": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {
+           "PolicyName": "CloudWatch-AccessPerms",
+           "PolicyDocument": {
+              "Statement": [ {
+                 "Effect": "Allow",
+                 "Action": [
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                    "logs:DescribeLogStreams"
+                 ],
+                 "Resource": [
+                    "arn:aws:logs:*:*:*"
+                ]
+              } ]
+           },
+           "Roles": [ { "Ref": "CloudWatchAccessRole" } ]
+        }
+     },
+     "vCDHostProfile": {
          "Type": "AWS::IAM::InstanceProfile",
          "Properties": {
              "Roles": [
                  {
                      "Ref": "xFerS3AccessRole"
+                 },
+                 {
+                     "Ref": "CloudWatchAccessRole"
                  }
              ],
              "Path": "/"
@@ -443,7 +523,7 @@
               "Ref": "MainVcdCellType"
           },
           "IamInstanceProfile": {
-              "Ref": "S3AccessHostProfile"
+              "Ref": "vCDHostProfile"
           },
           "SecurityGroupIds": [
               {
@@ -468,11 +548,14 @@
                 "",
                 [
                   "#!/bin/bash\n",
-                  "# Defina Variables\n",
+                  "# Define Variables\n",
+                  "REGION=$(curl -sq http://169.254.169.254/latest/meta-data/placement/availability-zone/)\n",
+                  "REGION=${REGION: :-1}\n",
+                  "IP=$(ccurl -s http://169.254.169.254/latest/meta-data/local-ipv4/)",
                   "# Update GuestOS\n",
                   "yum update -y\n",
                   "# Install necessary packages\n",
-                  "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel redhat-lsb python36 python36-pip python36-devel -y\n",
+                  "yum install awslogs automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel redhat-lsb python36 python36-pip python36-devel -y\n",
                   "# Install PIP\n",
                   "easy_install-3.6 pip\n",
                   "# Install vCD Cli\n",
@@ -571,40 +654,121 @@
                   "\n",
                   "# Update Permission on Certificates Keystore file\n",
                   "chmod 644 /tmp/certificates.ks\n",
-                  "# Get Instance IP Address \n",
-                  "ip=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')\n",
                   "# Configure vCD Cell\n",
                   {
                     "Fn::Join": [
                       "",
                       [
-                        "echo Y | /opt/vmware/vcloud-director/bin/configure -cons $ip --console-proxy-port-https 8443 -ip $ip --primary-port-http 80 --primary-port-https 443 -dbhost ",
+                        "echo Y | /opt/vmware/vcloud-director/bin/configure -cons $IP --console-proxy-port-https 8443 -ip $IP --primary-port-http 80 --primary-port-https 443 -dbhost ",
                         {
                           "Ref": "DBEndpoint"
                         },
-                  			" -dbport 5432 -dbtype postgres -dbname ",
-                  			{
+                  		" -dbport 5432 -dbtype postgres -dbname ",
+                  		{
                           "Ref": "DBName"
                         },
-                  			" -dbuser ",
-                  			{
+                  		" -dbuser ",
+                  		{
                           "Ref": "DBMasterUsername"
                         },
-                  			" -dbpassword ",
-                  			{
+                  		" -dbpassword ",
+                  		{
                           "Ref": "DBMasterUserPassword"
                         },
-                  			" -k /tmp/certificates.ks -w ",
-                  			{
+                  		" -k /tmp/certificates.ks -w ",
+                  		{
                           "Ref": "VcdCertKeystorePasswd"
                         },
-			                  " -unattended"
+			            " -unattended"
                       ]
                     ]
                   },
                   "\n",
+                  "# Change the Region in CLoudWatch Agent awscli.conf file\n",
+                  "export TMPREGION=$(grep region /etc/awslogs/awscli.conf)\n",
+                  "sed -i.back 's/${TMPREGION}/region = ${REGION}/g' /etc/awslogs/awscli.conf\n",
+                  "# Configure Log Groups in CloudWatch Agent config file\n",
+                  "cat >> /etc/awslogs/awslogs.conf <<- EOF\n",
+                  "\n",
+                  "[/var/log/messages]\n",
+                  "datetime_format = %b %d %H:%M:%S\n",
+                  "file = /var/log/messages\n",
+                  "buffer_duration = 5000\n",
+                  "log_stream_name = {hostname}\n",
+                  "initial_position = start_of_file\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "log_group_name = ",
+                        {
+                          "Ref": "MessagesLogGroup"
+                        },
+			            "\n"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "[cell.log]\n",
+                  "datetime_format = %b %d %H:%M:%S\n",
+                  "file = /opt/vmware/vcloud-director/logs/cell.log\n",
+                  "buffer_duration = 5000\n",
+                  "log_stream_name = {hostname}\n",
+                  "initial_position = start_of_file\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "log_group_name = ",
+                        {
+                          "Ref": "CellLogGroup"
+                        },
+			            "\n"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "[vcloud-container-debug.log]\n",
+                  "datetime_format = %b %d %H:%M:%S\n",
+                  "file = /opt/vmware/vcloud-director/logs/vcloud-container-debug.log\n",
+                  "buffer_duration = 5000\n",
+                  "log_stream_name = {hostname}\n",
+                  "initial_position = start_of_file\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "log_group_name = ",
+                        {
+                          "Ref": "vCloudContainerDebugLogGroup"
+                        },
+			            "\n"
+                      ]
+                    ]
+                  },
+                  "\n",
+                  "[console-proxy.log]\n",
+                  "datetime_format = %b %d %H:%M:%S\n",
+                  "file = /opt/vmware/vcloud-director/logs/console-proxy.log\n",
+                  "buffer_duration = 5000\n",
+                  "log_stream_name = {hostname}\n",
+                  "initial_position = start_of_file\n",
+                  {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "log_group_name = ",
+                        {
+                          "Ref": "ConsoleProxyLogGroup"
+                        },
+			            "\n"
+                      ]
+                    ]
+                  },
+                  "EOF\n",
+                  "# Add additional setting to vCD global.properties file\n",
                   "cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF\n",
-                  "#Custom Changes Made for console proxy and DB connections\n",
+                  "# Custom Changes Made for console proxy and DB connections\n",
                   "consoleproxy.websockets.enabled = true\n",
                   "consoleproxy.securenio.buffer.size = 17000\n",
                   "database.pool.maxActive = 200\n",
@@ -698,10 +862,34 @@
             "Ref": "CellsAccessSecurityGroup"
         }
     },
-    "S3AccessHostProfile": {
-        "Description": "IAM Host profile to allow access to S3",
+    "MessagesLogGroup": {
         "Value": {
-            "Ref": "S3AccessHostProfile"
+            "Ref": "MessagesLogGroup"
+        },
+        "Description": "CloudWatch Logs GroupName. /var/log/messages logs will be stored here."
+    },
+    "CellLogGroup": {
+        "Value": {
+            "Ref": "MessagesLogGroup"
+        },
+        "Description": "CloudWatch Logs GroupName. vCD cell.log logs will be stored here."
+    },
+    "ConsoleProxyLogGroup": {
+        "Value": {
+            "Ref": "MessagesLogGroup"
+        },
+        "Description": "CloudWatch Logs GroupName. vCD console-proxy.log logs will be stored here."
+    },
+    "vCloudContainerDebugLogGroup": {
+        "Value": {
+            "Ref": "MessagesLogGroup"
+        },
+        "Description": "CloudWatch Logs GroupName. vCD vcloud-container-debug.log logs will be stored here."
+    },
+    "vCDHostProfile": {
+        "Description": "IAM Host profile to allow access to S3 and CloudWatch",
+        "Value": {
+            "Ref": "vCDHostProfile"
         }
     }
   }
