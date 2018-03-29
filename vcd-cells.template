@@ -672,6 +672,10 @@
                             ]
                         },
                         "EOF\n",
+                        "# Enable CloudWatch Agent\n",
+                        "chkconfig awslogs on\n",
+                        "# Start CloudWatch Agent\n",
+                        "service awslogs start\n",
                         "# Add additional setting to vCD global.properties file\n",
                         "cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF\n",
                         "#Custom Changes Made for console proxy and DB connections\n",
@@ -934,6 +938,10 @@
                             ]
                         },
                         "EOF\n",
+                        "# Enable CloudWatch Agent\n",
+                        "chkconfig awslogs on\n",
+                        "# Start CloudWatch Agent\n",
+                        "service awslogs start\n",
                         "# Add additional setting to vCD global.properties file\n",
                         "cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF\n",
                         "#Custom Changes Made for console proxy and DB connections\n",
