@@ -684,7 +684,7 @@
                     ]
                   },
                   "\n",
-                  "# Change the Region in CLoudWatch Agent awscli.conf file\n",
+                  "# Change the Region in CloudWatch Agent awscli.conf file\n",
                   "export TMPREGION=$(grep region /etc/awslogs/awscli.conf)\n",
                   "sed -i.back 's/${TMPREGION}/region = ${REGION}/g' /etc/awslogs/awscli.conf\n",
                   "# Configure Log Groups in CloudWatch Agent config file\n",
