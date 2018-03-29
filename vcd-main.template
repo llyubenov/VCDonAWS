@@ -351,7 +351,7 @@
             }
         }
      },
-     "xFerS3AccessRole": {
+     "vCDAccessRole": {
         "Type": "AWS::IAM::Role",
         "Properties": {
            "AssumeRolePolicyDocument": {
@@ -369,7 +369,7 @@
      "xFerS3AccessPolicies": {
         "Type": "AWS::IAM::Policy",
         "Properties": {
-           "PolicyName": "xFer-S3-AccessPerms",
+           "PolicyName": "s3-xfer-Access",
            "PolicyDocument": {
               "Statement": [ {
                  "Effect": "Allow",
@@ -377,28 +377,13 @@
                  "Resource": "*"
               } ]
            },
-           "Roles": [ { "Ref": "xFerS3AccessRole" } ]
-        }
-     },
-     "CloudWatchAccessRole": {
-        "Type": "AWS::IAM::Role",
-        "Properties": {
-           "AssumeRolePolicyDocument": {
-              "Statement": [ {
-                 "Effect": "Allow",
-                 "Principal": {
-                    "Service": [ "ec2.amazonaws.com" ]
-                 },
-                 "Action": [ "sts:AssumeRole" ]
-              } ]
-           },
-           "Path": "/"
+           "Roles": [ { "Ref": "xvCDAccessRole" } ]
         }
      },
      "CloudWatchPolicies": {
         "Type": "AWS::IAM::Policy",
         "Properties": {
-           "PolicyName": "CloudWatch-AccessPerms",
+           "PolicyName": "CloudWatch-Access",
            "PolicyDocument": {
               "Statement": [ {
                  "Effect": "Allow",
@@ -413,20 +398,15 @@
                 ]
               } ]
            },
-           "Roles": [ { "Ref": "CloudWatchAccessRole" } ]
+           "Roles": [ { "Ref": "vCDAccessRole" } ]
         }
      },
      "vCDInstanceProfile": {
          "Type": "AWS::IAM::InstanceProfile",
          "Properties": {
-             "Roles": [
-                 {
-                     "Ref": "xFerS3AccessRole"
-                 },
-                 {
-                     "Ref": "CloudWatchAccessRole"
-                 }
-             ],
+             "Roles": {
+                     "Ref": "vCDAccessRole"
+             },
              "Path": "/"
          }
      },
