@@ -280,23 +280,23 @@
          },
          "MessagesLogGroup": {
             "Description": "CloudWatch Group Name for /var/log/messages",
-            "Type": "AWS::Logs::LogGroup"
+            "Type": "String"
          },
          "CellLogGroup": {
             "Description": "CloudWatch Group Name for cell.log",
-            "Type": "AWS::Logs::LogGroup"
+            "Type": "String"
          },
          "ConsoleProxyLogGroup": {
             "Description": "CloudWatch Group Name for console-proxy.log",
-            "Type": "AWS::Logs::LogGroup"
+            "Type": "String"
          },
          "vCloudContainerDebugLogGroup": {
             "Description": "CloudWatch Group Name for vcloud-container-debug.log",
-            "Type": "AWS::Logs::LogGroup"
+            "Type": "String"
          },
          "vCDInstanceProfile": {
             "Description": "IAM Insatnce profile name to be appliend to the vCD cells", 
-            "Type": "AWS::IAM::InstanceProfile"
+            "Type": "String"
          }
     },
     "Rules": {
