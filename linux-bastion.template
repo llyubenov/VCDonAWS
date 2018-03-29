@@ -32,7 +32,8 @@
                     "Parameters": [
                         "NumBastionHosts",
                         "EnableTCPForwarding",
-                        "EnableX11Forwarding"
+                        "EnableX11Forwarding",
+                        "LogRetentionDays"
                     ]
                 }
             ],
@@ -72,6 +73,9 @@
                 },
                 "VPCID": {
                     "default": "VPC ID"
+                },
+                "LogRetentionDays": {
+                    "default": "CloudWatch Log Retention"
                 }
             }
         }
@@ -167,6 +171,11 @@
         "VPCID": {
             "Description": "ID of the VPC (e.g., vpc-0343606e)",
             "Type": "AWS::EC2::VPC::Id"
+        },
+        "LogRetentionDays": {
+            "Description": "CloudWatch Logs Retention in Day",
+            "Default": "7",
+            "Type": "Number" 
         }
     },
     "Rules": {
@@ -243,7 +252,12 @@
     },
     "Resources": {
         "BastionMainLogGroup": {
-            "Type": "AWS::Logs::LogGroup"
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "RetentionInDays": {
+                    "Ref": "LogRetentionDays"
+                }
+            }
         },
         "SSHMetricFilter": {
             "Type": "AWS::Logs::MetricFilter",
@@ -680,6 +694,6 @@
                 "Ref": "PrivateInstanceSecurityGroup"
             },
             "Description": "Private Instances Security Group ID"
-        },
+        }
     }
 }
