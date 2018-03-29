@@ -130,7 +130,7 @@
                  "default" : "License Key."
                },
                "LogRetentionDays": {
-                "default": "CloudWatch Log Retention"
+                 "default": "CloudWatch Log Retention"
                }  
            }
        }
@@ -876,13 +876,13 @@
     },
     "CellLogGroup": {
         "Value": {
-            "Ref": "MessagesLogGroup"
+            "Ref": "CellLogGroup"
         },
         "Description": "CloudWatch Logs GroupName. vCD cell.log logs will be stored here."
     },
     "ConsoleProxyLogGroup": {
         "Value": {
-            "Ref": "MessagesLogGroup"
+            "Ref": "ConsoleProxyLogGroup"
         },
         "Description": "CloudWatch Logs GroupName. vCD console-proxy.log logs will be stored here."
     },
