@@ -857,7 +857,7 @@
         }
     },
     "vCDInstanceProfile" : {
-        "Description" : "IAM Instance profile",
+        "Description" : "IAM Host profile that allows access to S3 and CloudWatch",
         "Value": {
             "Ref": "vCDInstanceProfile"
         }
@@ -891,12 +891,6 @@
             "Ref": "MessagesLogGroup"
         },
         "Description": "CloudWatch Logs GroupName. vCD vcloud-container-debug.log logs will be stored here."
-    },
-    "vCDHostProfile": {
-        "Description": "IAM Host profile to allow access to S3 and CloudWatch",
-        "Value": {
-            "Ref": "vCDHostProfile"
-        }
     }
   }
 }
