@@ -404,9 +404,11 @@
      "vCDInstanceProfile": {
          "Type": "AWS::IAM::InstanceProfile",
          "Properties": {
-             "Roles": {
+             "Roles": [
+                 {
                      "Ref": "vCDAccessRole"
-             },
+                 }
+             ],
              "Path": "/"
          }
      },
