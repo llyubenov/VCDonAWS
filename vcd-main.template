@@ -874,7 +874,7 @@
     },
     "vCloudContainerDebugLogGroup": {
         "Value": {
-            "Ref": "MessagesLogGroup"
+            "Ref": "vCloudContainerDebugLogGroup"
         },
         "Description": "CloudWatch Logs GroupName. vCD vcloud-container-debug.log logs will be stored here."
     }
