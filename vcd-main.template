@@ -489,6 +489,7 @@
                   }
               ]
           },
+          "Monitoring" : "true",
           "BlockDeviceMappings": [
             {
               "DeviceName": "/dev/xvda",
