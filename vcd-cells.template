@@ -29,7 +29,8 @@
                         "NumVCDConsoleCells",
                         "PrivateInstanceSecurityGroupID",
                         "RDSAccessSecurityGroupID",
-                        "CellsAccessSecurityGroupID"
+                        "CellsAccessSecurityGroupID",
+                        "vCDInstanceProfile"
                     ]
                 },
                 {
@@ -57,6 +58,18 @@
                     "Parameters": [
                         "vCDUITargetGroup",
                         "vCDConsoleTargetGroup"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Log Groups and Retention Policy"
+                    },
+                    "Parameters": [
+                        "LogRetentionDays",
+                        "MessagesLogGroup",
+                        "CellLogGroup",
+                        "ConsoleProxyLogGroup",
+                        "vCloudContainerDebugLogGroup"
                     ]
                 }
             ],
@@ -120,7 +133,25 @@
                 },
                 "vCDConsoleVolumeSize": {
                     "Default": "vCD Console Cells root volume size"
-                }
+                },
+                "LogRetentionDays": {
+                    "default": "Log Retention"
+                },
+                "MessagesLogGroup": {
+                    "default": "Group ID for /var/log/messages"
+                },
+                "CellLogGroup": {
+                    "default": "Group ID for cell.log"
+                },
+                "ConsoleProxyLogGroup": {
+                    "default": "Group ID for console-proxy.log" 
+                },
+                "vCloudContainerDebugLogGroup": {
+                    "default": "Group ID for vcloud-container-debug.log"
+                },
+                "vCDInstanceProfile": {
+                    "default": "IAM Insatnce profile"
+                }  
             }
         }
     },
@@ -241,6 +272,31 @@
          "vCDConsoleTargetGroup": {
              "Description": "Arn of the vCD Console ELB Target Group.",
              "Type": "String"
+         },
+         "LogRetentionDays": {
+            "Description": "CloudWatch Logs Retention in Days",
+            "Default": "7",
+            "Type": "Number" 
+         },
+         "MessagesLogGroup": {
+            "Description": "CloudWatch Group Name for /var/log/messages",
+            "Type": "String"
+         },
+         "CellLogGroup": {
+            "Description": "CloudWatch Group Name for cell.log",
+            "Type": "String"
+         },
+         "ConsoleProxyLogGroup": {
+            "Description": "CloudWatch Group Name for console-proxy.log",
+            "Type": "String"
+         },
+         "vCloudContainerDebugLogGroup": {
+            "Description": "CloudWatch Group Name for vcloud-container-debug.log",
+            "Type": "String"
+         },
+         "vCDInstanceProfile": {
+            "Description": "IAM Insatnce profile name to be appliend to the vCD cells", 
+            "Type": "String"
          }
     },
     "Rules": {
@@ -298,46 +354,6 @@
         }
     },
     "Resources": {
-        "CellsS3AccessRole": {
-           "Type": "AWS::IAM::Role",
-           "Properties": {
-              "AssumeRolePolicyDocument": {
-                 "Statement": [ {
-                    "Effect": "Allow",
-                    "Principal": {
-                       "Service": [ "ec2.amazonaws.com" ]
-                    },
-                    "Action": [ "sts:AssumeRole" ]
-                 } ]
-              },
-              "Path": "/"
-           }
-        },
-        "CellsS3AccessPolicies": {
-           "Type": "AWS::IAM::Policy",
-           "Properties": {
-              "PolicyName": "S3-AccessPerms",
-              "PolicyDocument": {
-                 "Statement": [ {
-                    "Effect": "Allow",
-                    "Action": "s3:*",
-                    "Resource": "*"
-                 } ]
-              },
-              "Roles": [ { "Ref": "CellsS3AccessRole" } ]
-           }
-        },
-        "CellsS3AccessHostProfile": {
-            "Type": "AWS::IAM::InstanceProfile",
-            "Properties": {
-                "Roles": [
-                    {
-                        "Ref": "CellsS3AccessRole"
-                    }
-                ],
-                "Path": "/"
-            }
-        },
         "vCDUIAutoScalingGroup": {
             "Type": "AWS::AutoScaling::AutoScalingGroup",
             "Properties": {
@@ -421,7 +437,7 @@
                     "Ref": "KeyPairNameEC2"
                 },
                 "IamInstanceProfile": {
-                    "Ref": "CellsS3AccessHostProfile"
+                    "Ref": "vCDInstanceProfile"
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -472,10 +488,14 @@
                       "",
                       [
                         "#!/bin/bash\n",
+                        "# Define Variables\n",
+                        "REGION=$(curl -sq http://169.254.169.254/latest/meta-data/placement/availability-zone/)\n",
+                        "REGION=${REGION: :-1}\n",
+                        "IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)\n",
                         "# Update GuestOS\n",
                         "yum update -y\n",
                         "# Install necessary packages\n",
-                        "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel redhat-lsb python36 python36-pip python36-devel -y\n",
+                        "yum install awslogs automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel redhat-lsb python36 python36-pip python36-devel -y\n",
                         "# Clone S3FS repository from Git\n",
                         "cd /home/ec2-user\n",
                         "git clone https://github.com/s3fs-fuse/s3fs-fuse.git\n",
@@ -555,14 +575,12 @@
                         "# Mount the S3 Bucket\n",
                         "mount /opt/vmware/vcloud-director/data/transfer/\n",
                         "sleep 5\n",
-                        "# Get Instance IP Address \n",
-                        "ip=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')\n",
                         "# Configure vCD Cell\n",
                         {
                           "Fn::Join": [
                             "",
                             [
-                              "echo Y | /opt/vmware/vcloud-director/bin/configure -r /opt/vmware/vcloud-director/data/transfer/responses.properties -cons $ip --console-proxy-port-https 8443 -ip $ip --primary-port-http 80 --primary-port-https 443 ",
+                              "echo Y | /opt/vmware/vcloud-director/bin/configure -r /opt/vmware/vcloud-director/data/transfer/responses.properties -cons $IP --console-proxy-port-https 8443 -ip $IP --primary-port-http 80 --primary-port-https 443 ",
                         			" -k /opt/vmware/vcloud-director/data/transfer/certificates.ks -w ",
                         			{
                                 "Ref": "VcdCertKeystorePasswd"
@@ -572,6 +590,93 @@
                           ]
                         },
                         "\n",
+                        "# Change the Region in CloudWatch Agent awscli.conf file\n",
+                        "export TMPREGION=$(grep region /etc/awslogs/awscli.conf)\n",
+                        "sed -i.back \"s/${TMPREGION}/region = ${REGION}/g\" /etc/awslogs/awscli.conf\n",
+                        "# Configure Log Groups in CloudWatch Agent config file\n",
+                        "cat >> /etc/awslogs/awslogs.conf <<- EOF\n",
+                        "\n",
+                        "[/var/log/messages]\n",
+                        "datetime_format = %b %d %H:%M:%S\n",
+                        "file = /var/log/messages\n",
+                        "buffer_duration = 5000\n",
+                        "log_stream_name = {hostname}\n",
+                        "initial_position = start_of_file\n",
+                        {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "log_group_name = ",
+                                {
+                                "Ref": "MessagesLogGroup"
+                                },
+                                "\n"
+                            ]
+                            ]
+                        },
+                        "\n",
+                        "[cell.log]\n",
+                        "datetime_format = %b %d %H:%M:%S\n",
+                        "file = /opt/vmware/vcloud-director/logs/cell.log\n",
+                        "buffer_duration = 5000\n",
+                        "log_stream_name = {hostname}\n",
+                        "initial_position = start_of_file\n",
+                        {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "log_group_name = ",
+                                {
+                                "Ref": "CellLogGroup"
+                                },
+                                "\n"
+                            ]
+                            ]
+                        },
+                        "\n",
+                        "[vcloud-container-debug.log]\n",
+                        "datetime_format = %b %d %H:%M:%S\n",
+                        "file = /opt/vmware/vcloud-director/logs/vcloud-container-debug.log\n",
+                        "buffer_duration = 5000\n",
+                        "log_stream_name = {hostname}\n",
+                        "initial_position = start_of_file\n",
+                        {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "log_group_name = ",
+                                {
+                                "Ref": "vCloudContainerDebugLogGroup"
+                                },
+                                "\n"
+                            ]
+                            ]
+                        },
+                        "\n",
+                        "[console-proxy.log]\n",
+                        "datetime_format = %b %d %H:%M:%S\n",
+                        "file = /opt/vmware/vcloud-director/logs/console-proxy.log\n",
+                        "buffer_duration = 5000\n",
+                        "log_stream_name = {hostname}\n",
+                        "initial_position = start_of_file\n",
+                        {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "log_group_name = ",
+                                {
+                                "Ref": "ConsoleProxyLogGroup"
+                                },
+                                "\n"
+                            ]
+                            ]
+                        },
+                        "EOF\n",
+                        "# Enable CloudWatch Agent\n",
+                        "chkconfig awslogs on\n",
+                        "# Start CloudWatch Agent\n",
+                        "service awslogs start\n",
+                        "# Add additional setting to vCD global.properties file\n",
                         "cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF\n",
                         "#Custom Changes Made for console proxy and DB connections\n",
                         "consoleproxy.websockets.enabled = true\n",
@@ -598,7 +703,7 @@
                     "Ref": "KeyPairNameEC2"
                 },
                 "IamInstanceProfile": {
-                    "Ref": "CellsS3AccessHostProfile"
+                    "Ref": "vCDInstanceProfile"
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -649,10 +754,14 @@
                       "",
                       [
                         "#!/bin/bash\n",
+                        "# Define Variables\n",
+                        "REGION=$(curl -sq http://169.254.169.254/latest/meta-data/placement/availability-zone/)\n",
+                        "REGION=${REGION: :-1}\n",
+                        "IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)\n",
                         "# Update GuestOS\n",
                         "yum update -y\n",
                         "# Install necessary packages\n",
-                        "yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel nfs-utils nfs-utils-lib redhat-lsb python36 python36-pip python36-devel -y\n",
+                        "yum install awslogs automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel nfs-utils nfs-utils-lib redhat-lsb python36 python36-pip python36-devel -y\n",
                         "# Clone S3FS repository from Git\n",
                         "cd /home/ec2-user\n",
                         "git clone https://github.com/s3fs-fuse/s3fs-fuse.git\n",
@@ -732,14 +841,12 @@
                         "# Mount the S3 Bucket\n",
                         "mount /opt/vmware/vcloud-director/data/transfer/\n",
                         "sleep 5\n",
-                        "# Get Instance IP Address \n",
-                        "ip=$(ifconfig  | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')\n",
                         "# Configure vCD Cell\n",
                         {
                           "Fn::Join": [
                             "",
                             [
-                              "echo Y | /opt/vmware/vcloud-director/bin/configure -r /opt/vmware/vcloud-director/data/transfer/responses.properties -cons $ip --console-proxy-port-https 8443 -ip $ip --primary-port-http 80 --primary-port-https 443 ",
+                              "echo Y | /opt/vmware/vcloud-director/bin/configure -r /opt/vmware/vcloud-director/data/transfer/responses.properties -cons $IP --console-proxy-port-https 8443 -ip $IP --primary-port-http 80 --primary-port-https 443 ",
                         			" -k /opt/vmware/vcloud-director/data/transfer/certificates.ks -w ",
                         			{
                                 "Ref": "VcdCertKeystorePasswd"
@@ -749,6 +856,93 @@
                           ]
                         },
                         "\n",
+                        "# Change the Region in CloudWatch Agent awscli.conf file\n",
+                        "export TMPREGION=$(grep region /etc/awslogs/awscli.conf)\n",
+                        "sed -i.back \"s/${TMPREGION}/region = ${REGION}/g\" /etc/awslogs/awscli.conf\n",
+                        "# Configure Log Groups in CloudWatch Agent config file\n",
+                        "cat >> /etc/awslogs/awslogs.conf <<- EOF\n",
+                        "\n",
+                        "[/var/log/messages]\n",
+                        "datetime_format = %b %d %H:%M:%S\n",
+                        "file = /var/log/messages\n",
+                        "buffer_duration = 5000\n",
+                        "log_stream_name = {hostname}\n",
+                        "initial_position = start_of_file\n",
+                        {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "log_group_name = ",
+                                {
+                                "Ref": "MessagesLogGroup"
+                                },
+                                "\n"
+                            ]
+                            ]
+                        },
+                        "\n",
+                        "[cell.log]\n",
+                        "datetime_format = %b %d %H:%M:%S\n",
+                        "file = /opt/vmware/vcloud-director/logs/cell.log\n",
+                        "buffer_duration = 5000\n",
+                        "log_stream_name = {hostname}\n",
+                        "initial_position = start_of_file\n",
+                        {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "log_group_name = ",
+                                {
+                                "Ref": "CellLogGroup"
+                                },
+                                "\n"
+                            ]
+                            ]
+                        },
+                        "\n",
+                        "[vcloud-container-debug.log]\n",
+                        "datetime_format = %b %d %H:%M:%S\n",
+                        "file = /opt/vmware/vcloud-director/logs/vcloud-container-debug.log\n",
+                        "buffer_duration = 5000\n",
+                        "log_stream_name = {hostname}\n",
+                        "initial_position = start_of_file\n",
+                        {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "log_group_name = ",
+                                {
+                                "Ref": "vCloudContainerDebugLogGroup"
+                                },
+                                "\n"
+                            ]
+                            ]
+                        },
+                        "\n",
+                        "[console-proxy.log]\n",
+                        "datetime_format = %b %d %H:%M:%S\n",
+                        "file = /opt/vmware/vcloud-director/logs/console-proxy.log\n",
+                        "buffer_duration = 5000\n",
+                        "log_stream_name = {hostname}\n",
+                        "initial_position = start_of_file\n",
+                        {
+                            "Fn::Join": [
+                            "",
+                            [
+                                "log_group_name = ",
+                                {
+                                "Ref": "ConsoleProxyLogGroup"
+                                },
+                                "\n"
+                            ]
+                            ]
+                        },
+                        "EOF\n",
+                        "# Enable CloudWatch Agent\n",
+                        "chkconfig awslogs on\n",
+                        "# Start CloudWatch Agent\n",
+                        "service awslogs start\n",
+                        "# Add additional setting to vCD global.properties file\n",
                         "cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF\n",
                         "#Custom Changes Made for console proxy and DB connections\n",
                         "consoleproxy.websockets.enabled = true\n",

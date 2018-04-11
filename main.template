@@ -77,7 +77,8 @@
                         "NumVCDUICells",
                         "vCDConsoleCellType",
                         "vCDConsoleVolumeSize",
-                        "NumVCDConsoleCells"
+                        "NumVCDConsoleCells",
+                        "LogRetentionDays"
                     ]
                 },
                 {
@@ -266,7 +267,10 @@
                },
                "vCDConsoleVolumeSize": {
                    "default": "vCD Console Cells root volume size"
-               }
+               },
+               "LogRetentionDays": {
+                    "default": "CloudWatch Log Retention"
+               }  
             }
         }
     },
@@ -598,6 +602,11 @@
             "Default": "20",
             "Description": "Amazon EC2 Instance Root Volume Size GB",
             "Type": "String"
+        },
+        "LogRetentionDays": {
+            "Description": "CloudWatch Logs Retention in Days",
+            "Default": "7",
+            "Type": "Number" 
         }
     },
     "Resources": {
@@ -673,6 +682,9 @@
                           "VPCStack",
                           "Outputs.VPCID"
                       ]
+                  },
+                  "LogRetentionDays": {
+                    "Ref": "LogRetentionDays"
                   }
               }
           }
@@ -823,7 +835,10 @@
                   },
                   "MainVcdVolumeSize": {
                       "Ref": "MainVcdVolumeSize"
-                }
+                  },
+                  "LogRetentionDays": {
+                    "Ref": "LogRetentionDays"
+                  }
               }
           }
       },
@@ -985,6 +1000,39 @@
                   },
                   "vCDUIVolumeSize": {
                     "Ref": "vCDUIVolumeSize"
+                  },
+                  "vCDInstanceProfile": {
+                    "Fn::GetAtt": [
+                        "vCDMainStack",
+                        "Outputs.vCDInstanceProfile"
+                    ]
+                  },
+                  "LogRetentionDays": {
+                    "Ref": "LogRetentionDays"
+                  },
+                  "MessagesLogGroup": {
+                    "Fn::GetAtt": [
+                        "vCDMainStack",
+                        "Outputs.MessagesLogGroup"
+                    ]
+                  },
+                  "CellLogGroup": {
+                    "Fn::GetAtt": [
+                        "vCDMainStack",
+                        "Outputs.CellLogGroup"
+                    ]
+                  },
+                  "ConsoleProxyLogGroup": {
+                    "Fn::GetAtt": [
+                        "vCDMainStack",
+                        "Outputs.ConsoleProxyLogGroup"
+                    ]
+                  },
+                  "vCloudContainerDebugLogGroup": {
+                    "Fn::GetAtt": [
+                        "vCDMainStack",
+                        "Outputs.vCloudContainerDebugLogGroup"
+                    ]
                   }
               }
           }
