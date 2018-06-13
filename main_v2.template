@@ -324,8 +324,8 @@
         },
         "BastionAMIOS": {
             "AllowedValues": [
-                "Amazon-Linux-HVM",
-                "CentOS-7-HVM"
+                "Amazon-Linux-2-HVM",
+                "CentOS-7-1805_01-HVM"
             ],
             "Default": "Amazon-Linux-HVM",
             "Description": "The Linux distribution for the AMI to be used for the bastion instances",
