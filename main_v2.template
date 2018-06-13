@@ -361,7 +361,7 @@
                "Amazon-Linux-2-HVM",
                "CentOS-7-1805_01-HVM"
            ],
-           "Default": "Amazon-Linux-HVM",
+           "Default": "Amazon-Linux-2-HVM",
            "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
            "Type": "String"
        },
