@@ -194,7 +194,7 @@
             "Type": "String"
         },
         "vCDBuildName": {
-            "Default": "vmware-vcloud-director-distribution-9.0.0-7554058.bin",
+            "Default": "vmware-vcloud-director-distribution-9.1.0-7905839.bin",
             "Description": "Specify the vCD binary filename name.",
             "Type": "String"
         },
@@ -555,7 +555,7 @@
                 "AWS::CloudFormation::Init": {
                     "config": {
                         "files": {
-                            "/tmp/xfer_bootstrap.sh": {
+                            "/tmp/vcd_main_bootstrap.sh": {
                                 "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/vcd_main_bootstrap.sh",
                                 "mode": "000550",
                                 "owner": "root",
@@ -565,7 +565,7 @@
                         },
                         "commands": {
                             "b-bootstrap": {
-                                "command": "./tmp/xfer_bootstrap.sh"
+                                "command": "./tmp/vcd_main_bootstrap.sh"
                             }
                         }
                     }
