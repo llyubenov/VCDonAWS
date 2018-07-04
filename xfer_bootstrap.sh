@@ -2,7 +2,7 @@
 # xFer Server bootstrapping
 
 # Redirect script output to a log file
-exec > /var/log/xfer_bootstrap.sh                                                                      
+exec > /var/log/xfer_bootstrap.log                                                                     
 exec 2>&1
 
 # Configuration
