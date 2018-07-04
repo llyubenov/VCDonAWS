@@ -71,7 +71,7 @@
                 "EC2AMIOS": {
                     "default": "vCD EC2 AMI Operating System"
                 },
-                "MainVcdCellType": {
+                "MainVcdInstanceType": {
                     "default": "vCD EC2 Instance Type"
                 },
                 "PrivateSubnet1ID": {
@@ -157,7 +157,7 @@
             "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
             "Type": "String"
         },
-        "MainVcdCellType": {
+        "MainVcdInstanceType": {
             "AllowedValues": [
                 "t2.small",
                 "m5.large"
@@ -625,6 +625,7 @@
                             "pip install --upgrade pip\n",
                             "pip install awscli --ignore-installed six\n",
                             "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                            "vCDBuildBucketName=",
                             {
                                 "Ref": "vCDBuildBucketName"
                             },
@@ -728,7 +729,6 @@
                             {
                                 "Ref": "AWS::StackName"
                             },
-                            "\n",
                             " --resource vCDMain --region ",
                             {
                                 "Ref": "AWS::Region"
