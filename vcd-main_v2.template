@@ -433,7 +433,10 @@
             "PolicyDocument": {
                 "Statement": [ {
                     "Effect": "Allow",
-                    "Action": "s3:GetObject",
+                    "Action": [
+                        "s3:Get*",
+                        "s3:Put*"
+                    ],
                     "Resource": "*"
                 } ]
             },
