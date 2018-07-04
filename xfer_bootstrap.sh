@@ -1,6 +1,9 @@
 #!/bin/bash -e
 # xFer Server bootstrapping
 
+# Redirect script output to a log file
+exec > /var/log/xfer_bootstrap.sh                                                                      
+exec 2>&1
 
 # Configuration
 PROGRAM='vCD xFer Server'
