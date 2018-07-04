@@ -621,7 +621,7 @@
                             "#!/bin/bash\n",
                             "yum update -y\n",
                             "yum install -y epel-release\n",
-                            "yum install nfs-utils lvm2 python-pip rpm-build postgresql automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel git alsa-lib libICE libSM libX11 libXau libXdmcp libXext libXi libXt libXtst -y\n",
+                            "yum install nfs-utils lvm2 python-pip rpm-build postgresql automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel git alsa-lib libICE libSM libX11 libXau libXdmcp libXext libXi libXt libXtst pciutils redhat-lsb wget -y\n",
                             "pip install --upgrade pip\n",
                             "pip install awscli --ignore-installed six\n",
                             "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",

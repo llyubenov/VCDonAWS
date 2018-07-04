@@ -86,8 +86,8 @@ function vcd_main_on_cent_os () {
     
     #Prepare Transfer Store Mount
     mkdir -p /opt/vmware/vcloud-director/data/transfer
-    echo '$xFerIP:/exports/xfer /opt/vmware/vcloud-director/data/transfer nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0' >> /etc/fstab
-    echo '$efsID /opt/vmware/vcloud-director/data/transfer/cells efs defaults,_netdev 0 0' >> /etc/fstab
+    echo "$xFerIP:/exports/xfer /opt/vmware/vcloud-director/data/transfer nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
+    echo "$efsID /opt/vmware/vcloud-director/data/transfer/cells efs defaults,_netdev 0 0" >> /etc/fstab
 
     #Install vCD
     echo Y | /tmp/$vCDBuildName
@@ -95,8 +95,7 @@ function vcd_main_on_cent_os () {
     #Mount Transfer Store and change ownership
     mount /opt/vmware/vcloud-director/data/transfer/
     mount /opt/vmware/vcloud-director/data/transfer/cells
-    chown vclod:vcloud /opt/vmware/vcloud-director/data/transfer/
-    chown vclod:vcloud /opt/vmware/vcloud-director/data/transfer/cells
+    chown vcloud:vcloud -R /opt/vmware/vcloud-director/data/transfer/
 
     #Configure vCD Cell
     echo Y | /opt/vmware/vcloud-director/bin/configure -cons $instanceIP --console-proxy-port-https 8443 -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -dbhost $DBEndpoint -dbport 5432 -dbtype postgres -dbname $DBName -dbuser $DBMasterUsername -dbpassword $DBMasterUserPassword -k /tmp/$vCDKeystoreFileName -w $VcdCertKeystorePasswd -unattended
