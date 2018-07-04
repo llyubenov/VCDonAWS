@@ -356,7 +356,7 @@
                 "Amazon-Linux-HVM",
                 "CentOS-7-HVM"
             ],
-            "Default": "Amazon-Linux-HVM",
+            "Default": "CentOS-7-HVM",
             "Description": "The Linux distribution for the AMI to be used for the bastion instances",
             "Type": "String"
         },
@@ -390,7 +390,7 @@
                "Amazon-Linux-2-HVM",
                "CentOS-7-HVM"
            ],
-           "Default": "Amazon-Linux-2-HVM",
+           "Default": "CentOS-7-HVM",
            "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
            "Type": "String"
         },
@@ -833,13 +833,13 @@
                     "VPCCIDR": {
                         "Ref": "VPCCIDR"
                     },
-                    "PrivateSubnet1": {
+                    "PrivateSubnet1ID": {
                         "Fn::GetAtt": [
                             "VPCStack",
                             "Outputs.PrivateSubnet1ID"
                         ]
                     },
-                    "PrivateSubnet2": {
+                    "PrivateSubnet2ID": {
                         "Fn::GetAtt": [
                             "VPCStack",
                             "Outputs.PrivateSubnet2ID"

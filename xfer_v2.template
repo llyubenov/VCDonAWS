@@ -115,7 +115,7 @@
                 "Amazon-Linux-2-HVM",
                 "CentOS-7-HVM"
             ],
-            "Default": "Amazon-Linux-2-HVM",
+            "Default": "CentOS-7-HVM",
             "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
             "Type": "String"
         },
@@ -395,7 +395,7 @@
                 "Path": "/"
             }
         },
-        "xFerS3AccessPolicies": {
+        "xFerS3AccessPolicy": {
             "Type": "AWS::IAM::Policy",
             "Properties": {
                "PolicyName": "s3-xfer-Access",
@@ -409,7 +409,7 @@
                "Roles": [ { "Ref": "xFerAccessRole" } ]
             }
         },
-        "CloudWatchPolicies": {
+        "CloudWatchPolicy": {
             "Type": "AWS::IAM::Policy",
             "Properties": {
                "PolicyName": "CloudWatch-Access",
