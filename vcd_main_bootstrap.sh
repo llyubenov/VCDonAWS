@@ -92,13 +92,8 @@ function vcd_main_on_cent_os () {
     #Install vCD
     echo Y | /tmp/$vCDBuildName
 
-    #Mount Transfer Store and change ownership
-    mount /opt/vmware/vcloud-director/data/transfer/
-    mount /opt/vmware/vcloud-director/data/transfer/cells
-    chown vcloud:vcloud -R /opt/vmware/vcloud-director/data/transfer/
-
     #Configure vCD Cell
-    echo Y | /opt/vmware/vcloud-director/bin/configure -cons $instanceIP --console-proxy-port-https 8443 -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -dbhost $DBEndpoint -dbport 5432 -dbtype postgres -dbname $DBName -dbuser $DBMasterUsername -dbpassword $DBMasterUserPassword -k /tmp/$vCDKeystoreFileName -w $VcdCertKeystorePasswd -unattended
+    echo Y | /opt/vmware/vcloud-director/bin/configure -cons $instanceIP --console-proxy-port-https 8443 -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -dbhost $DBEndpoint -dbport 5432 -dbtype postgres -dbname $DBName -dbuser $DBMasterUsername -dbpassword "$DBMasterUserPassword" -k /tmp/$vCDKeystoreFileName -w "$VcdCertKeystorePasswd" -unattended
 
     #Additional changes to vCD global.properties file
 cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF
@@ -118,10 +113,15 @@ database.pool.removeAbandonedTimeout = 43200
 EOF
 
     # Initial vCD Configuration
-    /opt/vmware/vcloud-director/bin/cell-management-tool system-setup --email $vCDAdminEmail --full-name $vCDAdminFullName --installation-id $vCDInstalationId --password $vCDAdminPasswd --system-name $vCDSystemName --serial-number $vCDSerialNumber --user $vCDAdmin -unattended
+    /opt/vmware/vcloud-director/bin/cell-management-tool system-setup --email $vCDAdminEmail --full-name "$vCDAdminFullName" --installation-id $vCDInstalationId --password "$vCDAdminPasswd" --system-name "$vCDSystemName" --serial-number $vCDSerialNumber --user $vCDAdmin -unattended
 
     #Copy vCD response.properties file to S3
     aws s3 cp /opt/vmware/vcloud-director/etc/responses.properties s3://$vCDBuildBucketName/responses.properties
+
+    #Mount Transfer Store and change ownership
+    mount /opt/vmware/vcloud-director/data/transfer/
+    mount /opt/vmware/vcloud-director/data/transfer/cells
+    chown vcloud:vcloud -R /opt/vmware/vcloud-director/data/transfer/
 
     # Install and Configure CloudWatch Log service on xFer
     echo "log_group_name = $MessagesLogGroup" >> /tmp/MessagesLogGroup.txt
