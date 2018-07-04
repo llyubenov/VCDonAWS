@@ -1,0 +1,640 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Availability Zone Configuration"
+                    },
+                    "Parameters": [
+                        "AvailabilityZones",
+                        "NumberOfAZs"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "VPCID",
+                        "VPCCIDR",
+                        "PrivateSubnet1ID",
+                        "PrivateSubnet2ID",
+                        "PrivateSubnet1CIDR",
+                        "PrivateSubnet2CIDR"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "xFer EC2 Configuration"
+                    },
+                    "Parameters": [
+                        "KeyPairNameEC2",
+                        "EC2AMIOS",
+                        "xFerInstanceType",
+                        "xFerVolumeType",
+                        "xFerIOPS",
+                        "xFerVolumeSize",
+                        "PrivateInstanceSecurityGroupID",
+                        "LogRetentionDays"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "AvailabilityZones": {
+                    "default": "Availability Zones"
+                },
+                "NumberOfAZs": {
+                    "default": "Number of Availability Zones"
+                },
+                "KeyPairNameEC2": {
+                    "default": "Key Pair Name for vCD/xFer EC2 Instances"
+                },
+                "EC2AMIOS": {
+                    "default": "vCD/xFer EC2 AMI Operating System"
+                },
+                "xFerInstanceType": {
+                    "default": "xFer EC2 Instance Type"
+                },
+                "xFerVolumeType": {
+                    "default": "Transfer Store Volume Type"
+                },
+                "xFerIOPS": {
+                    "default": "Transfer Store Volume Provisioned IOPS"
+                },
+                "xFerVolumeSize": {
+                    "default": "Transfer Store Volume Size"
+                },
+                "PrivateSubnet1ID": {
+                    "default": "Private Subnet 1"
+                },
+                "PrivateSubnet2ID": {
+                    "default": "Private Subnet 2"
+                },
+                "PrivateSubnet1CIDR": {
+                    "default": "Private subnet 1 CIDR"
+                },
+                "PrivateSubnet2CIDR": {
+                    "default": "Private subnet 2 CIDR"
+                },
+                "VPCCIDR": {
+                    "default": "VPC CIDR"
+                },
+                "VPCID": {
+                    "default": "VPC ID"
+                },
+                "PrivateInstanceSecurityGroupID": {
+                    "default": "Security Group to Allow SSH Access from Bastion hosts"
+                },
+                "LogRetentionDays": {
+                    "default": "CloudWatch Log Retention"
+                }
+            }
+        }
+    },
+    "Parameters": {
+        "AvailabilityZones": {
+            "Description": "List of Availability Zones to use for the subnets in the VPC. Note: The logical order is preserved.",
+            "Type": "List<AWS::EC2::AvailabilityZone::Name>"
+        },
+        "NumberOfAZs": {
+            "AllowedValues": [
+                "1","2"
+            ],
+            "Default": "2",
+            "Description": "Number of Availability Zones to use in the VPC. This must match your selections in the list of Availability Zones parameter.",
+            "Type": "String"
+        },
+        "KeyPairNameEC2": {
+            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "EC2AMIOS": {
+            "AllowedValues": [
+                "Amazon-Linux-2-HVM",
+                "CentOS-7-HVM"
+            ],
+            "Default": "Amazon-Linux-2-HVM",
+            "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
+            "Type": "String"
+        },
+        "xFerInstanceType": {
+            "AllowedValues": [
+                "t2.micro",
+                "t2.medium",
+                "t2.large"
+            ],
+            "Default": "t2.medium",
+            "Description": "Amazon EC2 instances type",
+            "Type": "String"
+        },
+        "xFerVolumeType": {
+            "AllowedValues": [
+                "gp2",
+                "io1"
+            ],
+            "Default": "gp2",
+            "Description": "Type of EBS Volumes for xFer Server",
+            "Type": "String"
+        },
+        "xFerIOPS": {
+            "Default": "3000",
+            "Description": "Only Applicable when Volume Type is io1",
+            "Type": "Number"
+        },
+        "xFerVolumeSize": {
+            "Default": "1000",
+            "Description": "Transfer Volume Size GB",
+            "Type": "Number"
+        },
+        "PrivateSubnet1ID": {
+            "Description": "ID of the public subnet 1 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "PrivateSubnet2ID": {
+            "Description": "ID of the public subnet 2 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-e3246d8e)",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "PrivateSubnet1CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "172.16.2.0/24",
+            "Description": "CIDR block for private subnet 1 located in Availability Zone 1",
+            "Type": "String"
+        },
+        "PrivateSubnet2CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "172.16.4.0/24",
+            "Description": "CIDR block for private subnet 2 located in Availability Zone 2",
+            "Type": "String"
+        },
+        "VPCCIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "172.16.0.0/16",
+            "Description": "CIDR block for the VPC",
+            "Type": "String"
+        },
+        "VPCID": {
+            "Description": "ID of the VPC (e.g., vpc-0343606e)",
+            "Type": "AWS::EC2::VPC::Id"
+        },
+        "PrivateInstanceSecurityGroupID": {
+            "Description": "Security Group to Allow SSH Access from Bastion hosts",
+            "Type": "AWS::EC2::SecurityGroup::Id"
+        },
+        "LogRetentionDays": {
+            "Description": "CloudWatch Logs Retention in Days",
+            "Default": "7",
+            "Type": "Number" 
+        }
+    },
+    "Mappings": {
+        "AWSAMIRegionMap": {
+            "AMI": {
+                "AMZNLINUX2HVM": "mzn2-ami-hvm-2017.12.0.20180328.1-x86_64-gp2",
+                "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS ENA 1805_01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-77ec9308.4"
+            },
+            "ap-northeast-1": {
+            "AMZNLINUX2HVM": "ami-8fbab2f3",
+            "CENTOS7HVM": "ami-8e8847f1"
+            },
+            "ap-northeast-2": {
+                "AMZNLINUX2HVM": "ami-96b916f8",
+                "CENTOS7HVM": "ami-bf9c36d1"
+            },
+            "ap-south-1": {
+                "AMZNLINUX2HVM": "ami-07eb707f",
+                "CENTOS7HVM": "ami-1780a878"
+            },
+            "ap-southeast-1": {
+                "AMZNLINUX2HVM": "ami-3eb0e942",
+                "CENTOS7HVM": "ami-8e0205f2"
+            },
+            "ap-southeast-2": {
+                "AMZNLINUX2HVM": "ami-8267abe0",
+                "CENTOS7HVM": "ami-d8c21dba"
+            },
+            "ca-central-1": {
+                "AMZNLINUX2HVM": "ami-e8a0268c",
+                "CENTOS7HVM": "ami-e802818c"
+            },
+            "eu-central-1": {
+                "AMZNLINUX2HVM": "ami-b144195a",
+                "CENTOS7HVM": "ami-dd3c0f36"
+            },
+            "eu-west-1": {
+                "AMZNLINUX2HVM": "ami-38c09341",
+                "CENTOS7HVM": "ami-3548444c"
+            },
+            "eu-west-2": {
+                "AMZNLINUX2HVM": "ami-b98667de",
+                "CENTOS7HVM": "ami-00846a67"
+            },
+            "eu-west-3": {
+                "AMZNLINUX2HVM": "ami-bf17a1c2",
+                "CENTOS7HVM": "ami-262e9f5b"
+            },
+            "sa-east-1": {
+                "AMZNLINUX2HVM": "ami-7f712613",
+                "CENTOS7HVM": "ami-cb5803a7"
+            },
+            "us-east-1": {
+                "AMZNLINUX2HVM": "ami-f973ab84",
+                "CENTOS7HVM": "ami-9887c6e7"
+            },
+            "us-east-2": {
+                "AMZNLINUX2HVM": "ami-31c7f654",  
+                "CENTOS7HVM": "ami-9c0638f9"
+            },
+            "us-west-1": {
+                "AMZNLINUX2HVM": "ami-be4051de",
+                "CENTOS7HVM": "ami-4826c22b"
+            },
+            "us-west-2": {
+                "AMZNLINUX2HVM": "ami-07eb707f",
+                "CENTOS7HVM": "ami-3ecc8f46"
+            }
+        },
+        "LinuxAMINameMap": {
+            "Amazon-Linux-2-HVM": {
+                "Code": "AMZNLINUX2HVM"
+            },
+            "CentOS-7-HVM": {
+                "Code": "CENTOS7HVM"
+            }
+        }
+    },  
+    "Rules": {
+        "SubnetsInVPC": {
+            "Assertions": [
+                {
+                    "Assert": {
+                        "Fn::EachMemberIn": [
+                            {
+                                "Fn::ValueOfAll": [
+                                    "AWS::EC2::Subnet::Id",
+                                    "VpcId"
+                                ]
+                            },
+                            {
+                                "Fn::RefAll": "AWS::EC2::VPC::Id"
+                            }
+                        ]
+                    },
+                    "AssertDescription": "All subnets must exist in the VPC"
+                }
+            ]
+        }
+    },
+    "Resources" : {
+        "xFerMessagesLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "RetentionInDays": {
+                    "Ref": "LogRetentionDays"
+                }
+            }
+        },
+        "xFerAccessSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Enables Access between xFer and vCD EC2 Instances",
+                "VpcId": {
+                    "Ref": "VPCID"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                                "", [
+                                    {
+                                    "Ref": "AWS::StackName"
+                                    },
+                                    "-SG"
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "xFerAccessSecurityGroupIngress1": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "DependsOn": "xFerAccessSecurityGroup",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "xFerAccessSecurityGroup"
+                },
+                "IpProtocol": "-1",
+                "FromPort": "0",
+                "ToPort": "65535",
+                "SourceSecurityGroupId": {"Ref": "xFerAccessSecurityGroup"}
+            }   
+        },
+        "xFerAccessSecurityGroupIngress2": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "DependsOn": "xFerAccessSecurityGroup",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "xFerAccessSecurityGroup"
+                },
+                "CidrIp": "0.0.0.0/0",
+                "IpProtocol": "tcp",
+                "FromPort": "8443",
+                "ToPort": "8443"
+            }
+        },
+        "EFS": {
+            "Type" : "AWS::EFS::FileSystem",
+            "Properties" : {
+                "PerformanceMode": "generalPurpose",
+                "FileSystemTags": [
+                    {
+                        "Key": "Name",
+                        "Value": "xFer-Cells"
+                    }
+                ]    
+            }
+        },
+        "EFSMountTargetAZ1": {
+            "Type": "AWS::EFS::MountTarget",
+            "Properties": {
+                "FileSystemId": { "Ref": "EFS" },
+                "SubnetId": { 
+                    "Ref": "PrivateSubnet1ID" 
+                },
+              "SecurityGroups": [ { "Ref": "xFerAccessSecurityGroup" } ]        
+            }
+        },
+        "EFSMountTargetAZ2": {
+            "Type": "AWS::EFS::MountTarget",
+            "Properties": {
+                "FileSystemId": { "Ref": "EFS" },
+                "SubnetId": { 
+                    "Ref": "PrivateSubnet2ID" 
+                },
+              "SecurityGroups": [ { "Ref": "xFerAccessSecurityGroup" } ]        
+            }
+        },
+        "xFerAccessRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Statement": [ {
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [ "ec2.amazonaws.com" ]
+                        },
+                        "Action": [ "sts:AssumeRole" ]
+                    } ]
+                },
+                "Path": "/"
+            }
+        },
+        "xFerS3AccessPolicies": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+               "PolicyName": "s3-xfer-Access",
+               "PolicyDocument": {
+                  "Statement": [ {
+                     "Effect": "Allow",
+                     "Action": "s3:GetObject",
+                     "Resource": "*"
+                  } ]
+               },
+               "Roles": [ { "Ref": "xFerAccessRole" } ]
+            }
+        },
+        "CloudWatchPolicies": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+               "PolicyName": "CloudWatch-Access",
+               "PolicyDocument": {
+                  "Statement": [ {
+                     "Effect": "Allow",
+                     "Action": [
+                        "logs:CreateLogStream",
+                        "logs:GetLogEvents",
+                        "logs:PutLogEvents",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams",
+                        "logs:PutRetentionPolicy",
+                        "logs:PutMetricFilter",
+                        "logs:CreateLogGroup"
+                     ],
+                     "Resource": [
+                        "arn:aws:logs:*:*:*"
+                    ]
+                  } ]
+               },
+               "Roles": [ { "Ref": "xFerAccessRole" } ]
+            }
+        },
+        "xFerInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Roles": [
+                    {
+                        "Ref": "xFerAccessRole"
+                    }
+                ],
+                "Path": "/"
+            }
+        },
+        "xFerAutoScalingGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "LaunchConfigurationName": {
+                    "Ref": "xFerLaunchConfiguration"
+                },
+                "VPCZoneIdentifier": [
+                    {
+                        "Ref": "PrivateSubnet1ID"
+                    },
+                    {
+                        "Ref": "PrivateSubnet2ID"
+                    }
+                ],
+                "MinSize": {
+                    "Ref": "NumberOfAZs"
+                },
+                "MaxSize": {
+                    "Ref": "NumberOfAZs"
+                },
+                "Cooldown": "300",
+                "DesiredCapacity": {
+                    "Ref": "NumberOfAZs"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "vCD Transfer Server",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            },
+            "CreationPolicy": {
+                "ResourceSignal": {
+                    "Count": {
+                        "Ref": "NumberOfAZs"
+                    },
+                    "Timeout": "PT30M"
+                }
+            }
+        },
+        "xFerLaunchConfiguration": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Metadata": {
+                "AWS::CloudFormation::Authentication": {
+                    "S3AccessCreds": {
+                        "type": "S3",
+                        "roleName": {
+                            "Ref": "xFerAccessRole"
+                        },
+                        "buckets": [ "vcd-cf-templates" ]
+                    }
+                },
+                "AWS::CloudFormation::Init": {
+                    "config": {
+                        "files": {
+                            "/tmp/xfer_bootstrap.sh": {
+                                "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/xfer_bootstrap.sh",
+                                "mode": "000550",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
+                            }
+                        },
+                        "commands": {
+                            "b-bootstrap": {
+                                "command": "./tmp/xfer_bootstrap.sh"
+                            }
+                        }
+                    }
+                }
+            },
+            "Properties": {
+                "KeyName": {
+                    "Ref": "KeyPairNameEC2"
+                },
+                "IamInstanceProfile": {
+                    "Ref": "xFerInstanceProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "LinuxAMINameMap",
+                                {
+                                    "Ref": "EC2AMIOS"
+                                },
+                                "Code"
+                            ]
+                        }
+                    ]
+                },
+                "BlockDeviceMappings": [
+                    {
+                        "DeviceName": "/dev/xvdb",
+                        "Ebs": {
+                            "VolumeType": {
+                                "Ref": "xFerVolumeType"
+                            },
+                            "Iops" : { 
+                                "Ref": "xFerIOPS"
+                            },
+                            "DeleteOnTermination": "true",
+                            "VolumeSize": {
+                                "Ref": "xFerVolumeSize"
+                            }
+                        }
+                    }
+                ],
+                "SecurityGroups": [
+                    {
+                        "Ref": "PrivateInstanceSecurityGroupID"
+                    },
+                    {
+                        "Ref": "xFerAccessSecurityGroup"
+                    }
+                ],
+                "InstanceType": {
+                    "Ref": "xFerInstanceType"
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "yum update -y\n",
+                                "yum install -y epel-release\n",
+                                "yum install nfs-utils lvm2 python-pip -y\n",
+                                "pip install --upgrade pip\n",
+                                "pip install awscli --ignore-installed six\n",
+                                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                                "VPCCIDR=",
+                                {
+                                    "Ref": "VPCCIDR"
+                                },
+                                "\n",
+                                "CLOUDWATCHGROUP=",
+                                {
+                                    "Ref": "xFerMessagesLogGroup"
+                                },
+                                "\n",
+                                "cfn-init -v --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                " --resource xFerLaunchConfiguration --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n",
+                                "cfn-signal -e $? --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                " --resource xFerAutoScalingGroup --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n"
+
+                            ]
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "xFerAccessSecurityGroupID": {
+            "Value": {
+                "Ref": "xFerAccessSecurityGroup"
+            },
+            "Description": "xFer Store Access Security Group ID"
+        },
+        "xFerMessagesLogGroup": {
+            "Value": {
+                "Ref": "xFerMessagesLogGroup"
+            },
+            "Description": "CloudWatch Logs GroupName. /var/log/messages logs will be stored here."
+        },
+        "EFSID": {
+            "Value": {
+                "Ref": "EFS"
+            },
+            "Description": "EFS File system ID."
+        }
+    }
+}

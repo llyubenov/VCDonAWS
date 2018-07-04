@@ -40,12 +40,13 @@ function osrelease () {
     echo "${FUNCNAME[0]} Ended" >> /var/log/cfn-init.log
 }
 
- function xfer_on_amazon_os () {
- }
+#function xfer_on_amazon_os () {
+#}
 
 function xfer_on_cent_os () {
     # Install and Configure CloudWatch Log service on xFer
     export CWG=`curl http://169.254.169.254/latest/user-data/ | grep CLOUDWATCHGROUP | sed 's/CLOUDWATCHGROUP=//g'`
+    export NFSCIDR=`curl http://169.254.169.254/latest/user-data/ | grep VPCCIDR| sed 's/VPCCIDR=//g'`
     echo "log_group_name = $CWG" >> /tmp/groupname.txt
 
 cat <<'EOF' >> ~/cloudwatchlog.conf
@@ -99,7 +100,7 @@ EOF
     mount /exports/xfer/
 
     #Configure NFS Service
-    echo "/exports/xfer $VPCCIDR(rw,no_root_squash)" >> /etc/exports
+    echo "/exports/xfer $NFSCIDR(rw,no_root_squash)" >> /etc/exports
     systemctl enable nfs
     systemctl start nfs
     
