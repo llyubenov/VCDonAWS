@@ -93,11 +93,10 @@ function vcd_main_on_cent_os () {
     echo "$efsID /opt/vmware/vcloud-director/data/transfer/cells efs defaults,_netdev 0 0" >> /etc/fstab
 
     #Install vCD
-    echo Y | /tmp/$vCDBuildName
+    echo "N" | /tmp/$vCDBuildName
 
     #Configure vCD Cell
-    export vCDConfig="/opt/vmware/vcloud-director/bin/configure -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -cons $instanceIP --console-proxy-port-https 8443 -dbhost $DBEndpoint -dbport 5432 -dbtype postgres -dbname $DBName -dbuser $DBMasterUsername -dbpassword $DBMasterUserPassword --keystore /tmp/$vCDKeystoreFileName -w $VcdCertKeystorePasswd  --enable-ceip true -unattended"
-    $vCDConfig
+    /opt/vmware/vcloud-director/bin/configure -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -cons $instanceIP --console-proxy-port-https 8443 -dbhost $DBEndpoint -dbport 5432 -dbtype postgres -dbname $DBName -dbuser $DBMasterUsername -dbpassword $DBMasterUserPassword --keystore /tmp/$vCDKeystoreFileName -w $VcdCertKeystorePasswd  --enable-ceip true -unattended
 
     #Additional changes to vCD global.properties file
 cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF
@@ -120,8 +119,7 @@ database.pool.removeAbandonedTimeout = 43200
 EOF
 
     # Initial vCD Setup
-    export vCDInitialSetup="/opt/vmware/vcloud-director/bin/cell-management-tool system-setup --email $vCDAdminEmail --full-name '$vCDAdminFullName' --installation-id $vCDInstalationId --password '$vCDAdminPasswd' --system-name '$vCDSystemName' --serial-number $vCDSerialNumber --user $vCDAdmin -unattended"
-    $vCDInitialSetup
+    /opt/vmware/vcloud-director/bin/cell-management-tool system-setup --email $vCDAdminEmail --full-name "$vCDAdminFullName" --installation-id $vCDInstalationId --password "$vCDAdminPasswd" --system-name "$vCDSystemName" --serial-number $vCDSerialNumber --user $vCDAdmin -unattended
 
     #Copy vCD response.properties file to S3
     aws s3 cp /opt/vmware/vcloud-director/etc/responses.properties s3://$vCDBuildBucketName/responses.properties
