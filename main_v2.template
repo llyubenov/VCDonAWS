@@ -941,7 +941,7 @@
                     "efsID": {
                         "Fn::GetAtt": [
                             "xFerStack",
-                            "Outputs.efsID"
+                            "Outputs.EFSID"
                         ]
                     },
                     "DBEndpoint": {
