@@ -104,7 +104,8 @@
                     },
                     "Parameters": [
                         "vCDBuildBucketName",
-                        "vCDBuildName"
+                        "vCDBuildName",
+                        "vCDKeystoreFileName"
                     ]
                 },
                 {
@@ -516,7 +517,7 @@
             "Type": "String"
         },
         "vCDBuildName": {
-            "Default": "vmware-vcloud-director-distribution-9.0.0-7554058.bin",
+            "Default": "vmware-vcloud-director-distribution-9.1.0-7905839.bin",
             "Description": "Specify the vCD binary filename name.",
             "Type": "String"
         },
@@ -890,7 +891,10 @@
             }
         },
         "vCDMainStack": {
-            "DependsOn": "RDSStack",
+            "DependsOn": [
+                "RDSStack",
+                "xFerStack"
+            ],
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-main_v2.template",
