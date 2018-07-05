@@ -897,7 +897,7 @@
             ],
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
-                "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/vcd-main_v2.template",
+                "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/vcd-main_v2.template",
                 "Parameters": {
                     "VPCID": {
                         "Fn::GetAtt": [
