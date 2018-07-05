@@ -20,6 +20,7 @@
                         "KeyPairNameEC2",
                         "EC2AMIOS",
                         "MainVcdInstanceType",
+                        "MainVcdVolumeSize",
                         "PrivateInstanceSecurityGroupID",
                         "RDSAccessSecurityGroupID",
                         "xFerAccessSecurityGroupID",
@@ -73,6 +74,9 @@
                 },
                 "MainVcdInstanceType": {
                     "default": "vCD EC2 Instance Type"
+                },
+                "vCDUIVolumeSize": {
+                    "default": "vCD UI Cells root volume size"
                 },
                 "PrivateSubnet1ID": {
                     "default": "Private Subnet 1"
@@ -166,6 +170,11 @@
             "Description": "Amazon EC2 instances type",
             "Type": "String"
         },
+        "MainVcdVolumeSize": {
+            "Default": "16",
+            "Description": "Amazon EC2 Instance Root Volume Size GB",
+            "Type": "String"
+        },
         "PrivateSubnet1ID": {
             "Description": "ID of the public subnet 1 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
             "Type": "AWS::EC2::Subnet::Id"
@@ -200,7 +209,7 @@
         },
         "vCDKeystoreFileName": {
             "Default": "certificates.ks",
-            "Description": "Specify the vCD Java certifikate keystore filename name.",
+            "Description": "Specify the vCD Java certifikate keystore filename name stored in the same S3 bucket as the vCD build.",
             "Type": "String"
         },
         "efsID": {
@@ -241,7 +250,7 @@
             "Default": "vcd_admin"
         },
         "vCDAdminFullName": {
-            "Description": "The full name of the system administrator user you are creating.",
+            "Description": "The full name of the system administrator user you are creating. No spaces currently Allowed!!!",
             "Type": "String",
             "Default": "vCD Administrator Name"
         },
@@ -257,7 +266,7 @@
             "Default": "vcd_admin@company.com"
         },
         "vCDSystemName": {
-            "Description": "",
+            "Description": "vCD System Name. No spaces currently Allowed!!!",
             "Type": "String",
             "Default": "vCD System Name"
         },
