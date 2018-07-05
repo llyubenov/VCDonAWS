@@ -602,6 +602,18 @@
                     ]
                 },
                 "Monitoring" : "true",
+                "BlockDeviceMappings": [
+                    {
+                      "DeviceName": "/dev/xvda",
+                      "Ebs": {
+                        "VolumeType": "gp2",
+                        "DeleteOnTermination": "true",
+                        "VolumeSize": {
+                            "Ref": "MainVcdVolumeSize"
+                        }
+                      }
+                    }
+                ],
                 "InstanceType": {
                     "Ref": "MainVcdInstanceType"
                 },
