@@ -252,7 +252,7 @@
         "vCDAdminFullName": {
             "Description": "The full name of the system administrator user you are creating. No spaces currently Allowed!!!",
             "Type": "String",
-            "Default": "vCD Administrator Name"
+            "Default": "vCD_Administrator_Name"
         },
         "vCDAdminPasswd": {
             "NoEcho": "true",
@@ -268,7 +268,7 @@
         "vCDSystemName": {
             "Description": "vCD System Name. No spaces currently Allowed!!!",
             "Type": "String",
-            "Default": "vCD System Name"
+            "Default": "vCD_System_Name"
         },
         "vCDInstalationId": {
             "Description": "The installation ID for this installation of vCloud Director.",
