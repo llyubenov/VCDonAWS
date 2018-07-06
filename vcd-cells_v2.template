@@ -439,21 +439,24 @@
             "Path": "/"
             }
         },
-        "S3AccessPolicy": {
+        "vCDCellS3AccessPolicy": {
             "Type": "AWS::IAM::Policy",
             "Properties": {
             "PolicyName": "s3-Access",
             "PolicyDocument": {
                 "Statement": [ {
                     "Effect": "Allow",
-                    "Action": "s3:GetObject",
+                    "Action": [
+                        "s3:GetObject",
+                        "s3:PutObject"
+                    ],
                     "Resource": "*"
                 } ]
             },
             "Roles": [ { "Ref": "vCDCellsAccessRole" } ]
             }
         },
-        "EC2DescribePolicy": {
+        "vCDCellEC2DescribePolicy": {
             "Type": "AWS::IAM::Policy",
             "Properties": {
             "PolicyName": "EC2-Describe",
@@ -462,6 +465,31 @@
                     "Effect": "Allow",
                     "Action": "ec2:Describe*",
                     "Resource": "*"
+                } ]
+            },
+            "Roles": [ { "Ref": "vCDCellsAccessRole" } ]
+            }
+        },
+        "vCDCellCloudWatchPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+            "PolicyName": "CloudWatch-Access",
+            "PolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": [
+                        "logs:CreateLogStream",
+                        "logs:GetLogEvents",
+                        "logs:PutLogEvents",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams",
+                        "logs:PutRetentionPolicy",
+                        "logs:PutMetricFilter",
+                        "logs:CreateLogGroup"
+                    ],
+                    "Resource": [
+                        "arn:aws:logs:*:*:*"
+                    ]
                 } ]
             },
             "Roles": [ { "Ref": "vCDCellsAccessRole" } ]
