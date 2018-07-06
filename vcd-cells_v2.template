@@ -247,7 +247,7 @@
             "Type": "String"
         },
         "vCDBuildName": {
-            "Default": "vmware-vcloud-director-distribution-9.0.0-7554058.bin",
+            "Default": "vmware-vcloud-director-distribution-9.1.0-7905839.bin",
             "Description": "Specify the vCD binary filename name.",
             "Type": "String"
         },
@@ -709,7 +709,7 @@
                         {
                             "Ref": "AWS::StackName"
                         },
-                        " --resource vCDMain --region ",
+                        " --resource vCDUILaunchConfiguration --region ",
                         {
                             "Ref": "AWS::Region"
                         },
@@ -718,7 +718,7 @@
                         {
                             "Ref": "AWS::StackName"
                         },
-                        " --resource vCDMain --region ",
+                        " --resource vCDUIAutoScalingGroup --region ",
                         {
                             "Ref": "AWS::Region"
                         },
@@ -879,7 +879,7 @@
                                 {
                                     "Ref": "AWS::StackName"
                                 },
-                                " --resource vCDMain --region ",
+                                " --resource vCDConsoleLaunchConfiguration --region ",
                                 {
                                     "Ref": "AWS::Region"
                                 },
@@ -888,7 +888,7 @@
                                 {
                                     "Ref": "AWS::StackName"
                                 },
-                                " --resource vCDMain --region ",
+                                " --resource vCDConsoleAutoScalingGroup --region ",
                                 {
                                     "Ref": "AWS::Region"
                                 },
