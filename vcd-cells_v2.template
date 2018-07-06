@@ -31,8 +31,7 @@
                         "RDSAccessSecurityGroupID",
                         "CellsAccessSecurityGroupID",
                         "xFerAccessSecurityGroupID",
-                        "efsID",
-                        "vCDInstanceProfile"
+                        "efsID"
                     ]
                 },
                 {
@@ -160,10 +159,7 @@
                 },
                 "vCloudContainerDebugLogGroup": {
                     "default": "Group ID for vcloud-container-debug.log"
-                },
-                "vCDInstanceProfile": {
-                    "default": "IAM Insatnce profile"
-                }  
+                }
             }
         }
     },
@@ -318,10 +314,6 @@
         },
         "vCloudContainerDebugLogGroup": {
             "Description": "CloudWatch Group Name for vcloud-container-debug.log",
-            "Type": "String"
-        },
-        "vCDInstanceProfile": {
-            "Description": "IAM Insatnce profile name to be appliend to the vCD cells", 
             "Type": "String"
         }
     },
@@ -495,6 +487,17 @@
             "Roles": [ { "Ref": "vCDCellsAccessRole" } ]
             }
         },
+        "vCDCellsInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Roles": [
+                    {
+                        "Ref": "vCDCellsAccessRole"
+                    }
+                ],
+                "Path": "/"
+            }
+        },
         "vCDUIAutoScalingGroup": {
             "Type": "AWS::AutoScaling::AutoScalingGroup",
             "Properties": {
@@ -623,7 +626,7 @@
                     "Ref": "KeyPairNameEC2"
                 },
                 "IamInstanceProfile": {
-                    "Ref": "vCDInstanceProfile"
+                    "Ref": "vCDCellsInstanceProfile "
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
@@ -793,7 +796,7 @@
                     "Ref": "KeyPairNameEC2"
                 },
                 "IamInstanceProfile": {
-                    "Ref": "vCDInstanceProfile"
+                    "Ref": "vCDCellsInstanceProfile"
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
