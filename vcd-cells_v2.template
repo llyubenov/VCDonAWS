@@ -235,7 +235,7 @@
             "Description": "Select the Security Group that allows access to VCD cells.",
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
-            "xFerAccessSecurityGroupID": {
+        "xFerAccessSecurityGroupID": {
             "Description": "Select the Security Group that allows access to VCD Transfer Server.",
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
@@ -291,10 +291,6 @@
             "Description": "Enter the number of vCD Console Cells to create.",
             "Type": "String"
         },
-        "xFerBucketName": {
-            "Description": "Name of the S3 Bucket used for vCD transfer store.",
-            "Type": "String"
-        },
         "vCDUITargetGroup": {
             "Description": "Arn of the vCD UI ELB Target Group.",
             "Type": "String"
@@ -304,29 +300,29 @@
              "Type": "String"
         },
         "LogRetentionDays": {
-        "Description": "CloudWatch Logs Retention in Days",
-        "Default": "7",
-        "Type": "Number" 
+            "Description": "CloudWatch Logs Retention in Days",
+            "Default": "7",
+            "Type": "Number" 
         },
         "MessagesLogGroup": {
-        "Description": "CloudWatch Group Name for /var/log/messages",
-        "Type": "String"
+            "Description": "CloudWatch Group Name for /var/log/messages",
+            "Type": "String"
         },
         "CellLogGroup": {
-        "Description": "CloudWatch Group Name for cell.log",
-        "Type": "String"
+            "Description": "CloudWatch Group Name for cell.log",
+            "Type": "String"
         },
         "ConsoleProxyLogGroup": {
-        "Description": "CloudWatch Group Name for console-proxy.log",
-        "Type": "String"
+            "Description": "CloudWatch Group Name for console-proxy.log",
+            "Type": "String"
         },
         "vCloudContainerDebugLogGroup": {
-        "Description": "CloudWatch Group Name for vcloud-container-debug.log",
-        "Type": "String"
+            "Description": "CloudWatch Group Name for vcloud-container-debug.log",
+            "Type": "String"
         },
         "vCDInstanceProfile": {
-        "Description": "IAM Insatnce profile name to be appliend to the vCD cells", 
-        "Type": "String"
+            "Description": "IAM Insatnce profile name to be appliend to the vCD cells", 
+            "Type": "String"
         }
     },
     "Rules": {
@@ -428,6 +424,49 @@
         }
     },
     "Resources": {
+        "vCDCellsAccessRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+            "AssumeRolePolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": [ "ec2.amazonaws.com" ]
+                    },
+                    "Action": [ "sts:AssumeRole" ]
+                } ]
+            },
+            "Path": "/"
+            }
+        },
+        "S3AccessPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+            "PolicyName": "s3-Access",
+            "PolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": "s3:GetObject",
+                    "Resource": "*"
+                } ]
+            },
+            "Roles": [ { "Ref": "vCDCellsAccessRole" } ]
+            }
+        },
+        "EC2DescribePolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+            "PolicyName": "EC2-Describe",
+            "PolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": "ec2:Describe*",
+                    "Resource": "*"
+                } ]
+            },
+            "Roles": [ { "Ref": "vCDCellsAccessRole" } ]
+            }
+        },
         "vCDUIAutoScalingGroup": {
             "Type": "AWS::AutoScaling::AutoScalingGroup",
             "Properties": {
@@ -527,7 +566,7 @@
                     "S3AccessCreds": {
                         "type": "S3",
                         "roleName": {
-                            "Ref": "vCDAccessRole"
+                            "Ref": "vCDCellsAccessRoleID"
                         },
                         "buckets": [ "vcd-cf-templates" ]
                     }
@@ -697,7 +736,7 @@
                     "S3AccessCreds": {
                         "type": "S3",
                         "roleName": {
-                            "Ref": "vCDAccessRole"
+                            "Ref": "vCDCellsAccessRoleID"
                         },
                         "buckets": [ "vcd-cf-templates" ]
                     }
@@ -801,64 +840,14 @@
                                     "Ref": "vCDKeystoreFileName"
                                 },
                                 "\n",
+                                "vCDResponsesFileName=",
+                                {
+                                    "Ref": "vCDResponsesFileName"
+                                },
+                                "\n",
                                 "VcdCertKeystorePasswd=",
                                 {
                                     "Ref": "VcdCertKeystorePasswd"
-                                },
-                                "\n",
-                                "DBEndpoint=",
-                                {
-                                    "Ref": "DBEndpoint"
-                                },
-                                "\n",
-                                "DBName=",
-                                {
-                                    "Ref": "DBName"
-                                },
-                                "\n",
-                                "DBMasterUsername=",
-                                {
-                                    "Ref": "DBMasterUsername"
-                                },
-                                "\n",
-                                "DBMasterUserPassword=",
-                                {
-                                    "Ref": "DBMasterUserPassword"
-                                },
-                                "\n",
-                                "vCDAdminEmail=",
-                                {
-                                    "Ref": "vCDAdminEmail"
-                                },
-                                "\n",
-                                "vCDAdminFullName=",
-                                {
-                                    "Ref": "vCDAdminFullName"
-                                },
-                                "\n",
-                                "vCDInstalationId=",
-                                {
-                                    "Ref": "vCDInstalationId"
-                                },
-                                "\n",
-                                "vCDAdminPasswd=",
-                                {
-                                    "Ref": "vCDAdminPasswd"
-                                },
-                                "\n",
-                                "vCDSystemName=",
-                                {
-                                    "Ref": "vCDSystemName"
-                                },
-                                "\n",
-                                "vCDSerialNumber=",
-                                {
-                                    "Ref": "vCDSerialNumber"
-                                },
-                                "\n",
-                                "vCDAdmin=",
-                                {
-                                    "Ref": "vCDAdmin"
                                 },
                                 "\n",
                                 "MessagesLogGroup=",
