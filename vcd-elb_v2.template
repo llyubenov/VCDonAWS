@@ -1,0 +1,445 @@
+{
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Description": "This template deploys an Application and a Network Load Balancers that expose the vCD service to internets.",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "vCD ELB Network Configuration"
+                    },
+                    "Parameters": [
+                        "VPCID",
+                        "PublicSubnet1",
+                        "PublicSubnet2",
+                        "CellsAccessSecurityGroupID"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD ELB Certificate Configuration"
+                    },
+                    "Parameters": [
+                        "ELBCertificateArn"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD ELB Health Check Configuration"
+                    },
+                    "Parameters": [
+                        "ELBHealthCheckIntervalSeconds",
+                        "ELBHealthCheckProtocol",
+                        "ELBHealthCheckPort",
+                        "ELBHealthCheckPath",
+                        "ELBHealthCheckTimeoutSeconds",
+                        "ELBHealthyThresholdCount",
+                        "ELBUnhealthyThresholdCount",
+                        "ELBResponseCode"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "VPCID": {
+                    "default": "VPC ID"
+                },
+                "PublicSubnet1": {
+                    "default": "Public Subnet 1"
+                },
+                "PublicSubnet2": {
+                    "default": "Public Subnet 2"
+                },
+                "CellsAccessSecurityGroupID": {
+                    "default": "vCD Cells Security Group"
+                },
+                "ELBCertificateArn": {
+                    "default": "ELB Certificate"
+                },
+                "ELBHealthCheckIntervalSeconds": {
+                    "default": "Health Check Interval Seconds"
+                },
+                "ELBHealthCheckProtocol": {
+                    "default": "Health Check Protocol"
+                },
+                "ELBHealthCheckPort": {
+                    "default": "Health Check Port"
+                },
+                "ELBHealthCheckPath": {
+                    "default": "Health Check Path"
+                },
+                "ELBHealthCheckTimeoutSeconds": {
+                    "default": "Health Check Timeout Seconds"
+                },
+                "ELBHealthyThresholdCount": {
+                    "default": "Healthy Threshold Count"
+                },
+                "ELBUnhealthyThresholdCount": {
+                    "default": "Unhealthy Threshold Count"
+                },
+                "ELBResponseCode": {
+                    "default": "Response Code/s"
+                }
+            }
+        }
+    },
+    "Parameters": {
+        "VPCID": {
+            "Type": "AWS::EC2::VPC::Id",
+            "Description": "Choose which VPC the Load Balancers should be deployed to."
+        },
+        "PublicSubnet1ID": {
+            "Description": "ID of the public subnet 1 that you want to provision the vCD Load Balancers.",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "PublicSubnet2ID": {
+            "Description": "ID of the public subnet 2 that you want to provision the vCD Load Balancers.",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "CellsAccessSecurityGroupID": {
+            "Description": "Select the Security Group that allows access to the VCD cells.",
+            "Type": "AWS::EC2::SecurityGroup::Id"
+        },
+        "ELBCertificateArn": {
+            "Default": "arn:aws:acm:us-west-2:331345527506:certificate/615c31f1-87fa-4033-86f1-f381870d988d",
+            "Description": "Specify the Certificate Arn in ACM, which will be used for the vCD Load balancer.",
+            "Type": "String"
+        },
+        "ELBHealthCheckIntervalSeconds": {
+            "Default": "30",
+            "Description": "The approximate number of seconds between health checks for an individual target.",
+            "Type": "String"
+        },
+        "ELBHealthCheckProtocol": {
+            "Default": "HTTPS",
+            "Description": "The protocol that the load balancer uses when performing health checks on the targets, such as HTTP or HTTPS.",
+            "Type": "String"
+        },
+        "ELBHealthCheckPort": {
+            "Default": "443",
+            "Description": "The port that the load balancer uses when performing health checks on the targets.",
+            "Type": "String"
+        },
+        "ELBHealthCheckPath": {
+            "Default": "/cloud/server_status",
+            "Description": "The ping path destination where Elastic Load Balancing sends health check requests.",
+            "Type": "String"
+        },
+        "ELBHealthCheckTimeoutSeconds": {
+            "Default": "10",
+            "Description": "The number of seconds to wait for a response before considering that a health check has failed.",
+            "Type": "String"
+        },
+        "ELBHealthyThresholdCount": {
+            "Default": "3",
+            "Description": "The number of consecutive successful health checks that are required before an unhealthy target is considered healthy.",
+            "Type": "String"
+        },
+        "ELBUnhealthyThresholdCount": {
+            "Default": "3",
+            "Description": "The number of consecutive failed health checks that are required before a target is considered unhealthy.",
+            "Type": "String"
+        },
+        "ELBResponseCode": {
+            "Default": "200",
+            "Description": "The HTTP codes that a healthy target uses when responding to a health check.",
+            "Type": "String"
+        }
+    },
+    "Rules": {
+        "SubnetsInVPC": {
+            "Assertions": [
+                {
+                    "Assert": {
+                        "Fn::EachMemberIn": [
+                            {
+                                "Fn::ValueOfAll": [
+                                    "AWS::EC2::Subnet::Id",
+                                    "VpcId"
+                                ]
+                            },
+                            {
+                                "Fn::RefAll": "AWS::EC2::VPC::Id"
+                            }
+                        ]
+                    },
+                    "AssertDescription": "All subnets must exist in the VPC"
+                }
+            ]
+        }
+    },
+    "Resources": {
+        "VCDLBSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+            "GroupDescription": "Public Access to VCD Load Balancer",
+            "VpcId": {"Ref": "VPCID"},
+            "Tags": [
+                {
+                "Key": "Name",
+                "Value": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-vCDLB-SG"]]}
+                }
+            ]
+            }
+        },
+        "VCDLBSecurityGroupIngress": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "DependsOn": "VCDLBSecurityGroup",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "VCDLBSecurityGroup"
+                },
+                "CidrIp": "0.0.0.0/0",
+                "IpProtocol": "tcp",
+                "FromPort": "443",
+                "ToPort": "443"
+            }
+        },
+        "vCDUILoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties": {
+                "Subnets": [
+                    {
+                        "Ref": "PublicSubnet1ID"
+                    },
+                    {
+                        "Ref": "PublicSubnet2ID"
+                    }
+                ],
+                "SecurityGroups": [
+                    {
+                        "Ref": "VCDLBSecurityGroup"
+                    },
+                    {
+                        "Ref": "CellsAccessSecurityGroupID"
+                    }
+                ],
+                "Scheme" : "internet-facing",
+                "Type" : "application",
+                "IpAddressType" : "ipv4",
+                "Tags": [
+                    {
+                    "Key": "Name",
+                    "Value": {
+                        "Fn::Join": [
+                            "", [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "-vCDUI"
+                            ]
+                        ]
+                    }
+                    }
+                ]
+            }
+        },
+        "vCDConsoleLoadBalancer": {
+            "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+            "Properties": {
+                "LoadBalancerAttributes" : [ 
+                    {
+                        "Key" : "load_balancing.cross_zone.enabled",
+                        "Value" : "true"
+                    }
+                ],
+                "Subnets": [
+                    {
+                        "Ref": "PublicSubnet1ID"
+                    },
+                    {
+                        "Ref": "PublicSubnet2ID"
+                    }
+                ],
+                "Scheme" : "internet-facing",
+                "Type" : "network",
+                "IpAddressType" : "ipv4",
+                "Tags": [
+                  {
+                    "Key": "Name",
+                    "Value": {
+                        "Fn::Join": [
+                          "", [
+                            {
+                              "Ref": "AWS::StackName"
+                            },
+                            "-vCDConsole"
+                          ]
+                        ]
+                    }
+                  }
+                ]
+            }
+        },
+        "vCDUILoadBalancerListener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "LoadBalancerArn": {
+                    "Ref": "vCDUILoadBalancer"
+                },
+                "Port": 443,
+                "Protocol": "HTTPS",
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {
+                            "Ref": "vCDUITargetGroup"
+                        }
+                    }
+                ],
+                "Certificates": [
+                    {
+                        "CertificateArn": {
+                            "Ref": "ELBCertificateArn"
+                        }
+                    }
+                ]
+            }
+        },
+        "vCDConsoleLoadBalancerListener": {
+            "Type": "AWS::ElasticLoadBalancingV2::Listener",
+            "Properties": {
+                "LoadBalancerArn": {
+                    "Ref": "vCDConsoleLoadBalancer"
+                },
+                "Port": 443,
+                "Protocol": "TCP",
+                "DefaultActions": [
+                    {
+                        "Type": "forward",
+                        "TargetGroupArn": {
+                            "Ref": "vCDConsoleTargetGroup"
+                        }
+                    }
+                ]
+            }
+        },
+        "vCDUITargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPCID"
+                },
+                "Port": 443,
+                "Protocol": "HTTPS",
+                "HealthCheckIntervalSeconds": {
+                    "Ref": "ELBHealthCheckIntervalSeconds"
+                },
+                "HealthCheckProtocol": {
+                    "Ref": "ELBHealthCheckProtocol"
+                },
+                "HealthCheckPort": {
+                    "Ref": "ELBHealthCheckPort"
+                },
+                "HealthCheckPath" : {
+                    "Ref": "ELBHealthCheckPath"
+                },
+                "HealthCheckTimeoutSeconds": {
+                    "Ref": "ELBHealthCheckTimeoutSeconds"
+                },
+                "HealthyThresholdCount": {
+                    "Ref": "ELBHealthyThresholdCount"
+                },
+                "UnhealthyThresholdCount": {
+                    "Ref": "ELBUnhealthyThresholdCount"
+                },
+                "Matcher" : {
+                    "HttpCode": {
+                        "Ref": "ELBResponseCode"
+                    }
+                },
+                "TargetGroupAttributes" : [ 
+                    {
+                        "Key" : "deregistration_delay.timeout_seconds",
+                        "Value" : "60"
+                    }
+                ],
+                "Tags": [
+                  {
+                    "Key": "Name",
+                    "Value": {
+                        "Fn::Join": [
+                          "", [
+                            {
+                              "Ref": "AWS::StackName"
+                            },
+                            "-vCDUI-TargetGroup"
+                          ]
+                        ]
+                    }
+                  }
+                ]
+            }
+        },
+        "vCDConsoleTargetGroup": {
+            "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPCID"
+                },
+                "Port": 8443,
+                "Protocol": "TCP",
+                "HealthCheckIntervalSeconds": {
+                    "Ref": "ELBHealthCheckIntervalSeconds"
+                },
+                "HealthCheckProtocol": {
+                    "Ref": "ELBHealthCheckProtocol"
+                },
+                "HealthCheckPort": "8443",
+                "HealthCheckPath" : "/",
+                "HealthyThresholdCount": {
+                    "Ref": "ELBHealthyThresholdCount"
+                },
+                "TargetGroupAttributes" : [ 
+                    {
+                        "Key" : "deregistration_delay.timeout_seconds",
+                        "Value" : "60"
+                    }
+                ],
+                "Tags": [
+                  {
+                    "Key": "Name",
+                    "Value": {
+                        "Fn::Join": [
+                          "", [
+                            {
+                              "Ref": "AWS::StackName"
+                            },
+                            "-vCDConsole-TargetGroup"
+                          ]
+                        ]
+                    }
+                  }
+                ]
+            }
+        }
+    },
+    "Outputs": {
+        "vCDUILoadBalancer": {
+            "Description": "A reference to the Application Load Balancer",
+            "Value": {
+                "Ref": "vCDUILoadBalancer"
+            }
+        },
+        "vCDUILoadBalancerUrl": {
+            "Description": "The URL of the ALB",
+            "Value": {
+                "Fn::GetAtt": [
+                    "vCDUILoadBalancer",
+                    "DNSName"
+                ]
+            }
+        },
+        "vCDUITargetGroup": {
+            "Description": "vCD UI Target Group Arn",
+            "Value": {
+                "Ref": "vCDUITargetGroup"
+            }
+        },
+        "vCDConsoleTargetGroup": {
+            "Description": "vCD Console Target Group Arn",
+            "Value": {
+                "Ref": "vCDConsoleTargetGroup"
+            }
+        }
+    }
+}
