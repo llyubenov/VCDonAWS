@@ -641,61 +641,6 @@
                             "Ref": "VcdCertKeystorePasswd"
                         },
                         "\n",
-                        "DBEndpoint=",
-                        {
-                            "Ref": "DBEndpoint"
-                        },
-                        "\n",
-                        "DBName=",
-                        {
-                            "Ref": "DBName"
-                        },
-                        "\n",
-                        "DBMasterUsername=",
-                        {
-                            "Ref": "DBMasterUsername"
-                        },
-                        "\n",
-                        "DBMasterUserPassword=",
-                        {
-                            "Ref": "DBMasterUserPassword"
-                        },
-                        "\n",
-                        "vCDAdminEmail=",
-                        {
-                            "Ref": "vCDAdminEmail"
-                        },
-                        "\n",
-                        "vCDAdminFullName=",
-                        {
-                            "Ref": "vCDAdminFullName"
-                        },
-                        "\n",
-                        "vCDInstalationId=",
-                        {
-                            "Ref": "vCDInstalationId"
-                        },
-                        "\n",
-                        "vCDAdminPasswd=",
-                        {
-                            "Ref": "vCDAdminPasswd"
-                        },
-                        "\n",
-                        "vCDSystemName=",
-                        {
-                            "Ref": "vCDSystemName"
-                        },
-                        "\n",
-                        "vCDSerialNumber=",
-                        {
-                            "Ref": "vCDSerialNumber"
-                        },
-                        "\n",
-                        "vCDAdmin=",
-                        {
-                            "Ref": "vCDAdmin"
-                        },
-                        "\n",
                         "MessagesLogGroup=",
                         {
                             "Ref": "MessagesLogGroup"
