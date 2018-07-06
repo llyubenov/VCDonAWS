@@ -626,7 +626,7 @@
                     "Ref": "KeyPairNameEC2"
                 },
                 "IamInstanceProfile": {
-                    "Ref": "vCDCellsInstanceProfile "
+                    "Ref": "vCDCellsInstanceProfile"
                 },
                 "ImageId": {
                     "Fn::FindInMap": [
