@@ -566,7 +566,7 @@
                     "S3AccessCreds": {
                         "type": "S3",
                         "roleName": {
-                            "Ref": "vCDCellsAccessRoleID"
+                            "Ref": "vCDCellsAccessRole"
                         },
                         "buckets": [ "vcd-cf-templates" ]
                     }
@@ -736,7 +736,7 @@
                     "S3AccessCreds": {
                         "type": "S3",
                         "roleName": {
-                            "Ref": "vCDCellsAccessRoleID"
+                            "Ref": "vCDCellsAccessRole"
                         },
                         "buckets": [ "vcd-cf-templates" ]
                     }
