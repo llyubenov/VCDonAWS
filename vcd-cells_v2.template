@@ -36,7 +36,7 @@
                         "xFerAccessSecurityGroupID",
                         "vCDKeystoreFileName",
                         "vCDResponsesFileName",
-                        "VcdCertKeystorePasswd",
+                        "vCDCertKeystorePasswd",
                         "efsID"
                     ]
                 },
@@ -129,8 +129,8 @@
                 "efsID" : {
                     "default" : "EFS ID for Cell Spool Area"
                 },
-                "VcdCertKeystorePasswd" : {
-                    "default" : "vCD Keystore Password"
+                "vCDCertKeystorePasswd" : {
+                    "default" : "vCD Java Keystore Password"
                 },
                 "vCDUIInstanceType": {
                     "default" : "vCD UI Cells Instance Type"
@@ -284,7 +284,7 @@
             "Description": "EFS ID for Cell Spool Area that will be mounted under /opt/vmware/vcloud-director/data/transfer/cells.",
             "Type": "String"
         },
-            "VcdCertKeystorePasswd": {
+            "vCDCertKeystorePasswd": {
             "NoEcho": "true",
             "Description": "vCD Certificates Keystore Password. Minimum of 8 alphanumeric characters.",
             "Type": "String",
@@ -749,9 +749,9 @@
                             "Ref": "vCDResponsesFileName"
                         },
                         "\n",
-                        "VcdCertKeystorePasswd=",
+                        "vCDCertKeystorePasswd=",
                         {
-                            "Ref": "VcdCertKeystorePasswd"
+                            "Ref": "vCDCertKeystorePasswd"
                         },
                         "\n",
                         "MessagesLogGroup=",
@@ -929,9 +929,9 @@
                                     "Ref": "vCDResponsesFileName"
                                 },
                                 "\n",
-                                "VcdCertKeystorePasswd=",
+                                "vCDCertKeystorePasswd=",
                                 {
-                                    "Ref": "VcdCertKeystorePasswd"
+                                    "Ref": "vCDCertKeystorePasswd"
                                 },
                                 "\n",
                                 "MessagesLogGroup=",

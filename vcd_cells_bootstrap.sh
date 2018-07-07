@@ -54,7 +54,7 @@ function vcd_cells_on_cent_os () {
     export vCDBuildName=`curl http://169.254.169.254/latest/user-data/ | grep vCDBuildName | sed 's/vCDBuildName=//g'`
     export vCDKeystoreFileName=`curl http://169.254.169.254/latest/user-data/ | grep vCDKeystoreFileName | sed 's/vCDKeystoreFileName=//g'`
     export vCDResponsesFileName=`curl http://169.254.169.254/latest/user-data/ | grep vCDResponsesFileName | sed 's/vCDResponsesFileName=//g'`
-    export VcdCertKeystorePasswd=`curl http://169.254.169.254/latest/user-data/ | grep VcdCertKeystorePasswd | sed 's/VcdCertKeystorePasswd=//g'`
+    export vCDCertKeystorePasswd=`curl http://169.254.169.254/latest/user-data/ | grep vCDCertKeystorePasswd | sed 's/vCDCertKeystorePasswd=//g'`
     export MessagesLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep MessagesLogGroup | sed 's/MessagesLogGroup=//g'`
     export CellLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep CellLogGroup | sed 's/CellLogGroup=//g'`
     export ConsoleProxyLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep ConsoleProxyLogGroup | sed 's/ConsoleProxyLogGroup=//g'`
@@ -62,8 +62,8 @@ function vcd_cells_on_cent_os () {
     export efsID=`curl http://169.254.169.254/latest/user-data/ | grep efsID | sed 's/efsID=//g'`
     export xFerIP=`aws ec2 describe-instances --region=$Region --filters "Name=availability-zone,Values=$AZ" "Name=tag:Name,Values='vCD Transfer Server'" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
     export instanceIP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)
-    export VCDJXMS=`curl http://169.254.169.254/latest/user-data/ | grep VCDJXMS | sed 's/VCDJXMS=//g'`
-    export VCDJXMX=`curl http://169.254.169.254/latest/user-data/ | grep VCDJXMX | sed 's/VCDJXMX=//g'`
+    export vCDJXMS=`curl http://169.254.169.254/latest/user-data/ | grep vCDJXMS | sed 's/vCDJXMS=//g'`
+    export vCDJXMX=`curl http://169.254.169.254/latest/user-data/ | grep vCDJXMX | sed 's/vCDJXMX=//g'`
 
     #Copy vCD Binaries and Java Certificate Keystore
     aws s3 cp s3://$vCDBuildBucketName/$vCDBuildName /tmp/$vCDBuildName
@@ -89,7 +89,7 @@ function vcd_cells_on_cent_os () {
     echo "N" | /tmp/$vCDBuildName
 
     #Configure vCD Cell
-    /opt/vmware/vcloud-director/bin/configure -r /tmp/$vCDResponsesFileName -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -cons $instanceIP --console-proxy-port-https 8443 --keystore /tmp/$vCDKeystoreFileName -w $VcdCertKeystorePasswd  --enable-ceip true -unattended
+    /opt/vmware/vcloud-director/bin/configure -r /tmp/$vCDResponsesFileName -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -cons $instanceIP --console-proxy-port-https 8443 --keystore /tmp/$vCDKeystoreFileName -w $vCDCertKeystorePasswd  --enable-ceip true -unattended
 
     #Additional changes to vCD global.properties file
 cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF
@@ -112,8 +112,8 @@ database.pool.removeAbandonedTimeout = 43200
 EOF
 
     #Set Custom vCD Java Heap Size
-    sed -i "s/Xms1024M/Xms${VCDJXMS}M/g" /opt/vmware/vcloud-director/bin/vmware-vcd-cell-common
-    sed -i "s/Xmx4096M/Xmx${VCDJXMX}M/g" /opt/vmware/vcloud-director/bin/vmware-vcd-cell-common
+    sed -i "s/Xms1024M/Xms${vCDJXMS}M/g" /opt/vmware/vcloud-director/bin/vmware-vcd-cell-common
+    sed -i "s/Xmx4096M/Xmx${vCDJXMX}M/g" /opt/vmware/vcloud-director/bin/vmware-vcd-cell-common
 
 
     #Mount Transfer Store and change ownership
