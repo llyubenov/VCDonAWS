@@ -793,10 +793,10 @@
             "Fn::GetAtt" : ["vCDMain", "PrivateIp"]
             }
         },
-        "vCDInstanceProfile" : {
-            "Description" : "IAM Host profile that allows access to S3 and CloudWatch",
+        "CellsAccessSecurityGroupID": {
+            "Description": "Cells Access Security Group ID",
             "Value": {
-                "Ref": "vCDInstanceProfile"
+                "Ref": "CellsAccessSecurityGroup"
             }
         },
         "MessagesLogGroup": {
