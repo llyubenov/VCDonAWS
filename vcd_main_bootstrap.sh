@@ -96,7 +96,7 @@ function vcd_main_on_cent_os () {
     echo "N" | /tmp/$vCDBuildName
 
     #Configure vCD Cell
-    /opt/vmware/vcloud-director/bin/configure -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -cons $instanceIP --console-proxy-port-https 8443 -dbhost $DBEndpoint -dbport 5432 -dbtype postgres -dbname $DBName -dbuser $DBMasterUsername -dbpassword $DBMasterUserPassword --keystore /tmp/$vCDKeystoreFileName -w $VcdCertKeystorePasswd  --enable-ceip true -unattended
+    /opt/vmware/vcloud-director/bin/configure -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -cons $instanceIP --console-proxy-port-https 8443 -dbhost $DBEndpoint -dbport 5432 -dbtype postgres -dbname $DBName -dbuser $DBMasterUsername -dbpassword $DBMasterUserPassword --keystore /tmp/$vCDKeystoreFileName -w $vCDCertKeystorePasswd  --enable-ceip true -unattended
 
     #Additional changes to vCD global.properties file
 cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF

@@ -61,7 +61,7 @@
                         "vCDInstalationId",
                         "vCDSerialNumber",
                         "vCDKeystoreFileName",
-                        "VcdCertKeystorePasswd"
+                        "vCDCertKeystorePasswd"
                     ]
                 }
             ],
@@ -117,7 +117,7 @@
                 "DBMasterUserPassword" : {
                     "default" : "RDS Master User Password"
                 },
-                "VcdCertKeystorePasswd" : {
+                "vCDCertKeystorePasswd" : {
                     "default" : "Keystore Password"
                 },
                 "vCDAdmin" : {
@@ -238,7 +238,7 @@
             "Type": "String",
             "MinLength": "8"
         },
-        "VcdCertKeystorePasswd": {
+        "vCDCertKeystorePasswd": {
             "NoEcho": "true",
             "Description": "vCD Certificates Keystore Password. Minimum of 8 alphanumeric characters.",
             "Type": "String",
@@ -664,9 +664,9 @@
                                     "Ref": "vCDKeystoreFileName"
                                 },
                                 "\n",
-                                "VcdCertKeystorePasswd=",
+                                "vCDCertKeystorePasswd=",
                                 {
-                                    "Ref": "VcdCertKeystorePasswd"
+                                    "Ref": "vCDCertKeystorePasswd"
                                 },
                                 "\n",
                                 "DBEndpoint=",
