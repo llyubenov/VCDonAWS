@@ -16,26 +16,6 @@
                 },
                 {
                     "Label": {
-                        "default": "vCD Cells Configuration"
-                    },
-                    "Parameters": [
-                        "KeyPairNameEC2",
-                        "EC2AMIOS",
-                        "vCDUIInstanceType",
-                        "vCDUIVolumeSize",
-                        "NumVCDUICells",
-                        "vCDConsoleInstanceType",
-                        "vCDConsoleVolumeSize",
-                        "NumVCDConsoleCells",
-                        "PrivateInstanceSecurityGroupID",
-                        "RDSAccessSecurityGroupID",
-                        "CellsAccessSecurityGroupID",
-                        "xFerAccessSecurityGroupID",
-                        "efsID"
-                    ]
-                },
-                {
-                    "Label": {
                         "default": "vCD Binary Details"
                     },
                     "Parameters": [
@@ -45,12 +25,43 @@
                 },
                 {
                     "Label": {
-                        "default": "vCD Configuration Parameters"
+                        "default": "vCD Cells Common Configuration"
                     },
                     "Parameters": [
+                        "KeyPairNameEC2",
+                        "EC2AMIOS",
+                        "PrivateInstanceSecurityGroupID",
+                        "RDSAccessSecurityGroupID",
+                        "CellsAccessSecurityGroupID",
+                        "xFerAccessSecurityGroupID",
                         "vCDKeystoreFileName",
                         "vCDResponsesFileName",
-                        "VcdCertKeystorePasswd"
+                        "VcdCertKeystorePasswd",
+                        "efsID"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD UI Cells Configuration"
+                    },
+                    "Parameters": [
+                        "vCDUIInstanceType",
+                        "vCDUIVolumeSize",
+                        "NumVCDUICells",
+                        "vCDUIJXMS",
+                        "vCDUIJXMX"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Console Cells Configuration"
+                    },
+                    "Parameters": [
+                        "vCDConsoleInstanceType",
+                        "vCDConsoleVolumeSize",
+                        "NumVCDConsoleCells",
+                        "vCDConsoleJXMS",
+                        "vCDConsoleJXMX"
                     ]
                 },
                 {
@@ -119,46 +130,58 @@
                     "default" : "EFS ID for Cell Spool Area"
                 },
                 "VcdCertKeystorePasswd" : {
-                  "default" : "vCD Keystore Password"
+                    "default" : "vCD Keystore Password"
                 },
                 "vCDUIInstanceType": {
-                    "default": "vCD UI Cells Instance Type"
+                    "default" : "vCD UI Cells Instance Type"
                 },
                 "vCDConsoleInstanceType": {
-                    "default": "vCD Console Cells Instance Type"
+                    "default" : "vCD Console Cells Instance Type"
                 },
                 "NumVCDUICells": {
-                    "default": "Number of vCD UI Cells"
+                    "default" : "Number of vCD UI Cells"
                 },
                 "NumVCDConsoleCells": {
-                    "default": "Number of vCD Console Cells"
+                    "default" : "Number of vCD Console Cells"
                 },
                 "vCDUITargetGroup": {
-                    "default": "vCD UI ELB Target Group"
+                    "default" : "vCD UI ELB Target Group"
                 },
                 "vCDConsoleTargetGroup": {
-                    "default": "vCD Console ELB Target Group"
+                    "default" : "vCD Console ELB Target Group"
                 },
                 "vCDUIVolumeSize": {
-                    "Default": "vCD UI Cells root volume size"
+                    "default" : "vCD UI Cells root volume size"
                 },
                 "vCDConsoleVolumeSize": {
-                    "Default": "vCD Console Cells root volume size"
+                    "default" : "vCD Console Cells root volume size"
                 },
                 "LogRetentionDays": {
-                    "default": "Log Retention"
+                    "default" : "Log Retention"
                 },
                 "MessagesLogGroup": {
-                    "default": "Group ID for /var/log/messages"
+                    "default" : "Group ID for /var/log/messages"
                 },
                 "CellLogGroup": {
-                    "default": "Group ID for cell.log"
+                    "default" : "Group ID for cell.log"
                 },
                 "ConsoleProxyLogGroup": {
-                    "default": "Group ID for console-proxy.log" 
+                    "default" : "Group ID for console-proxy.log" 
                 },
                 "vCloudContainerDebugLogGroup": {
-                    "default": "Group ID for vcloud-container-debug.log"
+                    "default" : "Group ID for vcloud-container-debug.log"
+                },
+                "vCDUIJXMS": {
+                    "default" : "Initial vCD Java Heap Size"
+                },
+                "vCDUIJXMX": {
+                    "default" : "Maximum vCD Java Heap Size" 
+                },
+                "vCDConsoleJXMS": {
+                    "default" : "Initial vCD Java Heap Size" 
+                },
+                "vCDConsoleJXMX": {
+                    "default" : "Maximum vCD Java Heap Size"
                 }
             }
         }
@@ -296,25 +319,45 @@
              "Type": "String"
         },
         "LogRetentionDays": {
-            "Description": "CloudWatch Logs Retention in Days",
+            "Description": "CloudWatch Logs Retention in Days.",
             "Default": "7",
             "Type": "Number" 
         },
         "MessagesLogGroup": {
-            "Description": "CloudWatch Group Name for /var/log/messages",
+            "Description": "CloudWatch Group Name for /var/log/messages.",
             "Type": "String"
         },
         "CellLogGroup": {
-            "Description": "CloudWatch Group Name for cell.log",
+            "Description": "CloudWatch Group Name for cell.log.",
             "Type": "String"
         },
         "ConsoleProxyLogGroup": {
-            "Description": "CloudWatch Group Name for console-proxy.log",
+            "Description": "CloudWatch Group Name for console-proxy.log.",
             "Type": "String"
         },
         "vCloudContainerDebugLogGroup": {
-            "Description": "CloudWatch Group Name for vcloud-container-debug.log",
+            "Description": "CloudWatch Group Name for vcloud-container-debug.log.",
             "Type": "String"
+        },
+        "vCDUIJXMS": {
+            "Description": "vCD Java Heap Size initial memory allocation pool. Enter value in MB!",
+            "Default": "1024",
+            "Type": "Number" 
+        },
+        "vCDUIJXMX": {
+            "Description": "vCD Java Heap Size maximum memory allocation pool. Enter value in MB!",
+            "Default": "4096",
+            "Type": "Number" 
+        },
+        "vCDConsoleJXMS": {
+            "Description": "vCD Java Heap Size initial memory allocation pool. Enter value in MB!",
+            "Default": "1024",
+            "Type": "Number" 
+        },
+        "vCDConsoleJXMX": {
+            "Description": "vCD Java Heap Size maximum memory allocation pool. Enter value in MB!",
+            "Default": "4096",
+            "Type": "Number" 
         }
     },
     "Rules": {
@@ -736,6 +779,16 @@
                             "Ref": "efsID"
                         },               
                         "\n",
+                        "vCDJXMS=",
+                        {
+                            "Ref": "vCDUIJXMS"
+                        },               
+                        "\n",
+                        "vCDJXMX=",
+                        {
+                            "Ref": "vCDUIJXMX"
+                        },               
+                        "\n",
                         "cfn-init -v --stack ",
                         {
                             "Ref": "AWS::StackName"
@@ -904,6 +957,16 @@
                                 "efsID=",
                                 {
                                     "Ref": "efsID"
+                                },               
+                                "\n",
+                                "vCDJXMS=",
+                                {
+                                    "Ref": "vCDConsoleJXMS"
+                                },               
+                                "\n",
+                                "vCDJXMX=",
+                                {
+                                    "Ref": "vCDConsoleJXMX"
                                 },               
                                 "\n",
                                 "cfn-init -v --stack ",

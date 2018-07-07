@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# xFer Server bootstrapping
+# vCD Cells bootstrapping
 
 # Redirect script output to a log file
 exec > /var/log/vcd_cells_bootstrap.log                                                                  
@@ -43,10 +43,10 @@ function osrelease () {
     echo "${FUNCNAME[0]} Ended" >> /var/log/cfn-init.log
 }
 
-#function xfer_on_amazon_os () {
+#function vcd_cells_on_amazon_os () {
 #}
 
-function vcd_main_on_cent_os () {
+function vcd_cells_on_cent_os () {
     # Prepare Variables
     export Region=`curl http://169.254.169.254/latest/meta-data/placement/availability-zone | rev | cut -c 2- | rev`
     export AZ=`curl http://169.254.169.254/latest/meta-data/placement/availability-zone`
@@ -62,7 +62,8 @@ function vcd_main_on_cent_os () {
     export efsID=`curl http://169.254.169.254/latest/user-data/ | grep efsID | sed 's/efsID=//g'`
     export xFerIP=`aws ec2 describe-instances --region=$Region --filters "Name=availability-zone,Values=$AZ" "Name=tag:Name,Values='vCD Transfer Server'" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
     export instanceIP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)
-
+    export VCDJXMS=`curl http://169.254.169.254/latest/user-data/ | grep VCDJXMS | sed 's/VCDJXMS=//g'`
+    export VCDJXMX=`curl http://169.254.169.254/latest/user-data/ | grep VCDJXMX | sed 's/VCDJXMX=//g'`
 
     #Copy vCD Binaries and Java Certificate Keystore
     aws s3 cp s3://$vCDBuildBucketName/$vCDBuildName /tmp/$vCDBuildName
@@ -110,12 +111,17 @@ database.pool.abandonWhenPercentageFull = 0
 database.pool.removeAbandonedTimeout = 43200
 EOF
 
+    #Set Custom vCD Java Heap Size
+    sed -i "s/Xms1024M/Xms${VCDJXMS}M/g" /opt/vmware/vcloud-director/bin/vmware-vcd-cell-common
+    sed -i "s/Xmx4096M/Xmx${VCDJXMX}M/g" /opt/vmware/vcloud-director/bin/vmware-vcd-cell-common
+
+
     #Mount Transfer Store and change ownership
     mount /opt/vmware/vcloud-director/data/transfer/
     mount /opt/vmware/vcloud-director/data/transfer/cells
     chown vcloud:vcloud -R /opt/vmware/vcloud-director/data/transfer/
 
-    # Install and Configure CloudWatch Log service on xFer
+    # Install and Configure CloudWatch Log service
     echo "log_group_name = $MessagesLogGroup" >> /tmp/MessagesLogGroup.txt
     echo "log_group_name = $CellLogGroup" >> /tmp/CellLogGroup.txt
     echo "log_group_name = $ConsoleProxyLogGroup" >> /tmp/ConsoleProxyLogGroup.txt
@@ -215,11 +221,11 @@ release=$(osrelease)
 # AMZN Linux
 if [ "$release" == "AMZN" ]; then
     #Call function for AMZN
-    vcd_main_on_amazon_os
+    vcd_cells_on_amazon_os
 # CentOS Linux
 elif [ "$release" == "CentOS" ]; then
     #Call function for CentOS
-    vcd_main_on_cent_os
+    vcd_cells_on_cent_os
 else
     echo "[ERROR] Unsupported Linux OS"
     exit 1
