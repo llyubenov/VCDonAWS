@@ -119,7 +119,7 @@ database.pool.removeAbandonedTimeout = 43200
 EOF
 
     # Initial vCD Setup
-    /opt/vmware/vcloud-director/bin/cell-management-tool system-setup --email $vCDAdminEmail --full-name "$vCDAdminFullName" --installation-id $vCDInstalationId --password "$vCDAdminPasswd" --system-name "$vCDSystemName" --serial-number $vCDSerialNumber --user $vCDAdmin -unattended
+    /opt/vmware/vcloud-director/bin/cell-management-tool system-setup --email $vCDAdminEmail --full-name "$vCDAdminFullName" --installation-id $vCDInstalationId --password $vCDAdminPasswd --system-name "$vCDSystemName" --serial-number $vCDSerialNumber --user $vCDAdmin -unattended
 
     #Copy vCD response.properties file to S3
     aws s3 cp /opt/vmware/vcloud-director/etc/responses.properties s3://$vCDBuildBucketName/responses.properties
