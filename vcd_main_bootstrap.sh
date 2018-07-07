@@ -1,12 +1,12 @@
 #!/bin/bash -e
-# xFer Server bootstrapping
+# vCD Primary Cell bootstrapping
 
 # Redirect script output to a log file
 exec > /var/log/vcd_main_bootstrap.log                                                                  
 exec 2>&1
 
 # Configuration
-PROGRAM='vCD xFer Server'
+PROGRAM='Main vCD Cell'
 
 ##################################### Functions Definitions
 function checkos () {
@@ -43,7 +43,7 @@ function osrelease () {
     echo "${FUNCNAME[0]} Ended" >> /var/log/cfn-init.log
 }
 
-#function xfer_on_amazon_os () {
+#function vcd_main_on_amazon_os () {
 #}
 
 function vcd_main_on_cent_os () {
@@ -53,7 +53,7 @@ function vcd_main_on_cent_os () {
     export vCDBuildBucketName=`curl http://169.254.169.254/latest/user-data/ | grep vCDBuildBucketName | sed 's/vCDBuildBucketName=//g'`
     export vCDBuildName=`curl http://169.254.169.254/latest/user-data/ | grep vCDBuildName | sed 's/vCDBuildName=//g'`
     export vCDKeystoreFileName=`curl http://169.254.169.254/latest/user-data/ | grep vCDKeystoreFileName | sed 's/vCDKeystoreFileName=//g'`
-    export VcdCertKeystorePasswd=`curl http://169.254.169.254/latest/user-data/ | grep VcdCertKeystorePasswd | sed 's/VcdCertKeystorePasswd=//g'`
+    export vCDCertKeystorePasswd=`curl http://169.254.169.254/latest/user-data/ | grep vCDCertKeystorePasswd | sed 's/vCDCertKeystorePasswd=//g'`
     export DBEndpoint=`curl http://169.254.169.254/latest/user-data/ | grep DBEndpoint | sed 's/DBEndpoint=//g'`
     export DBName=`curl http://169.254.169.254/latest/user-data/ | grep DBName | sed 's/DBName=//g'`
     export DBMasterUsername=`curl http://169.254.169.254/latest/user-data/ | grep DBMasterUsername | sed 's/DBMasterUsername=//g'`

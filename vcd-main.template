@@ -1,172 +1,184 @@
 {
-   "AWSTemplateFormatVersion" : "2010-09-09",
-   "Metadata": {
-       "AWS::CloudFormation::Interface": {
-           "ParameterGroups": [
-               {
-                   "Label": {
-                       "default": "Network Configuration"
-                   },
-                   "Parameters": [
-                       "VPCID",
-                       "PrivateSubnet1ID"
-                   ]
-               },
-               {
-                   "Label": {
-                       "default": "Main vCD Cell Configuration"
-                   },
-                   "Parameters": [
-                       "KeyPairNameEC2",
-                       "EC2AMIOS",
-                       "MainVcdInstanceType",
-                       "MainVcdVolumeSize",
-                       "PrivateInstanceSecurityGroupID",
-                       "RDSAccessSecurityGroupID",
-                       "LogRetentionDays"
-                   ]
-               },
-               {
-                   "Label": {
-                       "default": "vCD Binaries Details"
-                   },
-                   "Parameters": [
-                       "vCDBuildBucketName",
-                       "vCDBuildName"
-                   ]
-               },
-               {
-                   "Label": {
-                       "default": "vCD Instance DB Configuration"
-                   },
-                   "Parameters": [
-                       "DBEndpoint",
-                       "DBName",
-                       "DBMasterUsername",
-                       "DBMasterUserPassword"
-                   ]
-               },
-               {
-                   "Label": {
-                       "default": "vCD Instance Configuration"
-                   },
-                   "Parameters": [
-                       "vCDAdmin",
-                       "vCDAdminFullName",
-                       "vCDAdminPasswd",
-                       "vCDAdminEmail",
-                       "vCDSystemName",
-                       "vCDInstalationId",
-                       "vCDSerialNumber",
-                       "VcdCertKeystorePasswd"
-                   ]
-               }
-           ],
-           "ParameterLabels": {
-               "KeyPairNameEC2": {
-                   "default": "Key Pair Name for all vCD Cells"
-               },
-               "EC2AMIOS": {
-                   "default": "vCD EC2 AMI Operating System"
-               },
-               "MainVcdVolumeSize": {
-                "Default": "Main vCD root volume size"
-               },
-               "MainVcdCellType": {
-                   "default": "vCD EC2 Instance Type"
-               },
-               "PrivateSubnet1ID": {
-                   "default": "Private Subnet 1"
-               },
-               "VPCID": {
-                   "default": "VPC ID"
-               },
-               "PrivateInstanceSecurityGroupID": {
-                   "default": "Security Group to Allow SSH Access from Bastion hosts"
-               },
-               "RDSAccessSecurityGroupID": {
-                   "default": "Security Group to Allow Access the vCD Postgres Database"
-               },
-               "vCDBuildBucketName" : {
-                 "default" : "S3 Bucket Name"
-               },
-               "vCDBuildName" : {
-                 "default" : "vCD Binary"
-               },
-               "DBEndpoint" : {
-                 "default" : "RDS Endpoint"
-               },
-               "DBName" : {
-                 "default" : "RDS database name"
-               },
-               "DBMasterUsername" : {
-                 "default" : "RDS Master Username"
-               },
-               "DBMasterUserPassword" : {
-                 "default" : "RDS Master User Password"
-               },
-               "VcdCertKeystorePasswd" : {
-                 "default" : "Keystore Password"
-               },
-               "vCDAdmin" : {
-                 "default" : "The system administrator's username"
-               },
-               "vCDAdminFullName" : {
-                 "default" : "The system administrator's full name"
-               },
-               "vCDAdminPasswd" : {
-                 "default" : "The system administrator password"
-               },
-               "vCDAdminEmail" : {
-                 "default" : "The system administrator's email address."
-               },
-               "vCDSystemName" : {
-                 "default" : "System name."
-               },
-               "vCDInstalationId" : {
-                 "default" : "Installation ID for this instance."
-               },
-               "vCDSerialNumber" : {
-                 "default" : "License Key."
-               },
-               "LogRetentionDays": {
-                 "default": "CloudWatch Log Retention"
-               }  
-           }
-       }
-   },
-   "Parameters": {
-       "KeyPairNameEC2": {
-           "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
-           "Type": "AWS::EC2::KeyPair::KeyName"
-       },
-       "EC2AMIOS": {
-           "AllowedValues": [
-               "Amazon-Linux-HVM",
-               "CentOS-7-HVM"
-           ],
-           "Default": "Amazon-Linux-HVM",
-           "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
-           "Type": "String"
-       },
-       "MainVcdVolumeSize": {
-           "Default": "20",
-           "Description": "Amazon EC2 Instance Root Volume Size GB",
-           "Type": "String"
-       },
-       "MainVcdCellType": {
-           "AllowedValues": [
-               "t2.small",
-               "m5.large"
-           ],
-           "Default": "t2.small",
-           "Description": "Amazon EC2 instances type",
-           "Type": "String"
-       },
-       "PrivateSubnet1ID": {
-           "Description": "ID of the public subnet 1 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
-           "Type": "AWS::EC2::Subnet::Id"
-       },
+    "AWSTemplateFormatVersion" : "2010-09-09",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "VPCID",
+                        "PrivateSubnet1ID"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Main vCD Cell Configuration"
+                    },
+                    "Parameters": [
+                        "KeyPairNameEC2",
+                        "EC2AMIOS",
+                        "MainVcdInstanceType",
+                        "MainVcdVolumeSize",
+                        "PrivateInstanceSecurityGroupID",
+                        "RDSAccessSecurityGroupID",
+                        "xFerAccessSecurityGroupID",
+                        "efsID",
+                        "LogRetentionDays"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Binaries Details"
+                    },
+                    "Parameters": [
+                        "vCDBuildBucketName",
+                        "vCDBuildName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Instance DB Configuration"
+                    },
+                    "Parameters": [
+                        "DBEndpoint",
+                        "DBName",
+                        "DBMasterUsername",
+                        "DBMasterUserPassword"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "vCD Instance Configuration"
+                    },
+                    "Parameters": [
+                        "vCDAdmin",
+                        "vCDAdminFullName",
+                        "vCDAdminPasswd",
+                        "vCDAdminEmail",
+                        "vCDSystemName",
+                        "vCDInstalationId",
+                        "vCDSerialNumber",
+                        "vCDKeystoreFileName",
+                        "VcdCertKeystorePasswd"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "KeyPairNameEC2": {
+                    "default": "Key Pair Name for all vCD Cells"
+                },
+                "EC2AMIOS": {
+                    "default": "vCD EC2 AMI Operating System"
+                },
+                "MainVcdInstanceType": {
+                    "default": "vCD EC2 Instance Type"
+                },
+                "vCDUIVolumeSize": {
+                    "default": "vCD UI Cells root volume size"
+                },
+                "PrivateSubnet1ID": {
+                    "default": "Private Subnet 1"
+                },
+                "VPCID": {
+                    "default": "VPC ID"
+                },
+                "PrivateInstanceSecurityGroupID": {
+                    "default": "Security Group to Allow SSH Access from Bastion hosts"
+                },
+                "RDSAccessSecurityGroupID": {
+                    "default": "Security Group to Allow Access the vCD Postgres Database"
+                },
+                "xFerAccessSecurityGroupID": {
+                    "default": "Security Group to Allow Access the vCD Transfer Server"
+                },
+                "vCDBuildBucketName" : {
+                    "default" : "S3 Bucket Name"
+                },
+                "vCDBuildName" : {
+                    "default" : "vCD Binary"
+                },
+                "vCDKeystoreFileName" : {
+                    "default" : "vCD Java Certificate Keystore filename"
+                },
+                "efsID" : {
+                    "default" : "EFS ID for Cell Spool Area"
+                },
+                "DBEndpoint" : {
+                    "default" : "RDS Endpoint"
+                },
+                "DBName" : {
+                    "default" : "RDS database name"
+                },
+                "DBMasterUsername" : {
+                    "default" : "RDS Master Username"
+                },
+                "DBMasterUserPassword" : {
+                    "default" : "RDS Master User Password"
+                },
+                "VcdCertKeystorePasswd" : {
+                    "default" : "Keystore Password"
+                },
+                "vCDAdmin" : {
+                    "default" : "The system administrator's username"
+                },
+                "vCDAdminFullName" : {
+                    "default" : "The system administrator's full name"
+                },
+                "vCDAdminPasswd" : {
+                    "default" : "The system administrator password"
+                },
+                "vCDAdminEmail" : {
+                    "default" : "The system administrator's email address."
+                },
+                "vCDSystemName" : {
+                    "default" : "System name."
+                },
+                "vCDInstalationId" : {
+                    "default" : "Installation ID for this instance."
+                },
+                "vCDSerialNumber" : {
+                    "default" : "License Key."
+                },
+                "LogRetentionDays": {
+                    "default": "CloudWatch Log Retention"
+                }  
+            }
+        }
+    },
+    "Parameters": {
+        "KeyPairNameEC2": {
+            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "EC2AMIOS": {
+            "AllowedValues": [
+                "Amazon-Linux-2-HVM",
+                "CentOS-7-HVM"
+            ],
+            "Default": "CentOS-7-HVM",
+            "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
+            "Type": "String"
+        },
+        "MainVcdInstanceType": {
+            "AllowedValues": [
+                "t2.small",
+                "m5.large"
+            ],
+            "Default": "t2.small",
+            "Description": "Amazon EC2 instances type",
+            "Type": "String"
+        },
+        "MainVcdVolumeSize": {
+            "Default": "16",
+            "Description": "Amazon EC2 Instance Root Volume Size GB",
+            "Type": "String"
+        },
+        "PrivateSubnet1ID": {
+            "Description": "ID of the public subnet 1 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
         "VPCID": {
             "Description": "ID of the VPC (e.g., vpc-0343606e)",
             "Type": "AWS::EC2::VPC::Id"
@@ -179,705 +191,637 @@
             "Description": "Security Group to Allow Access RDS Database",
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
+        "xFerAccessSecurityGroupID": {
+            "Description": "Select the Security Group that allows access to VCD Transfer Server.",
+            "Type": "AWS::EC2::SecurityGroup::Id"
+        },
         "vCDBuildBucketName": {
             "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
             "ConstraintDescription": "Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
             "Default": "vcd-builds",
-            "Description": "Bucket name that holds the VCD build to be used by this stack.",
+            "Description": "Bucket name that holds the VCD build and Java Certificate keystore to be used by this stack.",
             "Type": "String"
         },
         "vCDBuildName": {
-            "Default": "vmware-vcloud-director-distribution-9.0.0-7554058.bin",
+            "Default": "vmware-vcloud-director-distribution-9.1.0-7905839.bin",
             "Description": "Specify the vCD binary filename name.",
             "Type": "String"
         },
+        "vCDKeystoreFileName": {
+            "Default": "certificates.ks",
+            "Description": "Specify the vCD Java certifikate keystore filename name. The template assumes the response files is stored in the same S3 bucket as the vCD binary.",
+            "Type": "String"
+        },
+        "efsID": {
+            "Description": "EFS ID for Cell Spool Area that will be mounted under /opt/vmware/vcloud-director/data/transfer/cells.",
+            "Type": "String"
+        },
         "DBEndpoint": {
-          "Description": "vCD Postgres DB Endpoint Address.",
-          "Type": "String"
+            "Description": "vCD Postgres DB Endpoint Address.",
+            "Type": "String"
         },
         "DBName": {
-          "Default": "vcddb",
-          "Description" : "vCD Postgres database name",
-          "Type": "String",
-          "MinLength": "1",
-          "MaxLength": "16"
+            "Default": "vcddb",
+            "Description" : "vCD Postgres database name",
+            "Type": "String",
+            "MinLength": "1",
+            "MaxLength": "16"
         },
         "DBMasterUsername": {
-          "Description": "Database administration name. First character must be a letter and can not be 'root'.",
-          "Type": "String",
-          "Default": "dbmaster"
+            "Description": "Database administration name. First character must be a letter and can not be 'root'.",
+            "Type": "String",
+            "Default": "dbmaster"
         },
         "DBMasterUserPassword": {
-          "NoEcho": "true",
-          "Description": "Database administration password. Minimum of 8 alphanumeric characters.",
-          "Type": "String",
-          "MinLength": "8"
+            "NoEcho": "true",
+            "Description": "Database administration password. Minimum of 8 alphanumeric characters.",
+            "Type": "String",
+            "MinLength": "8"
         },
         "VcdCertKeystorePasswd": {
-          "NoEcho": "true",
-          "Description": "vCD Certificates Keystore Password. Minimum of 8 alphanumeric characters.",
-          "Type": "String",
-          "MinLength": "8"
+            "NoEcho": "true",
+            "Description": "vCD Certificates Keystore Password. Minimum of 8 alphanumeric characters.",
+            "Type": "String",
+            "MinLength": "8"
         },
         "vCDAdmin": {
-          "Description": "The username of the system administrator user you are creating.",
-          "Type": "String",
-          "Default": "vcd_admin"
+            "Description": "The username of the system administrator user you are creating.",
+            "Type": "String",
+            "Default": "vcd_admin"
         },
         "vCDAdminFullName": {
-          "Description": "The full name of the system administrator user you are creating.",
-          "Type": "String",
-          "Default": "vCD Administrator Name"
+            "Description": "The full name of the system administrator user you are creating. No spaces currently Allowed!!!",
+            "Type": "String",
+            "Default": "vCD_Administrator_Name"
         },
         "vCDAdminPasswd": {
-          "NoEcho": "true",
-          "Description": "The password for the system administrator user you are creating.",
-          "Type": "String",
-          "MinLength": "8"
+            "NoEcho": "true",
+            "Description": "The password for the system administrator user you are creating.",
+            "Type": "String",
+            "MinLength": "8"
         },
         "vCDAdminEmail": {
-          "Description": "The e-mail address for the system administrator you are creating.",
-          "Type": "String",
-          "Default": "vcd_admin@company.com"
+            "Description": "The e-mail address for the system administrator you are creating.",
+            "Type": "String",
+            "Default": "vcd_admin@company.com"
         },
         "vCDSystemName": {
-          "Description": "",
-          "Type": "String",
-          "Default": "vCD System Name"
+            "Description": "vCD System Name. No spaces currently Allowed!!!",
+            "Type": "String",
+            "Default": "vCD_System_Name"
         },
         "vCDInstalationId": {
-          "Description": "The installation ID for this installation of vCloud Director.",
-          "Type": "String",
-          "MinLength": "1",
-          "MaxLength": "2",
-          "AllowedPattern" : "[1-6][0-9]*",
-          "Default": "1",
-          "ConstraintDescription" : "Must be an integer in the range 1-63."
+            "Description": "The installation ID for this installation of vCloud Director.",
+            "Type": "String",
+            "MinLength": "1",
+            "MaxLength": "2",
+            "AllowedPattern" : "[1-6][0-9]*",
+            "Default": "1",
+            "ConstraintDescription" : "Must be an integer in the range 1-63."
         },
         "vCDSerialNumber": {
-          "Description": "The serial number (license key) for this vCD Instance.",
-          "Type": "String"
+            "Description": "The serial number (license key) for this vCD Instance.",
+            "Type": "String"
         },
         "LogRetentionDays": {
             "Description": "CloudWatch Logs Retention in Days",
             "Default": "7",
             "Type": "Number" 
         }
-   },
-   "Mappings": {
-       "AWSAMIRegionMap": {
-           "AMI": {
-               "AMZNLINUXHVM": "amzn-ami-hvm-2017.09.1.20171120-x86_64-gp2",
-               "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS 1708_11.01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-95096eef.4"
-           },
-           "us-east-1": {
-               "AMZNLINUXHVM": "ami-55ef662f",
-               "CENTOS7HVM": "ami-02e98f78"
-           },
-           "us-east-2": {
-               "AMZNLINUXHVM": "ami-15e9c770",
-               "CENTOS7HVM": "ami-e0eac385"
-           },
-           "us-west-1": {
-               "AMZNLINUXHVM": "ami-a51f27c5",
-               "CENTOS7HVM": "ami-b1a59fd1"
-           },
-           "us-west-2": {
-               "AMZNLINUXHVM": "ami-bf4193c7",
-               "CENTOS7HVM": "ami-b63ae0ce"
-           }
-       },
-       "LinuxAMINameMap": {
-           "Amazon-Linux-HVM": {
-               "Code": "AMZNLINUXHVM"
-           },
-           "CentOS-7-HVM": {
-               "Code": "CENTOS7HVM"
-           }
-       }
-   },
-   "Rules": {
-       "SubnetsInVPC": {
-           "Assertions": [
-               {
-                   "Assert": {
-                       "Fn::EachMemberIn": [
-                           {
-                               "Fn::ValueOfAll": [
-                                   "AWS::EC2::Subnet::Id",
-                                   "VpcId"
-                               ]
-                           },
-                           {
-                               "Fn::RefAll": "AWS::EC2::VPC::Id"
-                           }
-                       ]
-                   },
-                   "AssertDescription": "All subnets must exist in the VPC"
-               }
-           ]
-       }
-   },
-   "Resources" : {
-     "MessagesLogGroup": {
-        "Type": "AWS::Logs::LogGroup",
-        "Properties": {
-            "RetentionInDays": {
-                "Ref": "LogRetentionDays"
-            }
-        }
-     },
-     "CellLogGroup": {
-        "Type": "AWS::Logs::LogGroup",
-        "Properties": {
-            "RetentionInDays": {
-                "Ref": "LogRetentionDays"
-            }
-        }
-     },
-     "ConsoleProxyLogGroup": {
-        "Type": "AWS::Logs::LogGroup",
-        "Properties": {
-            "RetentionInDays": {
-                "Ref": "LogRetentionDays"
-            }
-        }
-     },
-     "vCloudContainerDebugLogGroup": {
-        "Type": "AWS::Logs::LogGroup",
-        "Properties": {
-            "RetentionInDays": {
-                "Ref": "LogRetentionDays"
-            }
-        }
-     },
-     "vCDAccessRole": {
-        "Type": "AWS::IAM::Role",
-        "Properties": {
-           "AssumeRolePolicyDocument": {
-              "Statement": [ {
-                 "Effect": "Allow",
-                 "Principal": {
-                    "Service": [ "ec2.amazonaws.com" ]
-                 },
-                 "Action": [ "sts:AssumeRole" ]
-              } ]
-           },
-           "Path": "/"
-        }
-     },
-     "xFerS3AccessPolicies": {
-        "Type": "AWS::IAM::Policy",
-        "Properties": {
-           "PolicyName": "s3-xfer-Access",
-           "PolicyDocument": {
-              "Statement": [ {
-                 "Effect": "Allow",
-                 "Action": "s3:*",
-                 "Resource": "*"
-              } ]
-           },
-           "Roles": [ { "Ref": "vCDAccessRole" } ]
-        }
-     },
-     "CloudWatchPolicies": {
-        "Type": "AWS::IAM::Policy",
-        "Properties": {
-           "PolicyName": "CloudWatch-Access",
-           "PolicyDocument": {
-              "Statement": [ {
-                 "Effect": "Allow",
-                 "Action": [
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents",
-                    "logs:DescribeLogStreams"
-                 ],
-                 "Resource": [
-                    "arn:aws:logs:*:*:*"
-                ]
-              } ]
-           },
-           "Roles": [ { "Ref": "vCDAccessRole" } ]
-        }
-     },
-     "vCDInstanceProfile": {
-         "Type": "AWS::IAM::InstanceProfile",
-         "Properties": {
-             "Roles": [
-                 {
-                     "Ref": "vCDAccessRole"
-                 }
-             ],
-             "Path": "/"
-         }
-     },
-     "xFerBucket" : {
-       "Type" : "AWS::S3::Bucket",
-       "Properties" : {
-         "BucketName": { "Fn::Join" : ["", [ { "Ref" : "VPCID" }, "-xfer" ]
-         ] }
-       }
-     },
-     "CellsAccessSecurityGroup": {
-         "Type": "AWS::EC2::SecurityGroup",
-         "Properties": {
-             "GroupDescription": "Enables Access between vCD EC2 Instances",
-             "VpcId": {
-                 "Ref": "VPCID"
-             },
-             "Tags": [
-               {
-                 "Key": "Name",
-                 "Value": {
-                     "Fn::Join": [
-                       "", [
-                         {
-                           "Ref": "AWS::StackName"
-                         },
-                         "-SG"
-                       ]
-                     ]
-                 }
-               }
-             ]
-         }
-     },
-     "CellsAccessSecurityGroupIngress1": {
-        "Type": "AWS::EC2::SecurityGroupIngress",
-        "DependsOn": "CellsAccessSecurityGroup",
-        "Properties": {
-            "GroupId": {
-                "Ref": "CellsAccessSecurityGroup"
+    },
+    "Mappings": {
+        "AWSAMIRegionMap": {
+            "AMI": {
+                "AMZNLINUX2HVM": "mzn2-ami-hvm-2017.12.0.20180328.1-x86_64-gp2",
+                "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS ENA 1805_01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-77ec9308.4"
             },
-            "IpProtocol": "-1",
-            "FromPort": "0",
-            "ToPort": "65535",
-            "SourceSecurityGroupId": {"Ref": "CellsAccessSecurityGroup"}
-    }
-     },
-     "CellsAccessSecurityGroupIngress2": {
-        "Type": "AWS::EC2::SecurityGroupIngress",
-        "DependsOn": "CellsAccessSecurityGroup",
-        "Properties": {
-            "GroupId": {
-                "Ref": "CellsAccessSecurityGroup"
+            "ap-northeast-1": {
+                "AMZNLINUX2HVM": "ami-8fbab2f3",
+                "CENTOS7HVM": "ami-8e8847f1"
             },
-            "CidrIp": "0.0.0.0/0",
-            "IpProtocol": "tcp",
-            "FromPort": "8443",
-            "ToPort": "8443"
+            "ap-northeast-2": {
+                "AMZNLINUX2HVM": "ami-96b916f8",
+                "CENTOS7HVM": "ami-bf9c36d1"
+            },
+            "ap-south-1": {
+                "AMZNLINUX2HVM": "ami-07eb707f",
+                "CENTOS7HVM": "ami-1780a878"
+            },
+            "ap-southeast-1": {
+                "AMZNLINUX2HVM": "ami-3eb0e942",
+                "CENTOS7HVM": "ami-8e0205f2"
+            },
+            "ap-southeast-2": {
+                "AMZNLINUX2HVM": "ami-8267abe0",
+                "CENTOS7HVM": "ami-d8c21dba"
+            },
+            "ca-central-1": {
+                "AMZNLINUX2HVM": "ami-e8a0268c",
+                "CENTOS7HVM": "ami-e802818c"
+            },
+            "eu-central-1": {
+                "AMZNLINUX2HVM": "ami-b144195a",
+                "CENTOS7HVM": "ami-dd3c0f36"
+            },
+            "eu-west-1": {
+                "AMZNLINUX2HVM": "ami-38c09341",
+                "CENTOS7HVM": "ami-3548444c"
+            },
+            "eu-west-2": {
+                "AMZNLINUX2HVM": "ami-b98667de",
+                "CENTOS7HVM": "ami-00846a67"
+            },
+            "eu-west-3": {
+                "AMZNLINUX2HVM": "ami-bf17a1c2",
+                "CENTOS7HVM": "ami-262e9f5b"
+            },
+            "sa-east-1": {
+                "AMZNLINUX2HVM": "ami-7f712613",
+                "CENTOS7HVM": "ami-cb5803a7"
+            },
+            "us-east-1": {
+                "AMZNLINUX2HVM": "ami-f973ab84",
+                "CENTOS7HVM": "ami-9887c6e7"
+            },
+            "us-east-2": {
+                "AMZNLINUX2HVM": "ami-31c7f654",  
+                "CENTOS7HVM": "ami-9c0638f9"
+            },
+            "us-west-1": {
+                "AMZNLINUX2HVM": "ami-be4051de",
+                "CENTOS7HVM": "ami-4826c22b"
+            },
+            "us-west-2": {
+                "AMZNLINUX2HVM": "ami-07eb707f",
+                "CENTOS7HVM": "ami-3ecc8f46"
+            }
+        },
+        "LinuxAMINameMap": {
+            "Amazon-Linux-2-HVM": {
+                "Code": "AMZNLINUX2HVM"
+            },
+            "CentOS-7-HVM": {
+                "Code": "CENTOS7HVM"
+            }
         }
     },
-      "vCDMain": {
-        "Type": "AWS::EC2::Instance",
-        "Properties": {
-          "ImageId": {
-              "Fn::FindInMap": [
-                  "AWSAMIRegionMap",
-                  {
-                      "Ref": "AWS::Region"
-                  },
-                  {
-                      "Fn::FindInMap": [
-                          "LinuxAMINameMap",
-                          {
-                              "Ref": "EC2AMIOS"
-                          },
-                          "Code"
-                      ]
-                  }
-              ]
-          },
-          "Monitoring" : "true",
-          "BlockDeviceMappings": [
-            {
-              "DeviceName": "/dev/xvda",
-              "Ebs": {
-                "VolumeType": "gp2",
-                "DeleteOnTermination": "false",
-                "VolumeSize": {
-                    "Ref": "MainVcdVolumeSize"
+    "Rules": {
+        "SubnetsInVPC": {
+            "Assertions": [
+                {
+                    "Assert": {
+                        "Fn::EachMemberIn": [
+                            {
+                                "Fn::ValueOfAll": [
+                                    "AWS::EC2::Subnet::Id",
+                                    "VpcId"
+                                ]
+                            },
+                            {
+                                "Fn::RefAll": "AWS::EC2::VPC::Id"
+                            }
+                        ]
+                    },
+                    "AssertDescription": "All subnets must exist in the VPC"
                 }
-              }
+            ]
+        }
+    },
+    "Resources" : {
+        "MessagesLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "RetentionInDays": {
+                    "Ref": "LogRetentionDays"
+                }
             }
-          ],
-          "InstanceType": {
-              "Ref": "MainVcdCellType"
-          },
-          "IamInstanceProfile": {
-              "Ref": "vCDInstanceProfile"
-          },
-          "SecurityGroupIds": [
-              {
-                  "Ref": "PrivateInstanceSecurityGroupID"
-              },
-              {
-                  "Ref": "CellsAccessSecurityGroup"
-              },
-              {
-                  "Ref": "RDSAccessSecurityGroupID"
-              }
-          ],
-          "KeyName": {
-              "Ref": "KeyPairNameEC2"
-          },
-          "SubnetId": {
-              "Ref": "PrivateSubnet1ID"
-          },
-          "UserData": {
-            "Fn::Base64": {
-              "Fn::Join": [
-                "",
-                [
-                  "#!/bin/bash\n",
-                  "# Define Variables\n",
-                  "REGION=$(curl -sq http://169.254.169.254/latest/meta-data/placement/availability-zone/)\n",
-                  "REGION=${REGION: :-1}\n",
-                  "IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)\n",
-                  "# Update GuestOS\n",
-                  "yum update -y\n",
-                  "# Install necessary packages\n",
-                  "yum install awslogs automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel redhat-lsb python36 python36-pip python36-devel -y\n",
-                  "# Install PIP\n",
-                  "easy_install-3.6 pip\n",
-                  "# Install vCD Cli\n",
-                  "/usr/local/bin/pip3 install --user vcd-cli\n",
-                  "# Clone S3FS repository from Git\n",
-                  "cd /home/ec2-user\n",
-                  "git clone https://github.com/s3fs-fuse/s3fs-fuse.git\n",
-                  "# Compile S3FS\n",
-                  "cd /home/ec2-user/s3fs-fuse\n",
-                  "./autogen.sh\n",
-                  "./configure --prefix=/usr --with-openssl\n",
-                  "make\n",
-                  "make install\n",
-                  "# Create vCD Transfer directory\n",
-                  "mkdir -p /opt/vmware/vcloud-director/data/transfer\n",
-                  "# Add S3 bucket mount point to fstab\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "echo 's3fs#",
-                        {
-                          "Ref": "xFerBucket"
-                        },
-                        " /opt/vmware/vcloud-director/data/transfer fuse _netdev,allow_other,iam_role=auto,uid=501,gid=501,url=http://s3-", 
-                        {
-                          "Ref": "AWS::Region"
-                        },
-                        ".amazonaws.com 0 0' >> /etc/fstab"
-                      ]
+        },
+        "CellLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "RetentionInDays": {
+                    "Ref": "LogRetentionDays"
+                }
+            }
+        },
+        "ConsoleProxyLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "RetentionInDays": {
+                    "Ref": "LogRetentionDays"
+                }
+            }
+        },
+        "vCloudContainerDebugLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+                "RetentionInDays": {
+                    "Ref": "LogRetentionDays"
+                }
+            }
+        },
+        "vCDAccessRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+            "AssumeRolePolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": [ "ec2.amazonaws.com" ]
+                    },
+                    "Action": [ "sts:AssumeRole" ]
+                } ]
+            },
+            "Path": "/"
+            }
+        },
+        "S3AccessPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+            "PolicyName": "s3-Access",
+            "PolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": [
+                        "s3:GetObject",
+                        "s3:PutObject"
+                    ],
+                    "Resource": "*"
+                } ]
+            },
+            "Roles": [ { "Ref": "vCDAccessRole" } ]
+            }
+        },
+        "EC2DescribePolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+            "PolicyName": "EC2-Describe",
+            "PolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": "ec2:Describe*",
+                    "Resource": "*"
+                } ]
+            },
+            "Roles": [ { "Ref": "vCDAccessRole" } ]
+            }
+        },
+        "CloudWatchPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+            "PolicyName": "CloudWatch-Access",
+            "PolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": [
+                        "logs:CreateLogStream",
+                        "logs:GetLogEvents",
+                        "logs:PutLogEvents",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams",
+                        "logs:PutRetentionPolicy",
+                        "logs:PutMetricFilter",
+                        "logs:CreateLogGroup"
+                    ],
+                    "Resource": [
+                        "arn:aws:logs:*:*:*"
                     ]
-                  },
-                  "\n",
-                  "# Copy vCD binaries from specified S3 Bucket\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "aws s3 cp s3://",
-                        {
-                          "Ref": "vCDBuildBucketName"
-                        },
-			                  "/",
-			                  {
-                          "Ref": "vCDBuildName"
-                        },
-			                  " /tmp/",
-			                  {
-                          "Ref": "vCDBuildName"
+                } ]
+            },
+            "Roles": [ { "Ref": "vCDAccessRole" } ]
+            }
+        },
+        "vCDInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Roles": [
+                    {
+                        "Ref": "vCDAccessRole"
+                    }
+                ],
+                "Path": "/"
+            }
+        },
+        "CellsAccessSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Enables Access between vCD EC2 Instances",
+                "VpcId": {
+                    "Ref": "VPCID"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": {
+                            "Fn::Join": [
+                            "", [
+                                {
+                                "Ref": "AWS::StackName"
+                                },
+                                "-SG"
+                            ]
+                            ]
                         }
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "# Make vCD binaries executable\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "chmod +x /tmp/",
-                        {
-                          "Ref": "vCDBuildName"
-                        }
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "# Install vCD\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "echo Y | /tmp/",
-                        {
-                          "Ref": "vCDBuildName"
-                        }
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "# Mount the S3 Bucket\n",
-                  "mount /opt/vmware/vcloud-director/data/transfer/\n",
-                  "sleep 5\n",
-                  "# Generate Self-signed certificate for vCD\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "/opt/vmware/vcloud-director/bin/cell-management-tool generate-certs -j -p -o /tmp/certificates.ks -w ",
-                        {
-                          "Ref": "VcdCertKeystorePasswd"
-                        }
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "# Update Permission on Certificates Keystore file\n",
-                  "chmod 644 /tmp/certificates.ks\n",
-                  "# Configure vCD Cell\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "echo Y | /opt/vmware/vcloud-director/bin/configure -cons $IP --console-proxy-port-https 8443 -ip $IP --primary-port-http 80 --primary-port-https 443 -dbhost ",
-                        {
-                          "Ref": "DBEndpoint"
-                        },
-                  		" -dbport 5432 -dbtype postgres -dbname ",
-                  		{
-                          "Ref": "DBName"
-                        },
-                  		" -dbuser ",
-                  		{
-                          "Ref": "DBMasterUsername"
-                        },
-                  		" -dbpassword ",
-                  		{
-                          "Ref": "DBMasterUserPassword"
-                        },
-                  		" -k /tmp/certificates.ks -w ",
-                  		{
-                          "Ref": "VcdCertKeystorePasswd"
-                        },
-			            " -unattended"
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "# Change the Region in CloudWatch Agent awscli.conf file\n",
-                  "export TMPREGION=$(grep region /etc/awslogs/awscli.conf)\n",
-                  "sed -i.back \"s/${TMPREGION}/region = ${REGION}/g\" /etc/awslogs/awscli.conf\n",
-                  "# Configure Log Groups in CloudWatch Agent config file\n",
-                  "cat >> /etc/awslogs/awslogs.conf <<- EOF\n",
-                  "\n",
-                  "[/var/log/messages]\n",
-                  "datetime_format = %b %d %H:%M:%S\n",
-                  "file = /var/log/messages\n",
-                  "buffer_duration = 5000\n",
-                  "log_stream_name = {hostname}\n",
-                  "initial_position = start_of_file\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "log_group_name = ",
-                        {
-                          "Ref": "MessagesLogGroup"
-                        },
-			            "\n"
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "[cell.log]\n",
-                  "datetime_format = %b %d %H:%M:%S\n",
-                  "file = /opt/vmware/vcloud-director/logs/cell.log\n",
-                  "buffer_duration = 5000\n",
-                  "log_stream_name = {hostname}\n",
-                  "initial_position = start_of_file\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "log_group_name = ",
-                        {
-                          "Ref": "CellLogGroup"
-                        },
-			            "\n"
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "[vcloud-container-debug.log]\n",
-                  "datetime_format = %b %d %H:%M:%S\n",
-                  "file = /opt/vmware/vcloud-director/logs/vcloud-container-debug.log\n",
-                  "buffer_duration = 5000\n",
-                  "log_stream_name = {hostname}\n",
-                  "initial_position = start_of_file\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "log_group_name = ",
-                        {
-                          "Ref": "vCloudContainerDebugLogGroup"
-                        },
-			            "\n"
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "[console-proxy.log]\n",
-                  "datetime_format = %b %d %H:%M:%S\n",
-                  "file = /opt/vmware/vcloud-director/logs/console-proxy.log\n",
-                  "buffer_duration = 5000\n",
-                  "log_stream_name = {hostname}\n",
-                  "initial_position = start_of_file\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "log_group_name = ",
-                        {
-                          "Ref": "ConsoleProxyLogGroup"
-                        },
-			            "\n"
-                      ]
-                    ]
-                  },
-                  "EOF\n",
-                  "# Enable CloudWatch Agent\n",
-                  "chkconfig awslogs on\n",
-                  "# Start CloudWatch Agent\n",
-                  "service awslogs start\n",
-                  "# Add additional setting to vCD global.properties file\n",
-                  "cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF\n",
-                  "# Custom Changes Made for console proxy and DB connections\n",
-                  "consoleproxy.websockets.enabled = true\n",
-                  "consoleproxy.securenio.buffer.size = 17000\n",
-                  "database.pool.maxActive = 200\n",
-                  "vcloud.http.maxThreads = 150\n",
-                  "vcloud.http.minThreads = 32\n",
-                  "vcloud.http.acceptorThreads = 16\n",
-                  "hibernate.generate_statistics=true\n",
-                  "EOF\n",
-                  "# Initial vCD Instance Configuration\n",
-                  {
-                    "Fn::Join": [
-                      "",
-                      [
-                        "/opt/vmware/vcloud-director/bin/cell-management-tool system-setup --email ",
-                        {
-                          "Ref": "vCDAdminEmail"
-                        },
-			                  " --full-name '",
-			                  {
-                          "Ref": "vCDAdminFullName"
-                        },
-                  			"' --installation-id ",
-                  			{
-                          "Ref": "vCDInstalationId"
-                        },
-                  			" --password ",
-                  			{
-                          "Ref": "vCDAdminPasswd"
-                        },
-                  			" --system-name '",
-                  			{
-                          "Ref": "vCDSystemName"
-                        },
-                  			"' --serial-number ",
-                  			{
-                          "Ref": "vCDSerialNumber"
-                        },
-                  			" --user ",
-                  			{
-                          "Ref": "vCDAdmin"
-                        },
-			                  " -unattended"
-                      ]
-                    ]
-                  },
-                  "\n",
-                  "# Copy vCD certificates keystore to vCD Transfer store\n",
-                  "cp /tmp/certificates.ks /opt/vmware/vcloud-director/data/transfer/certificates.ks\n",
-                  "# Copy vCD Response files to vCD Transfer store\n",
-                  "cp /opt/vmware/vcloud-director/etc/responses.properties /opt/vmware/vcloud-director/data/transfer/responses.properties\n",
-                  "# Update Permission on vCD Response file\n",
-                  "chmod 644 /opt/vmware/vcloud-director/data/transfer/responses.properties\n",
-                  "# Start vCD Services\n",
-                  "service vmware-vcd start\n",
-                  "sleep 120\n"
+                    }
                 ]
-              ]
             }
-          },
-          "Tags": [
-              {
-                  "Key": "Name",
-                  "Value": "vCDMain"
-              }
-          ]
-        }
-      }
-  },
-  "Outputs": {
-    "xFerBucketName": {
-          "Description": "xFer S3 Bucket Name",
-          "Value": {
-              "Ref": "xFerBucket"
-          }
-    },
-    "xFerBucketDomainName" : {
-        "Description" : "xFer S3 Bucket Domain Name",
-        "Value" : {
-          "Fn::GetAtt" : ["xFerBucket", "DomainName"]
-        }
-    },
-    "vCDMain" : {
-        "Description" : "vCDMain Private IP",
-        "Value" : {
-          "Fn::GetAtt" : ["vCDMain", "PrivateIp"]
-        }
-    },
-    "vCDInstanceProfile" : {
-        "Description" : "IAM Host profile that allows access to S3 and CloudWatch",
-        "Value": {
-            "Ref": "vCDInstanceProfile"
-        }
-    },
-    "CellsAccessSecurityGroupID": {
-        "Description": "Cells Access Security Group ID",
-        "Value": {
-            "Ref": "CellsAccessSecurityGroup"
-        }
-    },
-    "MessagesLogGroup": {
-        "Value": {
-            "Ref": "MessagesLogGroup"
         },
-        "Description": "CloudWatch Logs GroupName. /var/log/messages logs will be stored here."
-    },
-    "CellLogGroup": {
-        "Value": {
-            "Ref": "CellLogGroup"
+        "CellsAccessSecurityGroupIngress1": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "DependsOn": "CellsAccessSecurityGroup",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "CellsAccessSecurityGroup"
+                },
+                "IpProtocol": "-1",
+                "FromPort": "0",
+                "ToPort": "65535",
+                "SourceSecurityGroupId": {"Ref": "CellsAccessSecurityGroup"}
+            }
         },
-        "Description": "CloudWatch Logs GroupName. vCD cell.log logs will be stored here."
-    },
-    "ConsoleProxyLogGroup": {
-        "Value": {
-            "Ref": "ConsoleProxyLogGroup"
+        "CellsAccessSecurityGroupIngress2": {
+           "Type": "AWS::EC2::SecurityGroupIngress",
+           "DependsOn": "CellsAccessSecurityGroup",
+           "Properties": {
+                "GroupId": {
+                    "Ref": "CellsAccessSecurityGroup"
+                },
+                "CidrIp": "0.0.0.0/0",
+                "IpProtocol": "tcp",
+                "FromPort": "8443",
+                "ToPort": "8443"
+            }
         },
-        "Description": "CloudWatch Logs GroupName. vCD console-proxy.log logs will be stored here."
+        "vCDMain": {
+            "Type": "AWS::EC2::Instance",
+            "Metadata": {
+                "AWS::CloudFormation::Authentication": {
+                    "S3AccessCreds": {
+                        "type": "S3",
+                        "roleName": {
+                            "Ref": "vCDAccessRole"
+                        },
+                        "buckets": [ "vcd-cf-templates" ]
+                    }
+                },
+                "AWS::CloudFormation::Init": {
+                    "config": {
+                        "files": {
+                            "/tmp/vcd_main_bootstrap.sh": {
+                                "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/vcd_main_bootstrap.sh",
+                                "mode": "000550",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
+                            }
+                        },
+                        "commands": {
+                            "b-bootstrap": {
+                                "command": "./tmp/vcd_main_bootstrap.sh"
+                            }
+                        }
+                    }
+                }
+            },
+            "Properties": {
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "LinuxAMINameMap",
+                                {
+                                    "Ref": "EC2AMIOS"
+                                },
+                                "Code"
+                            ]
+                        }
+                    ]
+                },
+                "Monitoring" : "true",
+                "BlockDeviceMappings": [
+                    {
+                      "DeviceName": "/dev/xvda",
+                      "Ebs": {
+                        "VolumeType": "gp2",
+                        "DeleteOnTermination": "true",
+                        "VolumeSize": {
+                            "Ref": "MainVcdVolumeSize"
+                        }
+                      }
+                    }
+                ],
+                "InstanceType": {
+                    "Ref": "MainVcdInstanceType"
+                },
+                "IamInstanceProfile": {
+                    "Ref": "vCDInstanceProfile"
+                },
+                "SecurityGroupIds": [
+                    {
+                        "Ref": "PrivateInstanceSecurityGroupID"
+                    },
+                    {
+                        "Ref": "xFerAccessSecurityGroupID"
+                    },
+                    {
+                        "Ref": "RDSAccessSecurityGroupID"
+                    }
+                ],
+                "KeyName": {
+                    "Ref": "KeyPairNameEC2"
+                },
+                "SubnetId": {
+                    "Ref": "PrivateSubnet1ID"
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "yum update -y\n",
+                                "yum install -y epel-release\n",
+                                "yum install nfs-utils lvm2 python-pip rpm-build postgresql automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel git alsa-lib libICE libSM libX11 libXau libXdmcp libXext libXi libXt libXtst pciutils redhat-lsb wget -y\n",
+                                "pip install --upgrade pip\n",
+                                "pip install awscli --ignore-installed six\n",
+                                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                                "vCDBuildBucketName=",
+                                {
+                                    "Ref": "vCDBuildBucketName"
+                                },
+                                "\n",
+                                "vCDBuildName=",
+                                {
+                                    "Ref": "vCDBuildName"
+                                },
+                                "\n",
+                                "vCDKeystoreFileName=",
+                                {
+                                    "Ref": "vCDKeystoreFileName"
+                                },
+                                "\n",
+                                "VcdCertKeystorePasswd=",
+                                {
+                                    "Ref": "VcdCertKeystorePasswd"
+                                },
+                                "\n",
+                                "DBEndpoint=",
+                                {
+                                    "Ref": "DBEndpoint"
+                                },
+                                "\n",
+                                "DBName=",
+                                {
+                                    "Ref": "DBName"
+                                },
+                                "\n",
+                                "DBMasterUsername=",
+                                {
+                                    "Ref": "DBMasterUsername"
+                                },
+                                "\n",
+                                "DBMasterUserPassword=",
+                                {
+                                    "Ref": "DBMasterUserPassword"
+                                },
+                                "\n",
+                                "vCDAdminEmail=",
+                                {
+                                    "Ref": "vCDAdminEmail"
+                                },
+                                "\n",
+                                "vCDAdminFullName=",
+                                {
+                                    "Ref": "vCDAdminFullName"
+                                },
+                                "\n",
+                                "vCDInstalationId=",
+                                {
+                                    "Ref": "vCDInstalationId"
+                                },
+                                "\n",
+                                "vCDAdminPasswd=",
+                                {
+                                    "Ref": "vCDAdminPasswd"
+                                },
+                                "\n",
+                                "vCDSystemName=",
+                                {
+                                    "Ref": "vCDSystemName"
+                                },
+                                "\n",
+                                "vCDSerialNumber=",
+                                {
+                                    "Ref": "vCDSerialNumber"
+                                },
+                                "\n",
+                                "vCDAdmin=",
+                                {
+                                    "Ref": "vCDAdmin"
+                                },
+                                "\n",
+                                "MessagesLogGroup=",
+                                {
+                                    "Ref": "MessagesLogGroup"
+                                },
+                                "\n",
+                                "CellLogGroup=",
+                                {
+                                    "Ref": "CellLogGroup"
+                                },
+                                "\n",
+                                "ConsoleProxyLogGroup=",
+                                {
+                                    "Ref": "ConsoleProxyLogGroup"
+                                },
+                                "\n",
+                                "vCloudContainerDebugLogGroup=",
+                                {
+                                    "Ref": "vCloudContainerDebugLogGroup"
+                                },               
+                                "\n",
+                                "efsID=",
+                                {
+                                    "Ref": "efsID"
+                                },               
+                                "\n",
+                                "cfn-init -v --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                " --resource vCDMain --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n",
+                                "cfn-signal -e $? --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                " --resource vCDMain --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n"
+                            ]
+                        ]
+                    }
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "vCDMain"
+                    }
+                ]
+            },
+            "CreationPolicy": {
+                "ResourceSignal": {
+                    "Count": "1",
+                    "Timeout": "PT30M"
+                }
+            }
+        }
     },
-    "vCloudContainerDebugLogGroup": {
-        "Value": {
-            "Ref": "vCloudContainerDebugLogGroup"
+    "Outputs": {
+        "vCDMain" : {
+            "Description" : "vCDMain Private IP",
+            "Value" : {
+            "Fn::GetAtt" : ["vCDMain", "PrivateIp"]
+            }
         },
-        "Description": "CloudWatch Logs GroupName. vCD vcloud-container-debug.log logs will be stored here."
+        "vCDInstanceProfile" : {
+            "Description" : "IAM Host profile that allows access to S3 and CloudWatch",
+            "Value": {
+                "Ref": "vCDInstanceProfile"
+            }
+        },
+        "MessagesLogGroup": {
+            "Value": {
+                "Ref": "MessagesLogGroup"
+            },
+            "Description": "CloudWatch Logs GroupName. /var/log/messages logs will be stored here."
+        },
+        "CellLogGroup": {
+            "Value": {
+                "Ref": "CellLogGroup"
+            },
+            "Description": "CloudWatch Logs GroupName. vCD cell.log logs will be stored here."
+        },
+        "ConsoleProxyLogGroup": {
+            "Value": {
+                "Ref": "ConsoleProxyLogGroup"
+            },
+            "Description": "CloudWatch Logs GroupName. vCD console-proxy.log logs will be stored here."
+        },
+        "vCloudContainerDebugLogGroup": {
+            "Value": {
+                "Ref": "vCloudContainerDebugLogGroup"
+            },
+            "Description": "CloudWatch Logs GroupName. vCD vcloud-container-debug.log logs will be stored here."
+        }
     }
-  }
 }
