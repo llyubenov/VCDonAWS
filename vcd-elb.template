@@ -236,6 +236,12 @@
         "vCDConsoleLoadBalancer": {
             "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
             "Properties": {
+                "LoadBalancerAttributes" : [ 
+                    {
+                        "Key" : "load_balancing.cross_zone.enabled",
+                        "Value" : "true"
+                    }
+                ],
                 "Subnets": [
                     {
                         "Ref": "PublicSubnet1ID"
@@ -244,16 +250,8 @@
                         "Ref": "PublicSubnet2ID"
                     }
                 ],
-                "SecurityGroups": [
-                    {
-                        "Ref": "VCDLBSecurityGroup"
-                    },
-                    {
-                        "Ref": "CellsAccessSecurityGroupID"
-                    }
-                ],
                 "Scheme" : "internet-facing",
-                "Type" : "application",
+                "Type" : "network",
                 "IpAddressType" : "ipv4",
                 "Tags": [
                   {
@@ -304,19 +302,12 @@
                     "Ref": "vCDConsoleLoadBalancer"
                 },
                 "Port": 443,
-                "Protocol": "HTTPS",
+                "Protocol": "TCP",
                 "DefaultActions": [
                     {
                         "Type": "forward",
                         "TargetGroupArn": {
                             "Ref": "vCDConsoleTargetGroup"
-                        }
-                    }
-                ],
-                "Certificates": [
-                    {
-                        "CertificateArn": {
-                            "Ref": "ELBCertificateArn"
                         }
                     }
                 ]
@@ -386,32 +377,17 @@
                     "Ref": "VPCID"
                 },
                 "Port": 8443,
-                "Protocol": "HTTPS",
+                "Protocol": "TCP",
                 "HealthCheckIntervalSeconds": {
                     "Ref": "ELBHealthCheckIntervalSeconds"
                 },
                 "HealthCheckProtocol": {
                     "Ref": "ELBHealthCheckProtocol"
                 },
-                "HealthCheckPort": {
-                    "Ref": "ELBHealthCheckPort"
-                },
-                "HealthCheckPath" : {
-                    "Ref": "ELBHealthCheckPath"
-                },
-                "HealthCheckTimeoutSeconds": {
-                    "Ref": "ELBHealthCheckTimeoutSeconds"
-                },
+                "HealthCheckPort": "8443",
+                "HealthCheckPath" : "/",
                 "HealthyThresholdCount": {
                     "Ref": "ELBHealthyThresholdCount"
-                },
-                "UnhealthyThresholdCount": {
-                    "Ref": "ELBUnhealthyThresholdCount"
-                },
-                "Matcher" : {
-                    "HttpCode": {
-                        "Ref": "ELBResponseCode"
-                    }
                 },
                 "TargetGroupAttributes" : [ 
                     {
