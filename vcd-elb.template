@@ -10,8 +10,8 @@
                     },
                     "Parameters": [
                         "VPCID",
-                        "PublicSubnet1",
-                        "PublicSubnet2",
+                        "PublicSubnet1ID",
+                        "PublicSubnet2ID",
                         "CellsAccessSecurityGroupID"
                     ]
                 },
@@ -43,10 +43,10 @@
                 "VPCID": {
                     "default": "VPC ID"
                 },
-                "PublicSubnet1": {
+                "PublicSubnet1ID": {
                     "default": "Public Subnet 1"
                 },
-                "PublicSubnet2": {
+                "PublicSubnet2ID": {
                     "default": "Public Subnet 2"
                 },
                 "CellsAccessSecurityGroupID": {
@@ -87,11 +87,11 @@
             "Type": "AWS::EC2::VPC::Id",
             "Description": "Choose which VPC the Load Balancers should be deployed to."
         },
-        "PublicSubnet1ID": {
+        "PublicSubnet1IDID": {
             "Description": "ID of the public subnet 1 that you want to provision the vCD Load Balancers.",
             "Type": "AWS::EC2::Subnet::Id"
         },
-        "PublicSubnet2ID": {
+        "PublicSubnet2IDID": {
             "Description": "ID of the public subnet 2 that you want to provision the vCD Load Balancers.",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -100,7 +100,6 @@
             "Type": "AWS::EC2::SecurityGroup::Id"
         },
         "ELBCertificateArn": {
-            "Default": "arn:aws:acm:us-west-2:331345527506:certificate/615c31f1-87fa-4033-86f1-f381870d988d",
             "Description": "Specify the Certificate Arn in ACM, which will be used for the vCD Load balancer.",
             "Type": "String"
         },
@@ -199,10 +198,10 @@
             "Properties": {
                 "Subnets": [
                     {
-                        "Ref": "PublicSubnet1ID"
+                        "Ref": "PublicSubnet1IDID"
                     },
                     {
-                        "Ref": "PublicSubnet2ID"
+                        "Ref": "PublicSubnet2IDID"
                     }
                 ],
                 "SecurityGroups": [
@@ -244,10 +243,10 @@
                 ],
                 "Subnets": [
                     {
-                        "Ref": "PublicSubnet1ID"
+                        "Ref": "PublicSubnet1IDID"
                     },
                     {
-                        "Ref": "PublicSubnet2ID"
+                        "Ref": "PublicSubnet2IDID"
                     }
                 ],
                 "Scheme" : "internet-facing",
