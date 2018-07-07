@@ -60,7 +60,7 @@ function vcd_cells_on_cent_os () {
     export ConsoleProxyLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep ConsoleProxyLogGroup | sed 's/ConsoleProxyLogGroup=//g'`
     export vCloudContainerDebugLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep vCloudContainerDebugLogGroup | sed 's/vCloudContainerDebugLogGroup=//g'`
     export efsID=`curl http://169.254.169.254/latest/user-data/ | grep efsID | sed 's/efsID=//g'`
-    export xFerIP=`aws ec2 describe-instances --region=$Region --filters "Name=availability-zone,Values=$AZ" "Name=tag:Name,Values='vCD Transfer Server'" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
+    export xFerIP=`aws ec2 describe-instances --region=$Region --filters "Name=availability-zone,Values=$AZ" "Name=tag:Name,Values='vCD Transfer Server'" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
     export instanceIP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)
     export vCDJXMS=`curl http://169.254.169.254/latest/user-data/ | grep vCDJXMS | sed 's/vCDJXMS=//g'`
     export vCDJXMX=`curl http://169.254.169.254/latest/user-data/ | grep vCDJXMX | sed 's/vCDJXMX=//g'`
