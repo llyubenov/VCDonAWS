@@ -56,7 +56,16 @@
                 },
                 {
                     "Label": {
-                        "default": "Global vCD/xFer Settings"
+                        "default": "vCD Binaries Details"
+                    },
+                    "Parameters": [
+                        "vCDBuildBucketName",
+                        "vCDBuildName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Global vCD/xFer Configuration"
                     },
                     "Parameters": [
                         "KeyPairNameEC2",
@@ -72,8 +81,7 @@
                         "xFerInstanceType",
                         "xFerVolumeType",
                         "xFerIOPS",
-                        "xFerVolumeSize",
-                        "PrivateInstanceSecurityGroupID"
+                        "xFerVolumeSize"
                     ]
                 },
                 {
@@ -87,25 +95,26 @@
                 },
                 {
                     "Label": {
-                        "default": "vCD Cells Configuration"
+                        "default": "vCD UI Cells Configuration"
                     },
                     "Parameters": [
-                        "vCDUICellType",
+                        "vCDUIInstanceType",
                         "vCDUIVolumeSize",
                         "NumVCDUICells",
-                        "vCDConsoleCellType",
-                        "vCDConsoleVolumeSize",
-                        "NumVCDConsoleCells"
+                        "vCDUIJXMS",
+                        "vCDUIJXMX"
                     ]
                 },
                 {
                     "Label": {
-                        "default": "vCD Binaries Details"
+                        "default": "vCD Console Cells Configuration"
                     },
                     "Parameters": [
-                        "vCDBuildBucketName",
-                        "vCDBuildName",
-                        "vCDKeystoreFileName"
+                        "vCDConsoleInstanceType",
+                        "vCDConsoleVolumeSize",
+                        "NumVCDConsoleCells",
+                        "vCDConsoleJXMS",
+                        "vCDConsoleJXMX"
                     ]
                 },
                 {
@@ -120,7 +129,8 @@
                         "vCDSystemName",
                         "vCDInstalationId",
                         "vCDSerialNumber",
-                        "VcdCertKeystorePasswd"
+                        "vCDKeystoreFileName",
+                        "vCDCertKeystorePasswd"
                     ]
                 },
                 {
@@ -229,7 +239,7 @@
                 "MasterUserPassword" : {
                     "default" : "RDS Master User Password"
                 },
-                "VcdCertKeystorePasswd" : {
+                "vCDCertKeystorePasswd" : {
                     "default" : "Keystore Password"
                 },
                 "vCDAdmin" : {
@@ -253,10 +263,10 @@
                 "vCDSerialNumber" : {
                     "default" : "License Key."
                 },
-                "vCDUICellType": {
+                "vCDUIInstanceType": {
                     "default": "vCD UI Cells Instance Type"
                 },
-                "vCDConsoleCellType": {
+                "vCDConsoleInstanceType": {
                     "default": "vCD Console Cells Instance Type"
                 },
                 "NumVCDUICells": {
@@ -303,7 +313,19 @@
                 },
                 "LogRetentionDays": {
                         "default": "CloudWatch Log Retention"
-                }  
+                },
+                "vCDUIJXMS": {
+                    "default" : "Initial vCD Java Heap Size"
+                },
+                "vCDUIJXMX": {
+                    "default" : "Maximum vCD Java Heap Size" 
+                },
+                "vCDConsoleJXMS": {
+                    "default" : "Initial vCD Java Heap Size" 
+                },
+                "vCDConsoleJXMX": {
+                    "default" : "Maximum vCD Java Heap Size"
+                }
             }
         }
     },
@@ -526,7 +548,7 @@
             "Description": "Specify the vCD Java certifikate keystore filename name stored in the same S3 bucket as the vCD build.",
             "Type": "String"
         },
-        "VcdCertKeystorePasswd": {
+        "vCDCertKeystorePasswd": {
             "NoEcho": "true",
             "Description": "vCD Certificates Keystore Password. Minimum of 8 alphanumeric characters.",
             "Type": "String",
@@ -571,7 +593,7 @@
             "Description": "The serial number (license key) for this vCD Instance.",
             "Type": "String"
         },
-        "vCDUICellType": {
+        "vCDUIInstanceType": {
             "AllowedValues": [
                 "t2.small",
                 "m5.large",
@@ -581,7 +603,7 @@
             "Description": "Amazon EC2 instances type",
             "Type": "String"
         },
-        "vCDConsoleCellType": {
+        "vCDConsoleInstanceType": {
             "AllowedValues": [
                 "t2.small",
                 "m5.large",
@@ -673,6 +695,26 @@
         "LogRetentionDays": {
             "Description": "CloudWatch Logs Retention in Days",
             "Default": "7",
+            "Type": "Number" 
+        },
+        "vCDUIJXMS": {
+            "Description": "vCD Java Heap Size initial memory allocation pool. Enter value in MB!",
+            "Default": "1024",
+            "Type": "Number" 
+        },
+        "vCDUIJXMX": {
+            "Description": "vCD Java Heap Size maximum memory allocation pool. Enter value in MB!",
+            "Default": "4096",
+            "Type": "Number" 
+        },
+        "vCDConsoleJXMS": {
+            "Description": "vCD Java Heap Size initial memory allocation pool. Enter value in MB!",
+            "Default": "1024",
+            "Type": "Number" 
+        },
+        "vCDConsoleJXMX": {
+            "Description": "vCD Java Heap Size maximum memory allocation pool. Enter value in MB!",
+            "Default": "4096",
             "Type": "Number" 
         }
     },
@@ -968,8 +1010,8 @@
                     "vCDKeystoreFileName": {
                         "Ref": "vCDKeystoreFileName"
                     },
-                    "VcdCertKeystorePasswd": {
-                        "Ref": "VcdCertKeystorePasswd"
+                    "vCDCertKeystorePasswd": {
+                        "Ref": "vCDCertKeystorePasswd"
                     },
                     "vCDAdmin": {
                         "Ref": "vCDAdmin"
@@ -1057,6 +1099,138 @@
                     },
                     "ELBResponseCode" : {
                         "Ref": "ELBResponseCode"
+                    }
+                }
+            }
+        },
+        "vCDCellsStack": {
+            "DependsOn": [
+                "vCDMainStack",
+                "vCDELBStack"
+            ],
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/vcd-cells.template",
+                "Parameters": {
+                    "VPCID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCID"
+                        ]
+                    },
+                    "PrivateSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet1ID"
+                        ]
+                    },
+                    "PrivateSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet2ID"
+                        ]
+                    },
+                    "EC2AMIOS": {
+                        "Ref": "EC2AMIOS"
+                    },
+                    "vCDUIInstanceType": {
+                        "Ref": "vCDUIInstanceType"
+                    },
+                    "vCDConsoleInstanceType": {
+                        "Ref": "vCDConsoleInstanceType"
+                    },
+                    "KeyPairNameEC2": {
+                        "Ref": "KeyPairNameEC2"
+                    },
+                    "PrivateInstanceSecurityGroupID": {
+                        "Fn::GetAtt": [
+                            "BastionStack",
+                            "Outputs.PrivateInstanceSecurityGroupID"
+                        ]
+                    },
+                    "RDSAccessSecurityGroupID": {
+                        "Fn::GetAtt": [
+                            "RDSStack",
+                            "Outputs.RDSAccessSecurityGroupID"
+                        ]
+                    },
+                    "CellsAccessSecurityGroupID": {
+                        "Fn::GetAtt": [
+                            "vCDMainStack",
+                            "Outputs.CellsAccessSecurityGroupID"
+                        ]
+                    },
+                    "xFerAccessSecurityGroupID": {
+                        "Fn::GetAtt": [
+                            "xFerStack",
+                            "Outputs.xFerAccessSecurityGroupID"
+                        ]
+                    },
+                    "efsID": {
+                        "Fn::GetAtt": [
+                            "xFerStack",
+                            "Outputs.EFSID"
+                        ]
+                    },
+                    "vCDBuildBucketName": {
+                        "Ref": "vCDBuildBucketName"
+                    },
+                    "vCDBuildName": {
+                        "Ref": "vCDBuildName"
+                    },
+                    "vCDCertKeystorePasswd": {
+                        "Ref": "vCDCertKeystorePasswd"
+                    },
+                    "NumVCDUICells": {
+                        "Ref": "NumVCDUICells"
+                    },
+                    "NumVCDConsoleCells": {
+                        "Ref": "NumVCDConsoleCells"
+                    },
+                    "vCDUITargetGroup": {
+                        "Fn::GetAtt": [
+                            "vCDELBStack",
+                            "Outputs.vCDUITargetGroup"
+                        ]
+                    },
+                    "vCDConsoleTargetGroup": {
+                        "Fn::GetAtt": [
+                            "vCDELBStack",
+                            "Outputs.vCDConsoleTargetGroup"
+                        ]
+                    },
+                    "vCDConsoleVolumeSize": {
+                        "Ref": "vCDConsoleVolumeSize"
+                    },
+                    "vCDUIVolumeSize": {
+                        "Ref": "vCDUIVolumeSize"
+                    },
+                    "LogRetentionDays": {
+                        "Ref": "LogRetentionDays"
+                    },
+                    "MessagesLogGroup": {
+                        "Fn::GetAtt": [
+                            "vCDMainStack",
+                            "Outputs.MessagesLogGroup"
+                        ]
+                    },
+                    "CellLogGroup": {
+                        "Fn::GetAtt": [
+                            "vCDMainStack",
+                            "Outputs.CellLogGroup"
+                        ]
+                    },
+                    "ConsoleProxyLogGroup": {
+                        "Fn::GetAtt": [
+                            "vCDMainStack",
+                            "Outputs.ConsoleProxyLogGroup"
+                        ]
+                    },
+                    "vCloudContainerDebugLogGroup": {
+                        "Fn::GetAtt": [
+                            "vCDMainStack",
+                            "Outputs.vCloudContainerDebugLogGroup"
+                        ]
                     }
                 }
             }
