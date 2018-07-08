@@ -198,10 +198,10 @@
             "Properties": {
                 "Subnets": [
                     {
-                        "Ref": "PublicSubnet1IDID"
+                        "Ref": "PublicSubnet1ID"
                     },
                     {
-                        "Ref": "PublicSubnet2IDID"
+                        "Ref": "PublicSubnet2ID"
                     }
                 ],
                 "SecurityGroups": [
@@ -243,10 +243,10 @@
                 ],
                 "Subnets": [
                     {
-                        "Ref": "PublicSubnet1IDID"
+                        "Ref": "PublicSubnet1ID"
                     },
                     {
-                        "Ref": "PublicSubnet2IDID"
+                        "Ref": "PublicSubnet2ID"
                     }
                 ],
                 "Scheme" : "internet-facing",
