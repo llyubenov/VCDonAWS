@@ -87,11 +87,11 @@
             "Type": "AWS::EC2::VPC::Id",
             "Description": "Choose which VPC the Load Balancers should be deployed to."
         },
-        "PublicSubnet1IDID": {
+        "PublicSubnet1ID": {
             "Description": "ID of the public subnet 1 that you want to provision the vCD Load Balancers.",
             "Type": "AWS::EC2::Subnet::Id"
         },
-        "PublicSubnet2IDID": {
+        "PublicSubnet2ID": {
             "Description": "ID of the public subnet 2 that you want to provision the vCD Load Balancers.",
             "Type": "AWS::EC2::Subnet::Id"
         },
