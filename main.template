@@ -1074,32 +1074,32 @@
                             "Outputs.CellsAccessSecurityGroupID"
                         ]
                     },
-                    "ELBCertificateArn": {
-                        "Ref": "ELBCertificateArn"
+                    "ELBUICertificateArn": {
+                        "Ref": "ELBUICertificateArn"
                     },
-                    "ELBHealthCheckIntervalSeconds": {
-                        "Ref": "ELBHealthCheckIntervalSeconds"
+                    "ELBUIHealthCheckIntervalSeconds": {
+                        "Ref": "ELBUIHealthCheckIntervalSeconds"
                     },
-                    "ELBHealthCheckProtocol": {
-                        "Ref": "ELBHealthCheckProtocol"
+                    "ELBUIHealthCheckPath": {
+                        "Ref": "ELBUIHealthCheckPath"
                     },
-                    "ELBHealthCheckPort": {
-                        "Ref": "ELBHealthCheckPort"
+                    "ELBUIHealthCheckTimeoutSeconds": {
+                        "Ref": "ELBUIHealthCheckTimeoutSeconds"
                     },
-                    "ELBHealthCheckPath" : {
-                        "Ref": "ELBHealthCheckPath"
+                    "ELBUIHealthyThresholdCount" : {
+                        "Ref": "ELBUIHealthyThresholdCount"
                     },
-                    "ELBHealthCheckTimeoutSeconds": {
-                        "Ref": "ELBHealthCheckTimeoutSeconds"
+                    "ELBUIUnhealthyThresholdCount": {
+                        "Ref": "ELBUIUnhealthyThresholdCount"
                     },
-                    "ELBHealthyThresholdCount": {
-                        "Ref": "ELBHealthyThresholdCount"
+                    "ELBUIResponseCode": {
+                        "Ref": "ELBUIResponseCode"
                     },
-                    "ELBUnhealthyThresholdCount": {
-                        "Ref": "ELBUnhealthyThresholdCount"
+                    "ELBConsoleHealthCheckIntervalSeconds": {
+                        "Ref": "ELBConsoleHealthCheckIntervalSeconds"
                     },
-                    "ELBResponseCode" : {
-                        "Ref": "ELBResponseCode"
+                    "ELBConsoleHealthyThresholdCount" : {
+                        "Ref": "ELBConsoleHealthyThresholdCount"
                     }
                 }
             }
