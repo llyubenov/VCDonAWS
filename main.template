@@ -135,25 +135,25 @@
                 },
                 {
                     "Label": {
-                        "default": "vCD ELB Certificate Configuration"
+                        "default": "vCD UI Aplication Loadbalancer Configuration"
                     },
                     "Parameters": [
-                        "ELBCertificateArn"
+                        "ELBUICertificateArn",
+                        "ELBUIHealthCheckIntervalSeconds",
+                        "ELBUIHealthCheckPath",
+                        "ELBUIHealthCheckTimeoutSeconds",
+                        "ELBUIHealthyThresholdCount",
+                        "ELBUIUnhealthyThresholdCount",
+                        "ELBUIResponseCode"
                     ]
                 },
                 {
                     "Label": {
-                        "default": "vCD ELB Health Check Configuration"
+                        "default": "vCD Console Network Loadbalancer Configuration"
                     },
                     "Parameters": [
-                        "ELBHealthCheckIntervalSeconds",
-                        "ELBHealthCheckProtocol",
-                        "ELBHealthCheckPort",
-                        "ELBHealthCheckPath",
-                        "ELBHealthCheckTimeoutSeconds",
-                        "ELBHealthyThresholdCount",
-                        "ELBUnhealthyThresholdCount",
-                        "ELBResponseCode"
+                        "ELBConsoleHealthCheckIntervalSeconds",
+                        "ELBConsoleHealthyThresholdCount"
                     ]
                 }
             ],
@@ -275,32 +275,32 @@
                 "NumVCDConsoleCells": {
                     "default": "Number of vCD Console Cells"
                 },
-                "ELBCertificateArn": {
-                    "default": "ELB Certificate"
+                "ELBUICertificateArn": {
+                    "default": "vCD UI ALB Certificate"
                 },
-                "ELBHealthCheckIntervalSeconds": {
-                    "default": "Health Check Interval Seconds"
+                "ELBUIHealthCheckIntervalSeconds": {
+                    "default": "vCD UI ALB Health Check Interval Seconds"
                 },
-                "ELBHealthCheckProtocol": {
-                    "default": "Health Check Protocol"
+                "ELBUIHealthCheckPath": {
+                    "default": "vCD UI ALB Health Check Path"
                 },
-                "ELBHealthCheckPort": {
-                    "default": "Health Check Port"
+                "ELBUIHealthCheckTimeoutSeconds": {
+                    "default": "vCD UI ALB Health Check Timeout Seconds"
                 },
-                "ELBHealthCheckPath": {
-                    "default": "Health Check Path"
+                "ELBUIHealthyThresholdCount": {
+                    "default": "vCD UI ALB Healthy Threshold Count"
                 },
-                "ELBHealthCheckTimeoutSeconds": {
-                    "default": "Health Check Timeout Seconds"
+                "ELBUIUnhealthyThresholdCount": {
+                    "default": "vCD UI ALB Unhealthy Threshold Count"
                 },
-                "ELBHealthyThresholdCount": {
-                    "default": "Healthy Threshold Count"
+                "ELBUIResponseCode": {
+                    "default": "vCD UI ALB Response Code/s"
                 },
-                "ELBUnhealthyThresholdCount": {
-                    "default": "Unhealthy Threshold Count"
+                "ELBConsoleHealthCheckIntervalSeconds": {
+                    "default": "vCD Console NLB Health Check Interval Seconds"
                 },
-                "ELBResponseCode": {
-                    "default": "Response Code/s"
+                "ELBConsoleHealthyThresholdCount": {
+                    "default": "vCD Console NLB Healthy Threshold Count"
                 },
                 "MainVcdVolumeSize": {
                     "default": "Main vCD root volume size"
@@ -585,7 +585,7 @@
             "Type": "String",
             "MinLength": "1",
             "MaxLength": "2",
-            "AllowedPattern" : "[1-6][0-9]*",
+            "AllowedPattern" : "[1-9][0-9]*",
             "Default": "1",
             "ConstraintDescription" : "Must be an integer in the range 1-63."
         },
@@ -633,48 +633,49 @@
             "Description": "Enter the number of vCD Console Cells to create.",
             "Type": "String"
         },
-        "ELBCertificateArn": {
+        "ELBUICertificateArn": {
             "Description": "Specify the Certificate Arn in ACM, which will be used for the vCD Load balancer.",
             "Type": "String"
         },
-        "ELBHealthCheckIntervalSeconds": {
+        "ELBUIHealthCheckIntervalSeconds": {
             "Default": "30",
             "Description": "The approximate number of seconds between health checks for an individual target.",
             "Type": "String"
         },
-        "ELBHealthCheckProtocol": {
-            "Default": "HTTPS",
-            "Description": "The protocol that the load balancer uses when performing health checks on the targets, such as HTTP or HTTPS.",
-            "Type": "String"
-        },
-        "ELBHealthCheckPort": {
-            "Default": "443",
-            "Description": "The port that the load balancer uses when performing health checks on the targets.",
-            "Type": "String"
-        },
-        "ELBHealthCheckPath": {
+        "ELBUIHealthCheckPath": {
             "Default": "/cloud/server_status",
             "Description": "The ping path destination where Elastic Load Balancing sends health check requests.",
             "Type": "String"
         },
-        "ELBHealthCheckTimeoutSeconds": {
+        "ELBUIHealthCheckTimeoutSeconds": {
             "Default": "10",
             "Description": "The number of seconds to wait for a response before considering that a health check has failed.",
             "Type": "String"
         },
-        "ELBHealthyThresholdCount": {
+        "ELBUIHealthyThresholdCount": {
             "Default": "3",
             "Description": "The number of consecutive successful health checks that are required before an unhealthy target is considered healthy.",
             "Type": "String"
         },
-        "ELBUnhealthyThresholdCount": {
+        "ELBUIUnhealthyThresholdCount": {
             "Default": "3",
             "Description": "The number of consecutive failed health checks that are required before a target is considered unhealthy.",
             "Type": "String"
         },
-        "ELBResponseCode": {
+        "ELBUIResponseCode": {
             "Default": "200",
             "Description": "The HTTP codes that a healthy target uses when responding to a health check.",
+            "Type": "String"
+        },
+        "ELBConsoleHealthCheckIntervalSeconds": {
+            "Default": "30",
+            "AllowedValues" : ["10", "30"],
+            "Description": "The approximate number of seconds between health checks for an individual target. Allowed Values are 10 or 30 seconds!",
+            "Type": "String"
+        },
+        "ELBConsoleHealthyThresholdCount": {
+            "Default": "3",
+            "Description": "The number of consecutive successful health checks that are required before an unhealthy target is considered healthy.",
             "Type": "String"
         },
         "vCDUIVolumeSize": {
