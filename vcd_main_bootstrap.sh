@@ -58,13 +58,13 @@ function vcd_main_on_cent_os () {
     export DBName=`curl http://169.254.169.254/latest/user-data/ | grep DBName | sed 's/DBName=//g'`
     export DBMasterUsername=`curl http://169.254.169.254/latest/user-data/ | grep DBMasterUsername | sed 's/DBMasterUsername=//g'`
     export DBMasterUserPassword=`curl http://169.254.169.254/latest/user-data/ | grep DBMasterUserPassword | sed 's/DBMasterUserPassword=//g'`
-    export vCDAdminEmail=`curl http://169.254.169.254/latest/user-data/ | grep vCDAdminEmail | sed 's/vCDAdminEmail=//g'`
-    export vCDAdminFullName=`curl http://169.254.169.254/latest/user-data/ | grep vCDAdminFullName | sed 's/vCDAdminFullName=//g'`
+    export vCDAdminEmail=`curl http://169.254.169.254/latest/user-data/ | grep -w vCDAdminEmail | sed 's/vCDAdminEmail=//g'`
+    export vCDAdminFullName=`curl http://169.254.169.254/latest/user-data/ | grep -w vCDAdminFullName | sed 's/vCDAdminFullName=//g'`
     export vCDInstalationId=`curl http://169.254.169.254/latest/user-data/ | grep vCDInstalationId | sed 's/vCDInstalationId=//g'`
     export vCDAdminPasswd=`curl http://169.254.169.254/latest/user-data/ | grep vCDAdminPasswd | sed 's/vCDAdminPasswd=//g'`
     export vCDSystemName=`curl http://169.254.169.254/latest/user-data/ | grep vCDSystemName | sed 's/vCDSystemName=//g'`
     export vCDSerialNumber=`curl http://169.254.169.254/latest/user-data/ | grep vCDSerialNumber | sed 's/vCDSerialNumber=//g'`
-    export vCDAdmin=`curl http://169.254.169.254/latest/user-data/ | grep vCDAdmin | sed 's/vCDAdmin=//g'`
+    export vCDAdmin=`curl http://169.254.169.254/latest/user-data/ | grep -w vCDAdmin | sed 's/vCDAdmin=//g'`
     export MessagesLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep MessagesLogGroup | sed 's/MessagesLogGroup=//g'`
     export CellLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep CellLogGroup | sed 's/CellLogGroup=//g'`
     export ConsoleProxyLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep ConsoleProxyLogGroup | sed 's/ConsoleProxyLogGroup=//g'`
