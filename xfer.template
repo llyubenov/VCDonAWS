@@ -409,6 +409,20 @@
                "Roles": [ { "Ref": "xFerAccessRole" } ]
             }
         },
+        "EC2DescribePolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+            "PolicyName": "EC2-Describe",
+            "PolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": "ec2:Describe*",
+                    "Resource": "*"
+                } ]
+            },
+            "Roles": [ { "Ref": "vCDAccessRole" } ]
+            }
+        },
         "CloudWatchPolicy": {
             "Type": "AWS::IAM::Policy",
             "Properties": {
