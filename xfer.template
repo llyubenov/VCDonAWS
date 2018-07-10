@@ -516,7 +516,7 @@
                     "config": {
                         "files": {
                             "/tmp/xfer_bootstrap.sh": {
-                                "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/xfer_bootstrap.sh",
+                                "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/xfer_bootstrap_v2.sh",
                                 "mode": "000550",
                                 "owner": "root",
                                 "group": "root",
@@ -605,6 +605,10 @@
                                     "Ref": "xFerMessagesLogGroup"
                                 },
                                 "\n",
+                                "PrivateSubnet2ID=",
+                                {
+                                    "ref": "PrivateSubnet2ID"
+                                },
                                 "cfn-init -v --stack ",
                                 {
                                     "Ref": "AWS::StackName"
