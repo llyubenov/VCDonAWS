@@ -568,7 +568,7 @@
                     "config": {
                         "files": {
                             "/tmp/vcd_main_bootstrap.sh": {
-                                "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/vcd_main_bootstrap.sh",
+                                "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/vcd_main_bootstrap_v2.sh",
                                 "mode": "000550",
                                 "owner": "root",
                                 "group": "root",
