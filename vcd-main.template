@@ -208,10 +208,6 @@
             "Description": "Specify the vCD Java certifikate keystore filename name. The template assumes the response files is stored in the same S3 bucket as the vCD binary.",
             "Type": "String"
         },
-        "efsID": {
-            "Description": "EFS ID for Cell Spool Area that will be mounted under /opt/vmware/vcloud-director/data/transfer/cells.",
-            "Type": "String"
-        },
         "DBEndpoint": {
             "Description": "vCD Postgres DB Endpoint Address.",
             "Type": "String"
@@ -738,12 +734,7 @@
                                 "vCloudContainerDebugLogGroup=",
                                 {
                                     "Ref": "vCloudContainerDebugLogGroup"
-                                },               
-                                "\n",
-                                "efsID=",
-                                {
-                                    "Ref": "efsID"
-                                },               
+                                },           
                                 "\n",
                                 "cfn-init -v --stack ",
                                 {
