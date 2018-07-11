@@ -471,7 +471,7 @@
                     "config": {
                         "files": {
                             "/tmp/xfer_bootstrap.sh": {
-                                "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/xfer_bootstrap_v2.sh",
+                                "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/xfer_bootstrap.sh",
                                 "mode": "000550",
                                 "owner": "root",
                                 "group": "root",
