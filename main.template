@@ -981,12 +981,6 @@
                             "Outputs.xFerAccessSecurityGroupID"
                         ]
                     },
-                    "efsID": {
-                        "Fn::GetAtt": [
-                            "xFerStack",
-                            "Outputs.EFSID"
-                        ]
-                    },
                     "DBEndpoint": {
                         "Fn::GetAtt": [
                             "RDSStack",
@@ -1165,12 +1159,6 @@
                         "Fn::GetAtt": [
                             "xFerStack",
                             "Outputs.xFerAccessSecurityGroupID"
-                        ]
-                    },
-                    "efsID": {
-                        "Fn::GetAtt": [
-                            "xFerStack",
-                            "Outputs.EFSID"
                         ]
                     },
                     "vCDBuildBucketName": {
