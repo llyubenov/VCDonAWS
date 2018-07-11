@@ -59,18 +59,17 @@ function xfer_on_cent_os () {
 
         #Define GlusterFS Nodes
         export xFerPrimary=`curl -s http://169.254.169.254/latest/meta-data/hostname`
-        export xFerPeer=`aws ec2 describe-instances --region=$Region --filters "Name=network-interface.subnet-id,Values=$PrivateSubnet2CIDR" "Name=tag:Name,Values='vCD Transfer Server'" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
+        export xFerPeer=`aws ec2 describe-instances --region=$Region --filters "Name=network-interface.subnet-id,Values=$PrivateSubnet2ID" "Name=tag:Name,Values='vCD Transfer Server'" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateDnsName]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
 
         sleep 120
-
-        #Create Trustes Storage Pool
-        gluster peer probe $xFerPeer
 
         #Create Distributed GlusterFS Volume   
         if [ "$xFerPeer" == "Null" ]; then
             echo "No Secondary Node"
             gluster volume create xfer $xFerPrimary:/brick1/xfer
         else
+            #Create Trustes Storage Pool
+            gluster peer probe $xFerPeer
             gluster volume create xfer $xFerPrimary:/brick1/xfer $xFerPeer:/brick2/xfer
         fi  
 
@@ -93,7 +92,7 @@ function xfer_on_cent_os () {
     export SubnetID=`curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$MacAddress/subnet-id`
 
     # Install GlusterFS packages
-    yum install wget
+    yum install wget -y
     yum install centos-release-gluster -y
     yum install epel-release -y
     yum install glusterfs-server -y
