@@ -91,7 +91,7 @@ function vcd_main_on_cent_os () {
 #    sudo yum -y install build/amazon-efs-utils*rpm
     
     #Prepare Transfer Store Mount
-    echo "$xFerFQDN:/xfer /opt/vmware/vcloud-director/data/transfer glusterfs   defaults,_netdev  0  0" >> /etc/fstab
+    echo "$xFerFQDN:/xfer /opt/vmware/vcloud-director/data/transfer glusterfs defaults,_netdev  0  0" >> /etc/fstab
 #    echo "$xFerIP:/exports/xfer /opt/vmware/vcloud-director/data/transfer nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
 #    echo "$efsID /opt/vmware/vcloud-director/data/transfer/cells efs defaults,_netdev 0 0" >> /etc/fstab
 
