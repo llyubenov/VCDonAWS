@@ -24,7 +24,6 @@
                         "PrivateInstanceSecurityGroupID",
                         "RDSAccessSecurityGroupID",
                         "xFerAccessSecurityGroupID",
-                        "efsID",
                         "LogRetentionDays"
                     ]
                 },
@@ -101,9 +100,6 @@
                 },
                 "vCDKeystoreFileName" : {
                     "default" : "vCD Java Certificate Keystore filename"
-                },
-                "efsID" : {
-                    "default" : "EFS ID for Cell Spool Area"
                 },
                 "DBEndpoint" : {
                     "default" : "RDS Endpoint"
