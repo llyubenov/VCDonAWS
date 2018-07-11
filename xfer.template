@@ -335,51 +335,6 @@
                 "SourceSecurityGroupId": {"Ref": "xFerAccessSecurityGroup"}
             }   
         },
-        "xFerAccessSecurityGroupIngress2": {
-            "Type": "AWS::EC2::SecurityGroupIngress",
-            "DependsOn": "xFerAccessSecurityGroup",
-            "Properties": {
-                "GroupId": {
-                    "Ref": "xFerAccessSecurityGroup"
-                },
-                "CidrIp": "0.0.0.0/0",
-                "IpProtocol": "tcp",
-                "FromPort": "8443",
-                "ToPort": "8443"
-            }
-        },
-        "EFS": {
-            "Type" : "AWS::EFS::FileSystem",
-            "Properties" : {
-                "PerformanceMode": "generalPurpose",
-                "FileSystemTags": [
-                    {
-                        "Key": "Name",
-                        "Value": "xFer-Cells"
-                    }
-                ]    
-            }
-        },
-        "EFSMountTargetAZ1": {
-            "Type": "AWS::EFS::MountTarget",
-            "Properties": {
-                "FileSystemId": { "Ref": "EFS" },
-                "SubnetId": { 
-                    "Ref": "PrivateSubnet1ID" 
-                },
-              "SecurityGroups": [ { "Ref": "xFerAccessSecurityGroup" } ]        
-            }
-        },
-        "EFSMountTargetAZ2": {
-            "Type": "AWS::EFS::MountTarget",
-            "Properties": {
-                "FileSystemId": { "Ref": "EFS" },
-                "SubnetId": { 
-                    "Ref": "PrivateSubnet2ID" 
-                },
-              "SecurityGroups": [ { "Ref": "xFerAccessSecurityGroup" } ]        
-            }
-        },
         "xFerAccessRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -648,12 +603,6 @@
                 "Ref": "xFerMessagesLogGroup"
             },
             "Description": "CloudWatch Logs GroupName. /var/log/messages logs will be stored here."
-        },
-        "EFSID": {
-            "Value": {
-                "Ref": "EFS"
-            },
-            "Description": "EFS File system ID."
         }
     }
 }
