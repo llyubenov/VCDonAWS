@@ -36,8 +36,7 @@
                         "xFerAccessSecurityGroupID",
                         "vCDKeystoreFileName",
                         "vCDResponsesFileName",
-                        "vCDCertKeystorePasswd",
-                        "efsID"
+                        "vCDCertKeystorePasswd"
                     ]
                 },
                 {
@@ -125,9 +124,6 @@
                 },
                 "vCDResponsesFileName" : {
                     "default" : "vCD Responses File name"
-                },
-                "efsID" : {
-                    "default" : "EFS ID for Cell Spool Area"
                 },
                 "vCDCertKeystorePasswd" : {
                     "default" : "vCD Java Keystore Password"
@@ -278,10 +274,6 @@
         "vCDKeystoreFileName": {
             "Default": "certificates.ks",
             "Description": "Specify the vCD Java certifikate keystore filename name. The template assumes the response files is stored in the same S3 bucket as the vCD binary.",
-            "Type": "String"
-        },
-        "efsID": {
-            "Description": "EFS ID for Cell Spool Area that will be mounted under /opt/vmware/vcloud-director/data/transfer/cells.",
             "Type": "String"
         },
             "vCDCertKeystorePasswd": {
@@ -774,11 +766,6 @@
                             "Ref": "vCloudContainerDebugLogGroup"
                         },               
                         "\n",
-                        "efsID=",
-                        {
-                            "Ref": "efsID"
-                        },               
-                        "\n",
                         "vCDJXMS=",
                         {
                             "Ref": "vCDUIJXMS"
@@ -952,11 +939,6 @@
                                 "vCloudContainerDebugLogGroup=",
                                 {
                                     "Ref": "vCloudContainerDebugLogGroup"
-                                },               
-                                "\n",
-                                "efsID=",
-                                {
-                                    "Ref": "efsID"
                                 },               
                                 "\n",
                                 "vCDJXMS=",
