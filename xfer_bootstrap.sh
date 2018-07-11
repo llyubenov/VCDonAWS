@@ -47,9 +47,84 @@ function osrelease () {
 #}
 
 function xfer_on_cent_os () {
-    # Install and Configure CloudWatch Log service on xFer
+    
+    function primary_xfer_on_cent_os () {
+        #Mount xFer store
+        mkdir  /brick1
+        echo '/dev/vol_vcd_xfer/lv_vcd_xfer /brick1 xfs rw,noatime,inode64,nouuid 1 2' >> /etc/fstab
+        mount /brick1
+        
+        #Create xFer Volume folder
+        mkdir -p /brick1/xfer
+
+        #Define GlusterFS Nodes
+        export xFerPrimary=`curl -s http://169.254.169.254/latest/meta-data/hostname`
+        export xFerPeer=`aws ec2 describe-instances --region=$Region --filters "Name=network-interface.subnet-id,Values=$PrivateSubnet2ID" "Name=tag:Name,Values='vCD Transfer Server'" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateDnsName]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
+
+        sleep 120
+
+        #Create Distributed GlusterFS Volume   
+        if [ "$xFerPeer" == "Null" ]; then
+            echo "No Secondary Node"
+            gluster volume create xfer $xFerPrimary:/brick1/xfer
+        else
+            #Create Trustes Storage Pool
+            gluster peer probe $xFerPeer
+            sleep 10
+            gluster pool list
+            #Create GlusterFS Volume
+            gluster volume create xfer $xFerPrimary:/brick1/xfer $xFerPeer:/brick2/xfer
+        fi  
+
+        #Start GlusterFS Volume
+        gluster volume start xfer 
+    }
+
+    function secondary_xfer_on_cent_os () {
+        #Mount xFer store
+        mkdir  /brick2
+        echo '/dev/vol_vcd_xfer/lv_vcd_xfer /brick2 xfs rw,noatime,inode64,nouuid 1 2' >> /etc/fstab
+        mount /brick2
+
+        #Create xFer Volume folder
+        mkdir -p /brick2/xfer
+    }
+
+    # Prepare Variables
+    export Region=`curl http://169.254.169.254/latest/meta-data/placement/availability-zone | rev | cut -c 2- | rev`
+    export PrivateSubnet2ID=`curl http://169.254.169.254/latest/user-data/ | grep PrivateSubnet2ID | sed 's/PrivateSubnet2ID=//g'`
     export CWG=`curl http://169.254.169.254/latest/user-data/ | grep CLOUDWATCHGROUP | sed 's/CLOUDWATCHGROUP=//g'`
-    export NFSCIDR=`curl http://169.254.169.254/latest/user-data/ | grep VPCCIDR| sed 's/VPCCIDR=//g'`
+    export MacAddress=`curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/`
+    export SubnetID=`curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/$MacAddress/subnet-id`
+
+    # Install GlusterFS packages
+    yum install wget -y
+    yum install centos-release-gluster -y
+    yum install epel-release -y
+    yum install glusterfs-server -y
+
+    #Enable and Start GlusterFS services
+
+    systemctl start glusterd
+    systemctl enable glusterd
+    
+    #Create LVM for Transfer store
+    pvcreate /dev/xvdb
+    pvscan
+    vgcreate vol_vcd_xfer /dev/xvdb
+    lvcreate -l 100%FREE -n lv_vcd_xfer vol_vcd_xfer
+    mkfs.xfs -L vcdxfer /dev/vol_vcd_xfer/lv_vcd_xfer
+
+    #Configure ClusterFS Volume
+    if [ "$SubnetID" == "$PrivateSubnet2ID" ]; then
+        #Configure Secondary Node
+        secondary_xfer_on_cent_os
+    else
+        #Configure Primary Node
+        primary_xfer_on_cent_os
+    fi
+
+    # Install and Configure CloudWatch Log service on xFer
     echo "log_group_name = $CWG" >> /tmp/groupname.txt
 
 cat <<'EOF' >> ~/cloudwatchlog.conf
@@ -65,7 +140,6 @@ buffer_duration = 5000
 log_stream_name = {hostname}
 initial_position = start_of_file
 EOF
-    export Region=`curl http://169.254.169.254/latest/meta-data/placement/availability-zone | rev | cut -c 2- | rev`
     cat /tmp/groupname.txt >> ~/cloudwatchlog.conf
 
     curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
@@ -89,27 +163,6 @@ WantedBy=multi-user.target
 EOF
     systemctl enable awslogs
     systemctl restart awslogs
-
-    #Create LVM for Xfer store
-    pvcreate /dev/xvdb
-    pvscan
-    vgcreate vol_vcd_xfer /dev/xvdb
-    lvcreate -l 100%FREE -n lv_vcd_xfer vol_vcd_xfer
-    mkfs.ext4 -L vcdxfer /dev/vol_vcd_xfer/lv_vcd_xfer
-
-    #Mount xFer store
-    mkdir -p /exports/xfer
-    echo '/dev/vol_vcd_xfer/lv_vcd_xfer  /exports/xfer ext4    defaults        0 0' >> /etc/fstab
-    mount /exports/xfer/
-
-    #Configure NFS Service
-    echo "/exports/xfer $NFSCIDR(rw,no_root_squash)" >> /etc/exports
-    systemctl enable nfs
-    systemctl start nfs
-    
-    #Create Cells folder in the Xfer Store
-    mkdir -p /exports/xfer/cells
-
 
     #Run security updates
 cat <<'EOF' >> ~/mycron
