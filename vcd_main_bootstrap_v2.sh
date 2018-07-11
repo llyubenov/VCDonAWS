@@ -132,7 +132,7 @@ EOF
 #    mount /opt/vmware/vcloud-director/data/transfer/cells
     chown vcloud:vcloud -R /opt/vmware/vcloud-director/data/transfer/
 
-    # Install and Configure CloudWatch Log service on xFer
+    # Install and Configure CloudWatch Log service on vCD Main
     echo "log_group_name = $MessagesLogGroup" >> /tmp/MessagesLogGroup.txt
     echo "log_group_name = $CellLogGroup" >> /tmp/CellLogGroup.txt
     echo "log_group_name = $ConsoleProxyLogGroup" >> /tmp/ConsoleProxyLogGroup.txt
