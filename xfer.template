@@ -420,7 +420,7 @@
                     "Resource": "*"
                 } ]
             },
-            "Roles": [ { "Ref": "vCDAccessRole" } ]
+            "Roles": [ { "Ref": "xFerAccessRole" } ]
             }
         },
         "CloudWatchPolicy": {
@@ -607,8 +607,9 @@
                                 "\n",
                                 "PrivateSubnet2ID=",
                                 {
-                                    "ref": "PrivateSubnet2ID"
+                                    "Ref": "PrivateSubnet2ID"
                                 },
+                                "\n",
                                 "cfn-init -v --stack ",
                                 {
                                     "Ref": "AWS::StackName"
