@@ -70,6 +70,9 @@ function xfer_on_cent_os () {
         else
             #Create Trustes Storage Pool
             gluster peer probe $xFerPeer
+            sleep 10
+            gluster pool list
+            #Create GlusterFS Volume
             gluster volume create xfer $xFerPrimary:/brick1/xfer $xFerPeer:/brick2/xfer
         fi  
 
@@ -82,6 +85,9 @@ function xfer_on_cent_os () {
         mkdir  /brick2
         echo '/dev/vol_vcd_xfer/lv_vcd_xfer /brick2 xfs rw,noatime,inode64,nouuid 1 2' >> /etc/fstab
         mount /brick2
+
+        #Create xFer Volume folder
+        mkdir -p /brick2/xfer
     }
 
     # Prepare Variables
