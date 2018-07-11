@@ -65,6 +65,9 @@ function vcd_cells_on_cent_os () {
     export vCDJXMS=`curl http://169.254.169.254/latest/user-data/ | grep vCDJXMS | sed 's/vCDJXMS=//g'`
     export vCDJXMX=`curl http://169.254.169.254/latest/user-data/ | grep vCDJXMX | sed 's/vCDJXMX=//g'`
 
+    #Install GluxterFS client
+    yum install glusterfs-fuse -y
+
     #Copy vCD Binaries and Java Certificate Keystore
     aws s3 cp s3://$vCDBuildBucketName/$vCDBuildName /tmp/$vCDBuildName
     aws s3 cp s3://$vCDBuildBucketName/$vCDKeystoreFileName /tmp/$vCDKeystoreFileName
