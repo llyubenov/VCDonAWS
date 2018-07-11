@@ -69,10 +69,11 @@ function vcd_main_on_cent_os () {
     export CellLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep CellLogGroup | sed 's/CellLogGroup=//g'`
     export ConsoleProxyLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep ConsoleProxyLogGroup | sed 's/ConsoleProxyLogGroup=//g'`
     export vCloudContainerDebugLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep vCloudContainerDebugLogGroup | sed 's/vCloudContainerDebugLogGroup=//g'`
-    export efsID=`curl http://169.254.169.254/latest/user-data/ | grep efsID | sed 's/efsID=//g'`
-    export xFerIP=`aws ec2 describe-instances --region=$Region --filters "Name=availability-zone,Values=$AZ" "Name=tag:Name,Values='vCD Transfer Server'" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateIpAddress]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
+    export xFerFQDN=`aws ec2 describe-instances --region=$Region --filters "Name=availability-zone,Values=$AZ" "Name=tag:Name,Values='vCD Transfer Server'" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateDnsName]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
     export instanceIP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)
 
+    #Install GluxterFS client
+    yum install glusterfs-fuse -y
 
     #Copy vCD Binaries and Java Certificate Keystore
     aws s3 cp s3://$vCDBuildBucketName/$vCDBuildName /tmp/$vCDBuildName
@@ -81,16 +82,9 @@ function vcd_main_on_cent_os () {
     #Set vCD Binaries and Java Certificate Keystore permissions
     chmod +x /tmp/$vCDBuildName
     chmod 644 /tmp/$vCDKeystoreFileName
-
-    #Install EFS Utils
-    git clone https://github.com/aws/efs-utils
-    cd efs-utils
-    make rpm
-    sudo yum -y install build/amazon-efs-utils*rpm
     
     #Prepare Transfer Store Mount
-    echo "$xFerIP:/exports/xfer /opt/vmware/vcloud-director/data/transfer nfs4 nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,_netdev 0 0" >> /etc/fstab
-    echo "$efsID /opt/vmware/vcloud-director/data/transfer/cells efs defaults,_netdev 0 0" >> /etc/fstab
+    echo "$xFerFQDN:/xfer /opt/vmware/vcloud-director/data/transfer glusterfs defaults,_netdev  0  0" >> /etc/fstab
 
     #Install vCD
     echo "N" | /tmp/$vCDBuildName
@@ -126,10 +120,9 @@ EOF
 
     #Mount Transfer Store and change ownership
     mount /opt/vmware/vcloud-director/data/transfer/
-    mount /opt/vmware/vcloud-director/data/transfer/cells
     chown vcloud:vcloud -R /opt/vmware/vcloud-director/data/transfer/
 
-    # Install and Configure CloudWatch Log service on xFer
+    # Install and Configure CloudWatch Log service on vCD Main
     echo "log_group_name = $MessagesLogGroup" >> /tmp/MessagesLogGroup.txt
     echo "log_group_name = $CellLogGroup" >> /tmp/CellLogGroup.txt
     echo "log_group_name = $ConsoleProxyLogGroup" >> /tmp/ConsoleProxyLogGroup.txt
