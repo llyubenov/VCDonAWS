@@ -50,6 +50,7 @@ function vcd_cells_on_cent_os () {
     # Prepare Variables
     export Region=`curl http://169.254.169.254/latest/meta-data/placement/availability-zone | rev | cut -c 2- | rev`
     export AZ=`curl http://169.254.169.254/latest/meta-data/placement/availability-zone`
+    export VPCID=`curl http://169.254.169.254/latest/user-data/ | grep VPCID | sed 's/VPCID=//g'`
     export vCDBuildBucketName=`curl http://169.254.169.254/latest/user-data/ | grep vCDBuildBucketName | sed 's/vCDBuildBucketName=//g'`
     export vCDBuildName=`curl http://169.254.169.254/latest/user-data/ | grep vCDBuildName | sed 's/vCDBuildName=//g'`
     export vCDKeystoreFileName=`curl http://169.254.169.254/latest/user-data/ | grep vCDKeystoreFileName | sed 's/vCDKeystoreFileName=//g'`
@@ -58,7 +59,7 @@ function vcd_cells_on_cent_os () {
     export CellLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep CellLogGroup | sed 's/CellLogGroup=//g'`
     export ConsoleProxyLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep ConsoleProxyLogGroup | sed 's/ConsoleProxyLogGroup=//g'`
     export vCloudContainerDebugLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep vCloudContainerDebugLogGroup | sed 's/vCloudContainerDebugLogGroup=//g'`
-    export xFerFQDN=`aws ec2 describe-instances --region=$Region --filters "Name=availability-zone,Values=$AZ" "Name=tag:Name,Values='vCD Transfer Server'" "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[PrivateDnsName]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
+    export xFerFQDN=`aws ec2 describe-instances --region=$Region --filters "Name=availability-zone,Values=$AZ" "Name=tag:Name,Values='vCD Transfer Server'" "Name=instance-state-name,Values=running" "Name=vpc-id,Values=$VPCID" --query 'Reservations[*].Instances[*].[PrivateDnsName]' | sed -n '4p' | sed -e 's/ //g' -e 's/^"//' -e 's/"$//'`
     export instanceIP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)
     export vCDJXMS=`curl http://169.254.169.254/latest/user-data/ | grep vCDJXMS | sed 's/vCDJXMS=//g'`
     export vCDJXMX=`curl http://169.254.169.254/latest/user-data/ | grep vCDJXMX | sed 's/vCDJXMX=//g'`

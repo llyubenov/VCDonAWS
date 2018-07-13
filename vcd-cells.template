@@ -712,6 +712,11 @@
                         "pip install --upgrade pip\n",
                         "pip install awscli --ignore-installed six\n",
                         "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                        "VPCID=",
+                        {
+                            "Ref": "VPCID"
+                        },
+                        "\n",
                         "vCDBuildBucketName=",
                         {
                             "Ref": "vCDBuildBucketName"
