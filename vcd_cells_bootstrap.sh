@@ -53,7 +53,6 @@ function vcd_cells_on_cent_os () {
     export vCDBuildBucketName=`curl http://169.254.169.254/latest/user-data/ | grep vCDBuildBucketName | sed 's/vCDBuildBucketName=//g'`
     export vCDBuildName=`curl http://169.254.169.254/latest/user-data/ | grep vCDBuildName | sed 's/vCDBuildName=//g'`
     export vCDKeystoreFileName=`curl http://169.254.169.254/latest/user-data/ | grep vCDKeystoreFileName | sed 's/vCDKeystoreFileName=//g'`
-    export vCDResponsesFileName=`curl http://169.254.169.254/latest/user-data/ | grep vCDResponsesFileName | sed 's/vCDResponsesFileName=//g'`
     export vCDCertKeystorePasswd=`curl http://169.254.169.254/latest/user-data/ | grep vCDCertKeystorePasswd | sed 's/vCDCertKeystorePasswd=//g'`
     export MessagesLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep MessagesLogGroup | sed 's/MessagesLogGroup=//g'`
     export CellLogGroup=`curl http://169.254.169.254/latest/user-data/ | grep CellLogGroup | sed 's/CellLogGroup=//g'`
@@ -67,15 +66,11 @@ function vcd_cells_on_cent_os () {
     #Install GluxterFS client
     yum install glusterfs-fuse -y
 
-    #Copy vCD Binaries and Java Certificate Keystore
+    #Copy vCD Binaries
     aws s3 cp s3://$vCDBuildBucketName/$vCDBuildName /tmp/$vCDBuildName
-    aws s3 cp s3://$vCDBuildBucketName/$vCDKeystoreFileName /tmp/$vCDKeystoreFileName
-    aws s3 cp s3://$vCDBuildBucketName/$vCDResponsesFileName /tmp/$vCDResponsesFileName
 
-    #Set vCD Binaries and Java Certificate Keystore permissions
+    #Set vCD Binaries permissions
     chmod +x /tmp/$vCDBuildName
-    chmod 644 /tmp/$vCDKeystoreFileName
-    chmod 644 /tmp/$vCDResponsesFileName
 
     #Prepare Transfer Store Mount
     echo "$xFerFQDN:/xfer /opt/vmware/vcloud-director/data/transfer glusterfs defaults,_netdev  0  0" >> /etc/fstab
@@ -83,8 +78,16 @@ function vcd_cells_on_cent_os () {
     #Install vCD
     echo "N" | /tmp/$vCDBuildName
 
+    #Mount Transfer Store and change ownership
+    mount /opt/vmware/vcloud-director/data/transfer/
+    chown vcloud:vcloud -R /opt/vmware/vcloud-director/data/transfer/
+
+    #Set responses.properties and Java Certificate Keystore permissions
+    chmod 644 /opt/vmware/vcloud-director/data/transfer/responses.properties
+    chmod 644 /opt/vmware/vcloud-director/data/transfer/$vCDKeystoreFileName
+
     #Configure vCD Cell
-    /opt/vmware/vcloud-director/bin/configure -r /tmp/$vCDResponsesFileName -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -cons $instanceIP --console-proxy-port-https 8443 --keystore /tmp/$vCDKeystoreFileName -w $vCDCertKeystorePasswd  --enable-ceip true -unattended
+    /opt/vmware/vcloud-director/bin/configure -r /opt/vmware/vcloud-director/data/transfer/responses.properties -ip $instanceIP --primary-port-http 80 --primary-port-https 443 -cons $instanceIP --console-proxy-port-https 8443 --keystore /opt/vmware/vcloud-director/data/transfer/$vCDKeystoreFileName -w $vCDCertKeystorePasswd  --enable-ceip true -unattended
 
     #Additional changes to vCD global.properties file
 cat >> /opt/vmware/vcloud-director/etc/global.properties <<- EOF
@@ -111,9 +114,7 @@ EOF
     sed -i "s/Xmx4096M/Xmx${vCDJXMX}M/g" /opt/vmware/vcloud-director/bin/vmware-vcd-cell-common
 
 
-    #Mount Transfer Store and change ownership
-    mount /opt/vmware/vcloud-director/data/transfer/
-    chown vcloud:vcloud -R /opt/vmware/vcloud-director/data/transfer/
+   
 
     # Install and Configure CloudWatch Log service
     echo "log_group_name = $MessagesLogGroup" >> /tmp/MessagesLogGroup.txt

@@ -115,12 +115,13 @@ EOF
     # Initial vCD Setup
     /opt/vmware/vcloud-director/bin/cell-management-tool system-setup --email $vCDAdminEmail --full-name "$vCDAdminFullName" --installation-id $vCDInstalationId --password $vCDAdminPasswd --system-name "$vCDSystemName" --serial-number $vCDSerialNumber --user $vCDAdmin -unattended
 
-    #Copy vCD response.properties file to S3
-    aws s3 cp /opt/vmware/vcloud-director/etc/responses.properties s3://$vCDBuildBucketName/responses.properties
-
     #Mount Transfer Store and change ownership
     mount /opt/vmware/vcloud-director/data/transfer/
     chown vcloud:vcloud -R /opt/vmware/vcloud-director/data/transfer/
+
+    #Copy vCD response.properties Java Keystore file to transfer store
+    cp /opt/vmware/vcloud-director/etc/responses.properties /opt/vmware/vcloud-director/data/transfer/responses.properties
+    cp /tmp/$vCDKeystoreFileName /opt/vmware/vcloud-director/data/transfer/$vCDKeystoreFileName
 
     # Install and Configure CloudWatch Log service on vCD Main
     echo "log_group_name = $MessagesLogGroup" >> /tmp/MessagesLogGroup.txt

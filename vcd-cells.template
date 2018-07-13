@@ -35,7 +35,6 @@
                         "CellsAccessSecurityGroupID",
                         "xFerAccessSecurityGroupID",
                         "vCDKeystoreFileName",
-                        "vCDResponsesFileName",
                         "vCDCertKeystorePasswd"
                     ]
                 },
@@ -121,9 +120,6 @@
                 },
                 "vCDKeystoreFileName" : {
                     "default" : "vCD Java Certificate Keystore filename"
-                },
-                "vCDResponsesFileName" : {
-                    "default" : "vCD Responses File name"
                 },
                 "vCDCertKeystorePasswd" : {
                     "default" : "vCD Java Keystore Password"
@@ -266,17 +262,12 @@
             "Description": "Specify the vCD binary filename name.",
             "Type": "String"
         },
-        "vCDResponsesFileName": {
-            "Default": "responses.properties",
-            "Description": "Specify the name of the VCD Responses File. The template assumes the response files is stored in the same S3 bucket as the vCD binary and the vCD Java certifikate keystore.",
-            "Type": "String"
-        },
         "vCDKeystoreFileName": {
             "Default": "certificates.ks",
             "Description": "Specify the vCD Java certifikate keystore filename name. The template assumes the response files is stored in the same S3 bucket as the vCD binary.",
             "Type": "String"
         },
-            "vCDCertKeystorePasswd": {
+        "vCDCertKeystorePasswd": {
             "NoEcho": "true",
             "Description": "vCD Certificates Keystore Password. Minimum of 8 alphanumeric characters.",
             "Type": "String",
@@ -909,11 +900,6 @@
                                 "vCDKeystoreFileName=",
                                 {
                                     "Ref": "vCDKeystoreFileName"
-                                },
-                                "\n",
-                                "vCDResponsesFileName=",
-                                {
-                                    "Ref": "vCDResponsesFileName"
                                 },
                                 "\n",
                                 "vCDCertKeystorePasswd=",
