@@ -732,11 +732,6 @@
                             "Ref": "vCDKeystoreFileName"
                         },
                         "\n",
-                        "vCDResponsesFileName=",
-                        {
-                            "Ref": "vCDResponsesFileName"
-                        },
-                        "\n",
                         "vCDCertKeystorePasswd=",
                         {
                             "Ref": "vCDCertKeystorePasswd"
