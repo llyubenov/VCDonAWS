@@ -22,8 +22,7 @@
                         "PublicSubnet1CIDR",
                         "PublicSubnet2CIDR",
                         "PrivateSubnet1CIDR",
-                        "PrivateSubnet2CIDR",
-                        "VPCTenancy"
+                        "PrivateSubnet2CIDR"
                     ]
                 },
                 {
@@ -178,9 +177,6 @@
                 },
                 "VPCCIDR": {
                     "default": "VPC CIDR"
-                },
-                "VPCTenancy": {
-                    "default": "VPC Tenancy"
                 },
                 "BastionAMIOS": {
                     "default": "Bastion AMI Operating System"
