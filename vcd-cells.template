@@ -891,6 +891,7 @@
                                 {
                                     "Ref": "VPCID"
                                 },
+                                "\n",
                                 "vCDBuildBucketName=",
                                 {
                                     "Ref": "vCDBuildBucketName"
