@@ -1,300 +1,428 @@
 {
-"AWSTemplateFormatVersion": "2010-09-09",
-"Description": "Multi-AZ PostgreSQL RDS Template",
-"Metadata": {
-  "AWS::CloudFormation::Interface": {
-    "ParameterGroups": [
-      {
-        "Label": {"default": "Multi-AZ Configuration"},
-        "Parameters": [
-          "NumberOfAZs"
-        ]
-      },
-      {
-        "Label": {"default": "Network Configuration"},
-        "Parameters": [
-          "VPCID",
-          "PrivateSubnet1",
-          "PrivateSubnet2"
-        ]
-      },
-      {
-        "Label": {"default": "RDS Configuration"},
-        "Parameters": [
-          "RDSInstanceType",
-          "DBName",
-          "MasterUsername",
-          "MasterUserPassword",
-          "BackupRetentionPeriod",
-          "PreferredBackupWindow",
-          "PreferredMaintenanceWindow",
-          "AllocatedStorage",
-          "AutoMinorVersionUpgrade",
-          "TcpPort"
-        ]
-      }
-    ],
-    "ParameterLabels": {
-      "NumberOfAZs": {
-          "default": "Availability Zones"
-      },
-      "RDSInstanceType" : {
-        "default" : "RDS Instance Type"
-      },
-      "DBName" : {
-        "default" : "vCD Postgres database name"
-      },
-      "PrivateSubnet1" : {
-        "default" : "Private Subnet 1"
-      },
-      "PrivateSubnet2" : {
-        "default" : "Private Subnet 2"
-      },
-      "MasterUsername" : {
-        "default" : "Master Username"
-      },
-      "MasterUserPassword" : {
-        "default" : "Master User Password"
-      },
-      "BackupRetentionPeriod" : {
-        "default" : "Backup Retention Period"
-      },
-      "PreferredBackupWindow" : {
-        "default" : "Preferred Backup Window"
-      },
-      "PreferredMaintenanceWindow" : {
-        "default" : "Preferred Maintenance Window"
-      },
-      "AllocatedStorage" : {
-        "default" : "Allocated Storage"
-      },
-      "AutoMinorVersionUpgrade" : {
-        "default" : "Auto Minor Version Upgrade"
-      },
-      "TcpPort" : {
-        "default" : "TCP Port"
-      },
-      "VPCID": {
-          "default": "VPC ID"
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Multi-AZ PostgreSQL RDS Template",
+  "Metadata": {
+    "AWS::CloudFormation::Interface": {
+      "ParameterGroups": [
+        {
+          "Label": {
+            "default": "Multi-AZ Configuration"
+          },
+          "Parameters": [
+            "NumberOfAZs"
+          ]
+        },
+        {
+          "Label": {
+            "default": "Network Configuration"
+          },
+          "Parameters": [
+            "VPCID",
+            "PrivateSubnet1",
+            "PrivateSubnet2"
+          ]
+        },
+        {
+          "Label": {
+            "default": "RDS Configuration"
+          },
+          "Parameters": [
+            "RDSInstanceType",
+            "EngineVersion",
+            "DBName",
+            "MasterUsername",
+            "MasterUserPassword",
+            "BackupRetentionPeriod",
+            "PreferredBackupWindow",
+            "PreferredMaintenanceWindow",
+            "AllocatedStorage",
+            "AutoMinorVersionUpgrade",
+            "TcpPort"
+          ]
+        }
+      ],
+      "ParameterLabels": {
+        "NumberOfAZs": {
+            "default": "Availability Zones"
+        },
+        "RDSInstanceType" : {
+          "default" : "RDS Instance Type"
+        },
+        "EngineVersion" : {
+          "default" : "Postgres DB Version"
+        },
+        "DBName" : {
+          "default" : "vCD Postgres database name"
+        },
+        "PrivateSubnet1" : {
+          "default" : "Private Subnet 1"
+        },
+        "PrivateSubnet2" : {
+          "default" : "Private Subnet 2"
+        },
+        "MasterUsername" : {
+          "default" : "Master Username"
+        },
+        "MasterUserPassword" : {
+          "default" : "Master User Password"
+        },
+        "BackupRetentionPeriod" : {
+          "default" : "Backup Retention Period"
+        },
+        "PreferredBackupWindow" : {
+          "default" : "Preferred Backup Window"
+        },
+        "PreferredMaintenanceWindow" : {
+          "default" : "Preferred Maintenance Window"
+        },
+        "AllocatedStorage" : {
+          "default" : "Allocated Storage"
+        },
+        "AutoMinorVersionUpgrade" : {
+          "default" : "Auto Minor Version Upgrade"
+        },
+        "TcpPort" : {
+          "default" : "TCP Port"
+        },
+        "VPCID": {
+            "default": "VPC ID"
+        }
       }
     }
-  }
-},
-"Parameters": {
-  "VPCID": {
-    "Description": "Select VPC.",
-    "Type": "AWS::EC2::VPC::Id"
   },
-  "PrivateSubnet1": {
-    "Description": "Private Subnet 1 to deploy the RDS Instance.",
-    "Type": "AWS::EC2::Subnet::Id"
-  },
-  "PrivateSubnet2": {
-    "Description": "Private Subnet 2 to deploy the RDS Instance.",
-    "Type": "AWS::EC2::Subnet::Id"
-  },
-  "NumberOfAZs": {
+  "Parameters": {
+    "VPCID": {
+      "Description": "Select VPC.",
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "PrivateSubnet1": {
+      "Description": "Private Subnet 1 to deploy the RDS Instance.",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "PrivateSubnet2": {
+      "Description": "Private Subnet 2 to deploy the RDS Instance.",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "NumberOfAZs": {
+        "AllowedValues": [
+          "1",
+          "2"
+        ],
+        "Default": "2",
+        "Description": "Number of Availability Zones. Select 2 for Multi-AZ Deployment.",
+        "Type": "String"
+    },
+    "DBName": {
+      "Default": "vcddb",
+      "Description" : "vCD Postgres database name",
+      "Type": "String",
+      "MinLength": "1",
+      "MaxLength": "16",
+      "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
+      "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
+    },
+    "EngineVersion": {
       "AllowedValues": [
-        "1","2"
+        "9.6.6",
+        "9.6.8",
+        "9.6.9",
+        "10.1",
+        "10.3",
+        "10.4"
       ],
-      "Default": "2",
-      "Description": "Number of Availability Zones. Select 2 for Multi-AZ Deployment.",
+      "Default": "9.6.6",
+      "Description": "Select the PostgresDB engine version",
       "Type": "String"
   },
-  "DBName": {
-    "Default": "vcddb",
-    "Description" : "vCD Postgres database name",
-    "Type": "String",
-    "MinLength": "1",
-    "MaxLength": "16",
-    "AllowedPattern" : "[a-zA-Z][a-zA-Z0-9]*",
-    "ConstraintDescription" : "must begin with a letter and contain only alphanumeric characters."
-  },
-  "MasterUsername": {
-    "Description": "Database administration name. First character must be a letter and can not be 'root'.",
-    "Type": "String",
-    "Default": "dbmaster"
-  },
-  "MasterUserPassword": {
-    "NoEcho": "true",
-    "Description": "Database administration password. Minimum of 8 alphanumeric characters (pattern of [a-zA-Z0-9]).",
-    "Type": "String",
-    "MinLength": "8",
-    "AllowedPattern": "[a-zA-Z0-9!?]*",
-    "ConstraintDescription": "Must only contain upper and lowercase letters and numbers"
-  },
-  "BackupRetentionPeriod": {
-    "Description": "Enter Backup Retention Period in Days.",
-    "Type": "Number",
-    "Default": "7"
-  },
-  "TcpPort": {
-    "Description": "Enter RDS Listening TCP Port number.",
-    "Type": "Number",
-    "Default": "5432"
-  },
-  "PreferredBackupWindow": {
-    "Description": "Enter Preferred Backup Window Time (UTC).",
-    "Type": "String",
-    "Default": "17:00-19:00"
-  },
-  "PreferredMaintenanceWindow": {
-    "Description": "Enter Preferred Maintenance Window Time (UTC).",
-    "Type": "String",
-    "Default": "Sun:19:00-Sun:23:00"
-  },
-  "AllocatedStorage": {
-    "Default": "5",
-    "Description": "Allocated Storage Storage(GB) for the Database.",
-    "Type": "Number",
-    "MinValue": "5",
-    "MaxValue": "6144",
-    "ConstraintDescription": "Must be between 5-6144"
-  },
-  "AutoMinorVersionUpgrade": {
-    "Description": "Allow Automatic Minor Version Upgrades?",
-    "Type": "String",
-    "Default": "true",
-    "AllowedValues": [
-      "true",
-      "false"
-    ]
-  },
-  "RDSInstanceType": {
-    "Description": "Select Instance Type.",
-    "Type": "String",
-    "Default": "db.m4.large",
-    "AllowedValues": [
-      "db.t2.micro",
-      "db.t2.small",
-      "db.m4.large",
-      "db.m4.xlarge",
-      "db.m4.2xlarge"
-    ],
-    "ConstraintDescription": "Must be a valid EC2 instance type."
-  }
-},
-"Mappings": {
-  "Settings": {
-    "PostgreSQL": {
-      "Engine": "postgres",
-      "Version": "9.6.3"
+    "MasterUsername": {
+      "Description": "Database administration name. First character must be a letter and can not be 'root'.",
+      "Type": "String",
+      "Default": "dbmaster"
+    },
+    "MasterUserPassword": {
+      "NoEcho": "true",
+      "Description": "Database administration password. Minimum of 8 alphanumeric characters (pattern of [a-zA-Z0-9]).",
+      "Type": "String",
+      "MinLength": "8",
+      "AllowedPattern": "[a-zA-Z0-9!?]*",
+      "ConstraintDescription": "Must only contain upper and lowercase letters and numbers"
+    },
+    "BackupRetentionPeriod": {
+      "Description": "Enter Backup Retention Period in Days.",
+      "Type": "Number",
+      "Default": "7"
+    },
+    "TcpPort": {
+      "Description": "Enter RDS Listening TCP Port number.",
+      "Type": "Number",
+      "Default": "5432"
+    },
+    "PreferredBackupWindow": {
+      "Description": "Enter Preferred Backup Window Time (UTC).",
+      "Type": "String",
+      "Default": "17:00-19:00"
+    },
+    "PreferredMaintenanceWindow": {
+      "Description": "Enter Preferred Maintenance Window Time (UTC).",
+      "Type": "String",
+      "Default": "Sun:19:00-Sun:23:00"
+    },
+    "AllocatedStorage": {
+      "Default": "20",
+      "Description": "Allocated Storage Storage(GB) for the Database.",
+      "Type": "Number",
+      "MinValue": "5",
+      "MaxValue": "6144",
+      "ConstraintDescription": "Must be between 5-6144"
+    },
+    "AutoMinorVersionUpgrade": {
+      "Description": "Allow Automatic Minor Version Upgrades?",
+      "Type": "String",
+      "Default": "true",
+      "AllowedValues": [
+        "true",
+        "false"
+      ]
+    },
+    "RDSInstanceType": {
+      "Description": "Select Instance Type.",
+      "Type": "String",
+      "Default": "db.m4.large",
+      "AllowedValues": [
+        "db.t2.micro",
+        "db.t2.small",
+        "db.m4.large",
+        "db.m4.xlarge",
+        "db.m4.2xlarge"
+      ],
+      "ConstraintDescription": "Must be a valid EC2 instance type."
     }
-  }
-},
-"Conditions": {
-  "MultiAvailabilityZone": {"Fn::Equals": [{"Ref": "NumberOfAZs"},"2"]}
-},
-"Resources": {
-  "RDSAccessSecurityGroup": {
-    "Type": "AWS::EC2::SecurityGroup",
-    "Properties": {
-      "GroupDescription": "Instance to RDS Access",
-      "VpcId": {"Ref": "VPCID"},
-      "Tags": [
+  },
+  "Conditions": {
+    "MultiAvailabilityZone": {
+      "Fn::Equals": [
         {
-          "Key": "Name",
-          "Value": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-SG"]]}
-        }
+          "Ref": "NumberOfAZs"
+        },
+        "2"
       ]
     }
   },
-  "AccessSecurityGroupIngress": {
-    "Type": "AWS::EC2::SecurityGroupIngress",
-    "DependsOn": "RDSAccessSecurityGroup",
-    "Properties": {
-      "GroupId": {"Ref": "RDSAccessSecurityGroup"},
-      "IpProtocol": "tcp",
-      "FromPort": {"Ref": "TcpPort"},
-      "ToPort": {"Ref": "TcpPort"},
-      "SourceSecurityGroupId": {"Ref": "RDSAccessSecurityGroup"}
+  "Resources": {
+    "RDSAccessSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Instance to RDS Access",
+        "VpcId": {
+          "Ref": "VPCID"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Fn::Join": [
+                "", [
+                  {
+                    "Ref": "AWS::StackName"
+                  }, 
+                  "-SG"
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AccessSecurityGroupIngress": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "DependsOn": "RDSAccessSecurityGroup",
+      "Properties": {
+        "GroupId": {
+          "Ref": "RDSAccessSecurityGroup"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": {
+          "Ref": "TcpPort"
+        },
+        "ToPort": {
+          "Ref": "TcpPort"
+        },
+        "SourceSecurityGroupId": {
+          "Ref": "RDSAccessSecurityGroup"
+        }
+      }
+    },
+    "DBSubnetGroup": {
+      "Type": "AWS::RDS::DBSubnetGroup",
+      "Properties": {
+        "DBSubnetGroupDescription": {
+          "Fn::Join": [
+            "", [
+              "RDS Subnet Group for ", 
+              {
+                "Ref": "AWS::StackName"
+              }
+            ]
+          ]
+        },
+        "SubnetIds": [ 
+          {
+            "Ref": "PrivateSubnet1"
+          },
+          {
+            "Ref": "PrivateSubnet2"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {
+              "Ref": "AWS::StackName"
+            }
+          }
+        ]
+      }
+    },
+    "DBInstance": {
+      "Type": "AWS::RDS::DBInstance",
+      "DeletionPolicy": "Snapshot",
+      "DependsOn": [
+        "DBSubnetGroup", 
+        "RDSAccessSecurityGroup"
+      ],
+      "Properties": {
+        "DBName" : {
+          "Ref": "DBName"
+        },
+        "AllocatedStorage": {
+          "Ref": "AllocatedStorage"
+        },
+        "AllowMajorVersionUpgrade": "false",
+        "AutoMinorVersionUpgrade": {
+          "Ref": "AutoMinorVersionUpgrade"
+        },
+        "BackupRetentionPeriod": {
+          "Ref": "BackupRetentionPeriod"
+        },
+        "DBInstanceClass": {
+          "Ref": "RDSInstanceType"
+        },
+        "DBInstanceIdentifier": {
+          "Fn::Join": [
+            "", [
+              {
+                "Ref": "AWS::StackName"
+              }, 
+              "-vcddb"
+            ]
+          ]
+        },
+        "DBSubnetGroupName": {
+          "Ref": "DBSubnetGroup"
+        },
+        "Engine": "postgres",
+        "EngineVersion": {
+          "Ref": "EngineVersion"
+        },
+        "MasterUsername": {
+          "Ref": "MasterUsername"
+        },
+        "MasterUserPassword": {
+          "Ref": "MasterUserPassword"
+        },
+        "MultiAZ": {
+          "Fn::If" : [
+            "MultiAvailabilityZone",
+            "true",
+            "false"
+          ]
+        },
+        "Port": {
+          "Ref": "TcpPort"
+        },
+        "PreferredBackupWindow": {
+          "Ref": "PreferredBackupWindow"
+        },
+        "PreferredMaintenanceWindow": {
+          "Ref": "PreferredMaintenanceWindow"
+        },
+        "PubliclyAccessible": "false",
+        "StorageEncrypted": "false",
+        "StorageType": "gp2",
+        "VPCSecurityGroups": [
+          {
+            "Ref": "RDSAccessSecurityGroup"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-vcddb"]]}
+          }
+        ]
+      }
     }
   },
-  "DBSubnetGroup": {
-    "Type": "AWS::RDS::DBSubnetGroup",
-    "Properties": {
-      "DBSubnetGroupDescription": {"Fn::Join": ["", ["RDS Subnet Group for ", {"Ref": "AWS::StackName"}]]},
-      "SubnetIds": [ {"Ref": "PrivateSubnet1"}, {"Ref": "PrivateSubnet2"} ],
-      "Tags": [
-        {
-          "Key": "Name",
-          "Value": {"Ref": "AWS::StackName"}
-        }
-      ]
-    }
-  },
-  "DBInstance": {
-    "Type": "AWS::RDS::DBInstance",
-    "DeletionPolicy": "Snapshot",
-    "DependsOn": ["DBSubnetGroup", "RDSAccessSecurityGroup"],
-    "Properties": {
-      "DBName" : {"Ref": "DBName"},
-      "AllocatedStorage": {"Ref": "AllocatedStorage"},
-      "AllowMajorVersionUpgrade": "false",
-      "AutoMinorVersionUpgrade": {"Ref": "AutoMinorVersionUpgrade"},
-      "BackupRetentionPeriod": {"Ref": "BackupRetentionPeriod"},
-      "DBInstanceClass": {"Ref": "RDSInstanceType"},
-      "DBInstanceIdentifier": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-vcddb"]]},
-      "DBSubnetGroupName": {"Ref": "DBSubnetGroup"},
-      "Engine": {"Fn::FindInMap": ["Settings", "PostgreSQL", "Engine"]},
-      "EngineVersion": {"Fn::FindInMap": ["Settings", "PostgreSQL", "Version"]},
-      "MasterUsername": {"Ref": "MasterUsername"},
-      "MasterUserPassword": {"Ref": "MasterUserPassword"},
-      "MultiAZ": {"Fn::If" : ["MultiAvailabilityZone","true","false"]},
-      "Port": {"Ref": "TcpPort"},
-      "PreferredBackupWindow": {"Ref": "PreferredBackupWindow"},
-      "PreferredMaintenanceWindow": {"Ref": "PreferredMaintenanceWindow"},
-      "PubliclyAccessible": "false",
-      "StorageEncrypted": "false",
-      "StorageType": "gp2",
-      "VPCSecurityGroups": [{"Ref": "RDSAccessSecurityGroup"}],
-      "Tags": [
-        {
-          "Key": "Name",
-          "Value": {"Fn::Join": ["", [{"Ref": "AWS::StackName"}, "-vcddb"]]}
-        }
-      ]
+  "Outputs": {
+    "RDSEndpoint" : {
+      "Description" : "RDS Endpoint",
+      "Value" : {
+        "Fn::GetAtt" : [
+          "DBInstance",
+          "Endpoint.Address"
+        ]
+      }
+    },
+    "RDSPort" : {
+      "Description" : "RDS Port",
+      "Value" : { 
+        "Fn::GetAtt" : [
+          "DBInstance",
+          "Endpoint.Port"
+        ] 
+      }
+    },
+    "DBName": {
+      "Description": "Name of the vCD Database",
+      "Value": {
+        "Ref": "DBName"
+      }
+    },
+    "DBSubnetGroup": {
+      "Description": "DB Subnet Group Created.",
+      "Value": {
+        "Ref": "DBSubnetGroup"
+      }
+    },
+    "RDSAccessSecurityGroupID": {
+      "Description": "RDS Access Security Group Created.",
+      "Value": {
+        "Ref": "RDSAccessSecurityGroup"
+      }
+    },
+    "BackupRetentionPeriod": {
+      "Description": "Backup Retention Period in Days",
+      "Value": {
+        "Ref": "BackupRetentionPeriod"
+      }
+    },
+    "PreferredBackupWindow": {
+      "Description": "Preferred Backup Window",
+      "Value": {
+        "Ref": "PreferredBackupWindow"
+      }
+    },
+    "PreferredMaintenanceWindow": {
+      "Description": "Preferred Maintenance Window",
+      "Value": {
+        "Ref": "PreferredMaintenanceWindow"
+      }
+    },
+    "AllocatedStorage": {
+      "Description": "Allocated Storage in GB",
+      "Value": {
+        "Ref": "AllocatedStorage"
+      }
     }
   }
-},
-"Outputs": {
-  "RDSEndpoint" : {
-    "Description" : "RDS Endpoint",
-    "Value" : {
-      "Fn::GetAtt" : ["DBInstance", "Endpoint.Address"]
-    }
-  },
-  "RDSPort" : {
-    "Description" : "RDS Port",
-    "Value" : { "Fn::GetAtt" : ["DBInstance", "Endpoint.Port"] }
-  },
-  "DBName": {
-    "Description": "Name of the vCD Database",
-    "Value": {"Ref": "DBName"}
-  },
-  "DBSubnetGroup": {
-    "Description": "DB Subnet Group Created.",
-    "Value": {"Ref": "DBSubnetGroup"}
-  },
-  "RDSAccessSecurityGroupID": {
-    "Description": "RDS Access Security Group Created.",
-    "Value": {"Ref": "RDSAccessSecurityGroup"}
-  },
-  "BackupRetentionPeriod": {
-    "Description": "Backup Retention Period in Days",
-    "Value": {"Ref": "BackupRetentionPeriod"}
-  },
-  "PreferredBackupWindow": {
-    "Description": "Preferred Backup Window",
-    "Value": {"Ref": "PreferredBackupWindow"}
-  },
-  "PreferredMaintenanceWindow": {
-    "Description": "Preferred Maintenance Window",
-    "Value": {"Ref": "PreferredMaintenanceWindow"}
-  },
-  "AllocatedStorage": {
-    "Description": "Allocated Storage in GB",
-    "Value": {"Ref": "AllocatedStorage"}
-  }
-}
 }
