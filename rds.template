@@ -36,8 +36,7 @@
             "PreferredBackupWindow",
             "PreferredMaintenanceWindow",
             "AllocatedStorage",
-            "AutoMinorVersionUpgrade",
-            "TcpPort"
+            "AutoMinorVersionUpgrade"
           ]
         }
       ],
@@ -80,9 +79,6 @@
         },
         "AutoMinorVersionUpgrade" : {
           "default" : "Auto Minor Version Upgrade"
-        },
-        "TcpPort" : {
-          "default" : "TCP Port"
         },
         "VPCID": {
             "default": "VPC ID"
@@ -151,11 +147,6 @@
       "Description": "Enter Backup Retention Period in Days.",
       "Type": "Number",
       "Default": "7"
-    },
-    "TcpPort": {
-      "Description": "Enter RDS Listening TCP Port number.",
-      "Type": "Number",
-      "Default": "5432"
     },
     "PreferredBackupWindow": {
       "Description": "Enter Preferred Backup Window Time (UTC).",
@@ -241,12 +232,8 @@
           "Ref": "RDSAccessSecurityGroup"
         },
         "IpProtocol": "tcp",
-        "FromPort": {
-          "Ref": "TcpPort"
-        },
-        "ToPort": {
-          "Ref": "TcpPort"
-        },
+        "FromPort": "5432",
+        "ToPort": "5432",
         "SourceSecurityGroupId": {
           "Ref": "RDSAccessSecurityGroup"
         }
@@ -337,9 +324,7 @@
             "false"
           ]
         },
-        "Port": {
-          "Ref": "TcpPort"
-        },
+        "Port": "5432",
         "PreferredBackupWindow": {
           "Ref": "PreferredBackupWindow"
         },

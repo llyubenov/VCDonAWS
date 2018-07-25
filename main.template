@@ -50,8 +50,7 @@
                         "PreferredBackupWindow",
                         "PreferredMaintenanceWindow",
                         "AllocatedStorage",
-                        "AutoMinorVersionUpgrade",
-                        "TcpPort"
+                        "AutoMinorVersionUpgrade"
                     ]
                 },
                 {
@@ -446,11 +445,6 @@
             "Description": "Enter Backup Retention Period in Days.",
             "Type": "Number",
             "Default": "7"
-        },
-        "TcpPort": {
-            "Description": "Enter RDS Listening TCP Port number.",
-            "Type": "Number",
-            "Default": "5432"
         },
         "PreferredBackupWindow": {
             "Description": "Enter Preferred Backup Window Time (UTC).",
@@ -868,9 +862,6 @@
                     },
                     "AutoMinorVersionUpgrade": {
                         "Ref": "AutoMinorVersionUpgrade"
-                    },
-                    "TcpPort": {
-                        "Ref": "TcpPort"
                     }
                 }
             }
