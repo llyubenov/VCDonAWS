@@ -133,7 +133,7 @@
       "Default": "9.6.6",
       "Description": "Select the PostgresDB engine version",
       "Type": "String"
-  },
+    },
     "MasterUsername": {
       "Description": "Database administration name. First character must be a letter and can not be 'root'.",
       "Type": "String",
