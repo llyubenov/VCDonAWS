@@ -596,7 +596,7 @@
                 "Monitoring" : "true",
                 "BlockDeviceMappings": [
                     {
-                      "DeviceName": "/dev/xvda",
+                      "DeviceName": "/dev/sda1",
                       "Ebs": {
                         "VolumeType": "gp2",
                         "DeleteOnTermination": "true",
