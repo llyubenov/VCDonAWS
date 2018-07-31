@@ -119,14 +119,11 @@
     },
     "EngineVersion": {
       "AllowedValues": [
-        "9.6.6",
-        "9.6.8",
-        "9.6.9",
         "10.1",
         "10.3",
         "10.4"
       ],
-      "Default": "9.6.6",
+      "Default": "10.3",
       "Description": "Select the PostgresDB engine version",
       "Type": "String"
     },
@@ -270,6 +267,19 @@
         ]
       }
     },
+    "vCDPostgres10PG": {
+      "Type": "AWS::RDS::DBParameterGroup",
+      "Properties": {
+          "Description": "Database Parameter Group with optimizations for vCD",
+          "Family": "postgres10",
+           "Parameters": {
+              "max_connections": 500,
+              "track_counts": 1,
+              "autovacuum_naptime": 60,
+              "autovacuum_vacuum_cost_limit": 2400
+          }
+      }
+  },
     "DBInstance": {
       "Type": "AWS::RDS::DBInstance",
       "DeletionPolicy": "Snapshot",
@@ -306,6 +316,9 @@
         },
         "DBSubnetGroupName": {
           "Ref": "DBSubnetGroup"
+        },
+        "DBParameterGroupName" : {
+          "Ref" : "vCDPostgres10PG" 
         },
         "Engine": "postgres",
         "EngineVersion": {
