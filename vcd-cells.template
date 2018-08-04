@@ -848,14 +848,14 @@
                 },
                 "BlockDeviceMappings": [
                     {
-                      "DeviceName": "/dev/xvda",
-                      "Ebs": {
-                        "VolumeType": "gp2",
-                        "DeleteOnTermination": "true",
-                        "VolumeSize": {
-                            "Ref": "vCDConsoleVolumeSize"
+                        "DeviceName": "/dev/sda1",
+                        "Ebs": {
+                          "VolumeType": "gp2",
+                          "DeleteOnTermination": "true",
+                          "VolumeSize": {
+                              "Ref": "vCDUIVolumeSize"
+                          }
                         }
-                      }
                     }
                 ],
                 "SecurityGroups": [
