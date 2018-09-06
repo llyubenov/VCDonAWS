@@ -164,6 +164,10 @@ EOF
     systemctl enable awslogs
     systemctl restart awslogs
 
+    #Add Amazon Time Sync to Chrony
+    echo "server 169.254.169.123 prefer iburst" >> /etc/chrony.conf
+    systemctl restart chronyd
+
     #Run security updates
 cat <<'EOF' >> ~/mycron
 0 0 * * * yum -y update --security

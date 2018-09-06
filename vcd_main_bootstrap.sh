@@ -206,6 +206,10 @@ EOF
     sleep 180
     service vmware-vcd stop
 
+    #Add Amazon Time Sync to Chrony
+    echo "server 169.254.169.123 prefer iburst" >> /etc/chrony.conf
+    systemctl restart chronyd
+
     #Run security updates
 cat <<'EOF' >> ~/mycron
 0 0 * * * yum -y update --security
