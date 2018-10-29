@@ -1,0 +1,404 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This template is intended to be deployed into an existing VPC with two public subnets. It will create two auto-scaling groups, one for vCD UI Cells and one for vCD Console Proxy Cells.",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "VPCID",
+                        "PrivateSubnet1ID",
+                        "PrivateSubnet2ID"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Content Upload Instance Configuration"
+                    },
+                    "Parameters": [
+                        "KeyPairNameEC2",
+                        "EC2AMIOS",
+                        "PrivateInstanceSecurityGroupID",
+                        "ContentUploadInstanceType",
+                        "ContentUploadVolumeSize",
+                        "NumContentUploadCells",
+                        "ContentUploadBucket"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "KeyPairNameEC2": {
+                    "default": "Key Pair Name for all vCD Cells"
+                },
+                "EC2AMIOS": {
+                    "default": "vCD EC2 AMI Operating System"
+                },
+                "PrivateSubnet1ID": {
+                    "default": "Private Subnet 1"
+                },
+                "PrivateSubnet2ID": {
+                    "default": "Private Subnet 2"
+                },
+                "VPCID": {
+                    "default": "VPC ID"
+                },
+                "PrivateInstanceSecurityGroupID": {
+                    "default": "SSH Access from Bastion hosts"
+                },
+                "ContentUploadInstanceType": {
+                    "default" : "Instance Type"
+                },
+                "NumContentUploadInstances": {
+                    "default" : "Number of Content Upload Instances"
+                },
+                "ContentUploadVolumeSize": {
+                    "default" : "Volume size"
+                },
+                "ContentUploadBucket": {
+                    "default": "S3 bucket for Content Upload"
+                }
+            }
+        }
+    },
+    "Parameters": {
+        "KeyPairNameEC2": {
+            "Description": "Public/private key pairs allow you to securely connect to your instance after it launches",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "EC2AMIOS": {
+            "AllowedValues": [
+                "Amazon-Linux-HVM",
+                "CentOS-7-HVM"
+            ],
+            "Default": "CentOS-7-HVM",
+            "Description": "The Linux distribution for the AMI to be used for the EC2 instances",
+            "Type": "String"
+        },
+        "ContentUploadInstanceType": {
+            "AllowedValues": [
+                "t3.medium",
+                "t3.large",
+                "t3.xlarge"
+            ],
+            "Default": "t3.large",
+            "Description": "Amazon EC2 instances type",
+            "Type": "String"
+        },
+        "ContentUploadVolumeSize": {
+            "Default": "40",
+            "Description": "Amazon EC2 Instance Root Volume Size GB",
+            "Type": "String"
+        },
+        "PrivateSubnet1ID": {
+            "Description": "ID of the public subnet 1 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "PrivateSubnet2ID": {
+            "Description": "ID of the public subnet 2 that you want to provision the EC2 insteaces in the first AZ (e.g., subnet-a0246dcd)",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
+        "VPCID": {
+            "Description": "ID of the VPC (e.g., vpc-0343606e)",
+            "Type": "AWS::EC2::VPC::Id"
+        },
+        "PrivateInstanceSecurityGroupID": {
+            "Description": "Security Group to Allow SSH Access from Bastion hosts",
+            "Type": "AWS::EC2::SecurityGroup::Id"
+        },
+        "NumContentUploadInstances": {
+            "AllowedValues": [
+                "1",
+                "2"
+            ],
+            "Default": "1",
+            "Description": "Enter the number of vCD UI Cells to create.",
+            "Type": "String"
+        },
+        "ContentUploadBucket": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "vlp-content-upload",
+            "Description": "Bucket name that is used for content upload to VCD.",
+            "Type": "String"
+        }
+    },
+    "Rules": {
+        "SubnetsInVPC": {
+            "Assertions": [
+                {
+                    "Assert": {
+                        "Fn::EachMemberIn": [
+                            {
+                                "Fn::ValueOfAll": [
+                                    "AWS::EC2::Subnet::Id",
+                                    "VpcId"
+                                ]
+                            },
+                            {
+                                "Fn::RefAll": "AWS::EC2::VPC::Id"
+                            }
+                        ]
+                    },
+                    "AssertDescription": "All subnets must exist in the VPC"
+                }
+            ]
+        }
+    },
+    "Mappings": {
+        "AWSAMIRegionMap": {
+            "AMI": {
+                "AMZNLINUX2HVM": "mzn2-ami-hvm-2017.12.0.20180328.1-x86_64-gp2",
+                "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS ENA 1805_01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-77ec9308.4"
+            },
+            "ap-northeast-1": {
+                "AMZNLINUX2HVM": "ami-8fbab2f3",
+                "CENTOS7HVM": "ami-8e8847f1"
+            },
+            "ap-northeast-2": {
+                "AMZNLINUX2HVM": "ami-96b916f8",
+                "CENTOS7HVM": "ami-bf9c36d1"
+            },
+            "ap-south-1": {
+                "AMZNLINUX2HVM": "ami-07eb707f",
+                "CENTOS7HVM": "ami-1780a878"
+            },
+            "ap-southeast-1": {
+                "AMZNLINUX2HVM": "ami-3eb0e942",
+                "CENTOS7HVM": "ami-8e0205f2"
+            },
+            "ap-southeast-2": {
+                "AMZNLINUX2HVM": "ami-8267abe0",
+                "CENTOS7HVM": "ami-d8c21dba"
+            },
+            "ca-central-1": {
+                "AMZNLINUX2HVM": "ami-e8a0268c",
+                "CENTOS7HVM": "ami-e802818c"
+            },
+            "eu-central-1": {
+                "AMZNLINUX2HVM": "ami-b144195a",
+                "CENTOS7HVM": "ami-dd3c0f36"
+            },
+            "eu-west-1": {
+                "AMZNLINUX2HVM": "ami-38c09341",
+                "CENTOS7HVM": "ami-3548444c"
+            },
+            "eu-west-2": {
+                "AMZNLINUX2HVM": "ami-b98667de",
+                "CENTOS7HVM": "ami-00846a67"
+            },
+            "eu-west-3": {
+                "AMZNLINUX2HVM": "ami-bf17a1c2",
+                "CENTOS7HVM": "ami-262e9f5b"
+            },
+            "sa-east-1": {
+                "AMZNLINUX2HVM": "ami-7f712613",
+                "CENTOS7HVM": "ami-cb5803a7"
+            },
+            "us-east-1": {
+                "AMZNLINUX2HVM": "ami-f973ab84",
+                "CENTOS7HVM": "ami-9887c6e7"
+            },
+            "us-east-2": {
+                "AMZNLINUX2HVM": "ami-31c7f654",  
+                "CENTOS7HVM": "ami-9c0638f9"
+            },
+            "us-west-1": {
+                "AMZNLINUX2HVM": "ami-be4051de",
+                "CENTOS7HVM": "ami-4826c22b"
+            },
+            "us-west-2": {
+                "AMZNLINUX2HVM": "ami-07eb707f",
+                "CENTOS7HVM": "ami-3ecc8f46"
+            }
+        },
+        "LinuxAMINameMap": {
+            "Amazon-Linux-HVM": {
+                "Code": "AMZNLINUX2HVM"
+            },
+            "CentOS-7-HVM": {
+                "Code": "CENTOS7HVM"
+            }
+        }
+    },
+    "Resources": {
+        "ContentUploadAccessRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+            "AssumeRolePolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Principal": {
+                        "Service": [ "ec2.amazonaws.com" ]
+                    },
+                    "Action": [ "sts:AssumeRole" ]
+                } ]
+            },
+            "Path": "/"
+            }
+        },
+        "ContentUploadS3AccessPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+            "PolicyName": "s3-Access",
+            "PolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
+                    "Action": "s3:*",
+                    "Resource": "*"
+                } ]
+            },
+            "Roles": [ { "Ref": "ContentUploadAccessRole" } ]
+            }
+        },
+        "ContentUploadInstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "Roles": [
+                    {
+                        "Ref": "ContentUploadAccessRole"
+                    }
+                ],
+                "Path": "/"
+            }
+        },
+        "ContentUploadAutoScalingGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+                "LaunchConfigurationName": {
+                    "Ref": "ContentUploadLaunchConfiguration"
+                },
+                "VPCZoneIdentifier": [
+                    {
+                        "Ref": "PrivateSubnet1ID"
+                    },
+                    {
+                        "Ref": "PrivateSubnet2ID"
+                    }
+                ],
+                "MinSize": {
+                    "Ref": "NumContentUploadInstances"
+                },
+                "MaxSize": {
+                    "Ref": "NumContentUploadInstances"
+                },
+                "Cooldown": "300",
+                "DesiredCapacity": {
+                    "Ref": "NumContentUploadInstances"
+                },
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "Content-Upload",
+                        "PropagateAtLaunch": "true"
+                    }
+                ]
+            },
+            "CreationPolicy": {
+                "ResourceSignal": {
+                    "Count": {
+                        "Ref": "NumVCDConsoleCells"
+                    },
+                    "Timeout": "PT30M"
+                }
+            }
+        },
+        "ContentUploadLaunchConfiguration": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Metadata": {
+                "AWS::CloudFormation::Authentication": {
+                    "S3AccessCreds": {
+                        "type": "S3",
+                        "roleName": {
+                            "Ref": "vCDCellsAccessRole"
+                        },
+                        "buckets": [ "vcd-cf-templates" ]
+                    }
+                },
+                "AWS::CloudFormation::Init": {
+                    "config": {
+                        "files": {
+                            "/tmp/vcd_cells_bootstrap.sh": {
+                                "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/content_upload_bootstrap.sh",
+                                "mode": "000550",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
+                            }
+                        },
+                        "commands": {
+                            "b-bootstrap": {
+                                "command": "./tmp/content_upload_bootstrap.sh"
+                            }
+                        }
+                    }
+                }
+            },
+            "Properties": {
+                "KeyName": {
+                    "Ref": "KeyPairNameEC2"
+                },
+                "IamInstanceProfile": {
+                    "Ref": "ContentUploadInstanceProfile"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        {
+                            "Fn::FindInMap": [
+                                "LinuxAMINameMap",
+                                {
+                                    "Ref": "EC2AMIOS"
+                                },
+                                "Code"
+                            ]
+                        }
+                    ]
+                },
+                "BlockDeviceMappings": [
+                    {
+                      "DeviceName": "/dev/xvda",
+                      "Ebs": {
+                        "VolumeType": "gp2",
+                        "DeleteOnTermination": "true",
+                        "VolumeSize": {
+                            "Ref": "ContentUploadVolumeSize"
+                        }
+                      }
+                    }
+                ],
+                "SecurityGroups": [
+                    {
+                        "Ref": "PrivateInstanceSecurityGroupID"
+                    }
+                ],
+                "InstanceType": {
+                    "Ref": "ContentUploadInstanceType"
+                },
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                        "",
+                            [
+                            "#!/bin/bash\n",
+                            "yum update -y\n",
+                            "yum install -y git rpm-build wget automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel\n",
+                            "pip install --upgrade pip\n",
+                            "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                            "ContentUploadBucket=",
+                            {
+                                "Ref": "ContentUploadBucket"
+                            }
+                            ]
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
