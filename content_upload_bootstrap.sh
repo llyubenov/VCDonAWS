@@ -99,8 +99,8 @@ EOF
     echo "${FUNCNAME[0]} Ended"
 }
 
-function content_upload_on_cent_os () {
-}
+#function content_upload_on_cent_os () {
+#}
 
 ##################################### End Function Definitions
 
