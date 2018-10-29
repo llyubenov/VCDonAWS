@@ -33,7 +33,7 @@ function chkstatus () {
 
 function osrelease () {
     OS=`cat /etc/os-release | grep '^NAME=' |  tr -d \" | sed 's/\n//g' | sed 's/NAME=//g'`
-    if [ "$OS" == "Amazon Linux AMI" ]; then
+    if [ "$OS" == "Amazon Linux" ]; then
         echo "AMZN"
     elif [ "$OS" == "CentOS Linux" ]; then
         echo "CentOS"
@@ -80,7 +80,7 @@ function content_upload_on_amazon_os () {
     sleep 10
 
     # Upload Content Upload Helper Script
-    cp /opt/$ContentUploadBucket/scripts/tenantlib.py /usr/lib64/python3.6/tenantlib.py
+    cp /opt/$ContentUploadBucket/scripts/tenantlib.py /root/.local/lib/python3.7/site-packages/tenantlib.py
 
     # Upload Content Upload Script
     cp /opt/$ContentUploadBucket/scripts/content-upload.py /tmp/content-upload.py
@@ -101,7 +101,6 @@ EOF
 
 function content_upload_on_cent_os () {
 }
-
 
 ##################################### End Function Definitions
 
