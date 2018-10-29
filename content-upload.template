@@ -320,7 +320,7 @@
                 "AWS::CloudFormation::Init": {
                     "config": {
                         "files": {
-                            "/tmp/vcd_cells_bootstrap.sh": {
+                            "/tmp/content_upload_bootstrap.sh": {
                                 "source": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/content_upload_bootstrap.sh",
                                 "mode": "000550",
                                 "owner": "root",
@@ -387,15 +387,15 @@
                             [
                             "#!/bin/bash\n",
                             "yum update -y\n",
-                            "yum install -y git rpm-build wget automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel\n",
+                            "yum install -y git aws-cfn-bootstrap rpm-build wget automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel\n",
                             "easy_install pip\n",
                             "pip install --upgrade pip\n",
-                            "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
                             "ContentUploadBucket=",
                             {
                                 "Ref": "ContentUploadBucket"
                             },
-                            "cfn-init -v --stack ",
+                            "\n",
+                            "/opt/aws/bin/cfn-init -v --stack ",
                             {
                                 "Ref": "AWS::StackName"
                             },
@@ -404,7 +404,7 @@
                                 "Ref": "AWS::Region"
                             },
                             "\n",
-                            "cfn-signal -e $? --stack ",
+                            "/opt/aws/bin/cfn-signal -e $? --stack ",
                             {
                                 "Ref": "AWS::StackName"
                             },
