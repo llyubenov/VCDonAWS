@@ -299,7 +299,7 @@
             "CreationPolicy": {
                 "ResourceSignal": {
                     "Count": {
-                        "Ref": "NumVCDConsoleCells"
+                        "Ref": "NumContentUploadInstances"
                     },
                     "Timeout": "PT30M"
                 }
@@ -312,7 +312,7 @@
                     "S3AccessCreds": {
                         "type": "S3",
                         "roleName": {
-                            "Ref": "vCDCellsAccessRole"
+                            "Ref": "ContentUploadAccessRole"
                         },
                         "buckets": [ "vcd-cf-templates" ]
                     }
@@ -388,12 +388,31 @@
                             "#!/bin/bash\n",
                             "yum update -y\n",
                             "yum install -y git rpm-build wget automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel\n",
+                            "easy_install pip\n",
                             "pip install --upgrade pip\n",
                             "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
                             "ContentUploadBucket=",
                             {
                                 "Ref": "ContentUploadBucket"
-                            }
+                            },
+                            "cfn-init -v --stack ",
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            " --resource ContentUploadLaunchConfiguration --region ",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            "\n",
+                            "cfn-signal -e $? --stack ",
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            " --resource ContentUploadAutoScalingGroup --region ",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            "\n"
                             ]
                         ]
                     }

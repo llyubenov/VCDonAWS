@@ -1,12 +1,12 @@
 #!/bin/bash -e
-# vCD Cells bootstrapping
+# Contnt Upload bootstrapping
 
 # Redirect script output to a log file
-exec > /var/log/vcd_cells_bootstrap.log                                                                  
+exec > /var/log/content_upload_bootstrap.log                                                                  
 exec 2>&1
 
 # Configuration
-PROGRAM='Additional vCD Cells'
+PROGRAM='Content Upload Instance Bootstrap'
 
 ##################################### Functions Definitions
 function checkos () {
