@@ -58,6 +58,10 @@ function content_upload_on_amazon_os () {
     # Install vCD Python SDK
     pip3 install --user pyvcloud
 
+    # Install AWS Python SDK
+    pip install --user boto3
+    pip3 install --user boto3
+    
     # Clone S3FS repository from Git
     cd /opt
     git clone https://github.com/s3fs-fuse/s3fs-fuse.git
