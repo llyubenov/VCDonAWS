@@ -246,6 +246,20 @@
             "PolicyDocument": {
                 "Statement": [ {
                     "Effect": "Allow",
+                    "Action": "sns:Publish",
+                    "Resource": "*"
+                } ]
+            },
+            "Roles": [ { "Ref": "ContentUploadAccessRole" } ]
+            }
+        },
+        "ContentUploadSNSAccessPolicy": {
+            "Type": "AWS::IAM::Policy",
+            "Properties": {
+            "PolicyName": "SNS-Publish-Policy",
+            "PolicyDocument": {
+                "Statement": [ {
+                    "Effect": "Allow",
                     "Action": "s3:*",
                     "Resource": "*"
                 } ]
