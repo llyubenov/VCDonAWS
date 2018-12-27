@@ -89,14 +89,13 @@ function content_upload_on_amazon_os () {
     # Upload Content Upload Script
     cp /opt/$ContentUploadBucket/scripts/content-upload.py /tmp/content-upload.py
 
-    # Copy a modified version of Org.py that iss needed by the content uplaod script
-    cp /opt/$ContentUploadBucket/scripts/org.py /home/ec2-user/.local/lib/python3.7/site-packages/pyvcloud/vcd/org.py
-    cp /opt/$ContentUploadBucket/scripts/org.py /root/.local/lib/python3.7/site-packages/pyvcloud/vcd/org.py
+    # Copy a modified version of Org.py that is needed by the content uplaod script
+    echo 'Y' | cp /opt/$ContentUploadBucket/scripts/org.py /root/.local/lib/python3.7/site-packages/pyvcloud/vcd/org.py
 
     # Install OVF Tool
-    cp /opt/$ContentUploadBucket/scripts/VMware-ovftool-4.3.0-7948156-lin.x86_64.bundle /tmp/
-    chmod +x VMware-ovftool-4.3.0-7948156-lin.x86_64.bundle
-    echo 'yes' | ./VMware-ovftool-4.3.0-7948156-lin.x86_64.bundle --eulas-agreed
+    # cp /opt/$ContentUploadBucket/scripts/VMware-ovftool-4.3.0-7948156-lin.x86_64.bundle /tmp/
+    # chmod +x VMware-ovftool-4.3.0-7948156-lin.x86_64.bundle
+    # echo 'yes' | ./VMware-ovftool-4.3.0-7948156-lin.x86_64.bundle --eulas-agreed
 
     #Add Amazon Time Sync to Chrony
     echo "server 169.254.169.123 prefer iburst" >> /etc/chrony.conf
