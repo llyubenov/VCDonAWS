@@ -119,11 +119,11 @@
     },
     "EngineVersion": {
       "AllowedValues": [
-        "10.1",
-        "10.3",
-        "10.4"
+        "10.4",
+        "10.6",
+        "10.9"
       ],
-      "Default": "10.3",
+      "Default": "10.6",
       "Description": "Select the PostgresDB engine version",
       "Type": "String"
     },
@@ -223,14 +223,13 @@
     },
     "AccessSecurityGroupIngress": {
       "Type": "AWS::EC2::SecurityGroupIngress",
-      "DependsOn": "RDSAccessSecurityGroup",
       "Properties": {
         "GroupId": {
           "Ref": "RDSAccessSecurityGroup"
         },
         "IpProtocol": "tcp",
-        "FromPort": "5432",
-        "ToPort": "5432",
+        "FromPort": 5432,
+        "ToPort": 5432,
         "SourceSecurityGroupId": {
           "Ref": "RDSAccessSecurityGroup"
         }
@@ -273,20 +272,16 @@
           "Description": "Database Parameter Group with optimizations for vCD",
           "Family": "postgres10",
            "Parameters": {
-              "max_connections": 500,
-              "track_counts": 1,
-              "autovacuum_naptime": 60,
-              "autovacuum_vacuum_cost_limit": 2400
+              "max_connections": "500",
+              "track_counts": "1",
+              "autovacuum_naptime": "60",
+              "autovacuum_vacuum_cost_limit": "2400"
           }
       }
   },
     "DBInstance": {
       "Type": "AWS::RDS::DBInstance",
       "DeletionPolicy": "Snapshot",
-      "DependsOn": [
-        "DBSubnetGroup", 
-        "RDSAccessSecurityGroup"
-      ],
       "Properties": {
         "DBName" : {
           "Ref": "DBName"
@@ -294,7 +289,7 @@
         "AllocatedStorage": {
           "Ref": "AllocatedStorage"
         },
-        "AllowMajorVersionUpgrade": "false",
+        "AllowMajorVersionUpgrade": false,
         "AutoMinorVersionUpgrade": {
           "Ref": "AutoMinorVersionUpgrade"
         },
@@ -333,8 +328,8 @@
         "MultiAZ": {
           "Fn::If" : [
             "MultiAvailabilityZone",
-            "true",
-            "false"
+            true,
+            false
           ]
         },
         "Port": "5432",
@@ -344,8 +339,8 @@
         "PreferredMaintenanceWindow": {
           "Ref": "PreferredMaintenanceWindow"
         },
-        "PubliclyAccessible": "false",
-        "StorageEncrypted": "false",
+        "PubliclyAccessible": false,
+        "StorageEncrypted": false,
         "StorageType": "gp2",
         "VPCSecurityGroups": [
           {
