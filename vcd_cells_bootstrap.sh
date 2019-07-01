@@ -65,6 +65,8 @@ function vcd_cells_on_cent_os () {
     export vCDJXMX=`curl http://169.254.169.254/latest/user-data/ | grep vCDJXMX | sed 's/vCDJXMX=//g'`
 
     #Install GluxterFS client
+    yum install centos-release-gluster -y
+    yum install epel-release -y
     yum install glusterfs-fuse -y
 
     #Copy vCD Binaries

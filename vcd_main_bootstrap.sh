@@ -74,6 +74,8 @@ function vcd_main_on_cent_os () {
     export instanceIP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4/)
 
     #Install GluxterFS client
+    yum install centos-release-gluster -y
+    yum install epel-release -y
     yum install glusterfs-fuse -y
 
     #Copy vCD Binaries and Java Certificate Keystore
