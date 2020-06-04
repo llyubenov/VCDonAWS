@@ -226,9 +226,6 @@
                 "vCDKeystoreFileName" : {
                     "default" : "vCD Java Certificate Keystore filename"
                 },
-                "DBEndpoint" : {
-                    "default" : "RDS Endpoint"
-                },
                 "DBName" : {
                     "default" : "vCD Postgres database name"
                 },
@@ -378,7 +375,6 @@
         },
         "BastionAMIOS": {
             "AllowedValues": [
-                "Amazon-Linux-HVM",
                 "CentOS-7-HVM"
             ],
             "Default": "CentOS-7-HVM",
@@ -412,7 +408,6 @@
         },
         "EC2AMIOS": {
            "AllowedValues": [
-               "Amazon-Linux-2-HVM",
                "CentOS-7-HVM"
            ],
            "Default": "CentOS-7-HVM",
@@ -759,7 +754,6 @@
             }
         },
         "BastionStack": {
-            "DependsOn": "VPCStack",
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/linux-bastion.template",
@@ -804,7 +798,6 @@
             }
         },
         "RDSStack": {
-            "DependsOn": "VPCStack",
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/rds.template",
@@ -864,7 +857,6 @@
             }
         },
         "xFerStack": {
-            "DependsOn": "BastionStack",
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/xfer.template",
@@ -938,10 +930,6 @@
             }
         },
         "vCDMainStack": {
-            "DependsOn": [
-                "RDSStack",
-                "xFerStack"
-            ],
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/vcd-main.template",
@@ -1043,7 +1031,6 @@
             }
         },
         "vCDELBStack": {
-            "DependsOn": "vCDMainStack",
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/vcd-elb.template",
@@ -1103,10 +1090,6 @@
             }
         },
         "vCDCellsStack": {
-            "DependsOn": [
-                "vCDMainStack",
-                "vCDELBStack"
-            ],
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": "https://s3-us-west-2.amazonaws.com/vcd-cf-templates/dev/vcd-cells.template",
@@ -1198,9 +1181,6 @@
                     "vCDUIVolumeSize": {
                         "Ref": "vCDUIVolumeSize"
                     },
-                    "LogRetentionDays": {
-                        "Ref": "LogRetentionDays"
-                    },
                     "MessagesLogGroup": {
                         "Fn::GetAtt": [
                             "vCDMainStack",
@@ -1224,6 +1204,18 @@
                             "vCDMainStack",
                             "Outputs.vCloudContainerDebugLogGroup"
                         ]
+                    },
+                    "vCDUIJXMS": {
+                        "Ref": "vCDUIJXMS"
+                    },
+                    "vCDUIJXMX": {
+                        "Ref": "vCDUIJXMX"
+                    },
+                    "vCDConsoleJXMS": {
+                        "Ref": "vCDConsoleJXMS"
+                    },
+                    "vCDConsoleJXMX": {
+                        "Ref": "vCDConsoleJXMX"
                     }
                 }
             }
