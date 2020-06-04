@@ -74,7 +74,7 @@
                 "MainVcdInstanceType": {
                     "default": "vCD EC2 Instance Type"
                 },
-                "vCDUIVolumeSize": {
+                "MainVcdVolumeSize": {
                     "default": "vCD UI Cells root volume size"
                 },
                 "PrivateSubnet1ID": {
@@ -150,7 +150,6 @@
         },
         "EC2AMIOS": {
             "AllowedValues": [
-                "Amazon-Linux-2-HVM",
                 "CentOS-7-HVM"
             ],
             "Default": "CentOS-7-HVM",
@@ -284,74 +283,34 @@
     "Mappings": {
         "AWSAMIRegionMap": {
             "AMI": {
-                "AMZNLINUX2HVM": "mzn2-ami-hvm-2017.12.0.20180328.1-x86_64-gp2",
-                "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS ENA 1805_01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-77ec9308.4"
-            },
-            "ap-northeast-1": {
-                "AMZNLINUX2HVM": "ami-8fbab2f3",
-                "CENTOS7HVM": "ami-8e8847f1"
-            },
-            "ap-northeast-2": {
-                "AMZNLINUX2HVM": "ami-96b916f8",
-                "CENTOS7HVM": "ami-bf9c36d1"
-            },
-            "ap-south-1": {
-                "AMZNLINUX2HVM": "ami-07eb707f",
-                "CENTOS7HVM": "ami-1780a878"
-            },
-            "ap-southeast-1": {
-                "AMZNLINUX2HVM": "ami-3eb0e942",
-                "CENTOS7HVM": "ami-8e0205f2"
-            },
-            "ap-southeast-2": {
-                "AMZNLINUX2HVM": "ami-8267abe0",
-                "CENTOS7HVM": "ami-d8c21dba"
-            },
-            "ca-central-1": {
-                "AMZNLINUX2HVM": "ami-e8a0268c",
-                "CENTOS7HVM": "ami-e802818c"
+                "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS ENA 2002_01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-0042af67f8e4dcc20.4"
             },
             "eu-central-1": {
-                "AMZNLINUX2HVM": "ami-b144195a",
-                "CENTOS7HVM": "ami-dd3c0f36"
+                "CENTOS7HVM": "ami-0e8286b71b81c3cc1"
             },
             "eu-west-1": {
-                "AMZNLINUX2HVM": "ami-38c09341",
-                "CENTOS7HVM": "ami-3548444c"
+                "CENTOS7HVM": "ami-0b850cf02cc00fdc8"
             },
             "eu-west-2": {
-                "AMZNLINUX2HVM": "ami-b98667de",
-                "CENTOS7HVM": "ami-00846a67"
+                "CENTOS7HVM": "ami-09e5afc68eed60ef4"
             },
             "eu-west-3": {
-                "AMZNLINUX2HVM": "ami-bf17a1c2",
-                "CENTOS7HVM": "ami-262e9f5b"
-            },
-            "sa-east-1": {
-                "AMZNLINUX2HVM": "ami-7f712613",
-                "CENTOS7HVM": "ami-cb5803a7"
+                "CENTOS7HVM": "ami-0cb72d2e599cffbf9"
             },
             "us-east-1": {
-                "AMZNLINUX2HVM": "ami-f973ab84",
-                "CENTOS7HVM": "ami-9887c6e7"
+                "CENTOS7HVM": "ami-0affd4508a5d2481b"
             },
             "us-east-2": {
-                "AMZNLINUX2HVM": "ami-31c7f654",  
-                "CENTOS7HVM": "ami-9c0638f9"
+                "CENTOS7HVM": "ami-01e36b7901e884a10"
             },
             "us-west-1": {
-                "AMZNLINUX2HVM": "ami-be4051de",
-                "CENTOS7HVM": "ami-4826c22b"
+                "CENTOS7HVM": "ami-098f55b4287a885ba"
             },
             "us-west-2": {
-                "AMZNLINUX2HVM": "ami-07eb707f",
-                "CENTOS7HVM": "ami-3ecc8f46"
+                "CENTOS7HVM": "ami-0bc06212a56393ee1"
             }
         },
         "LinuxAMINameMap": {
-            "Amazon-Linux-2-HVM": {
-                "Code": "AMZNLINUX2HVM"
-            },
             "CentOS-7-HVM": {
                 "Code": "CENTOS7HVM"
             }
@@ -520,28 +479,26 @@
         },
         "CellsAccessSecurityGroupIngress1": {
             "Type": "AWS::EC2::SecurityGroupIngress",
-            "DependsOn": "CellsAccessSecurityGroup",
             "Properties": {
                 "GroupId": {
                     "Ref": "CellsAccessSecurityGroup"
                 },
                 "IpProtocol": "-1",
-                "FromPort": "0",
-                "ToPort": "65535",
+                "FromPort": 0,
+                "ToPort": 65535,
                 "SourceSecurityGroupId": {"Ref": "CellsAccessSecurityGroup"}
             }
         },
         "CellsAccessSecurityGroupIngress2": {
            "Type": "AWS::EC2::SecurityGroupIngress",
-           "DependsOn": "CellsAccessSecurityGroup",
            "Properties": {
                 "GroupId": {
                     "Ref": "CellsAccessSecurityGroup"
                 },
                 "CidrIp": "0.0.0.0/0",
                 "IpProtocol": "tcp",
-                "FromPort": "8443",
-                "ToPort": "8443"
+                "FromPort": 8443,
+                "ToPort": 8443
             }
         },
         "vCDMain": {
@@ -593,13 +550,13 @@
                         }
                     ]
                 },
-                "Monitoring" : "true",
+                "Monitoring" : true,
                 "BlockDeviceMappings": [
                     {
                       "DeviceName": "/dev/sda1",
                       "Ebs": {
                         "VolumeType": "gp2",
-                        "DeleteOnTermination": "true",
+                        "DeleteOnTermination": true,
                         "VolumeSize": {
                             "Ref": "MainVcdVolumeSize"
                         }
