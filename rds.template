@@ -281,7 +281,7 @@
   },
     "DBInstance": {
       "Type": "AWS::RDS::DBInstance",
-      "DeletionPolicy": "Snapshot",
+      "DeletionPolicy": "Delete",
       "Properties": {
         "DBName" : {
           "Ref": "DBName"
