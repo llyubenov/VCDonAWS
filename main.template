@@ -471,23 +471,23 @@
         "RDSInstanceType": {
             "Description": "Select Instance Type.",
             "Type": "String",
-            "Default": "db.m4.large",
+            "Default": "db.m5.large",
             "AllowedValues": [
             "db.t2.micro",
             "db.t2.small",
-            "db.m4.large",
-            "db.m4.xlarge",
-            "db.m4.2xlarge"
+            "db.m5.large",
+            "db.m5.xlarge",
+            "db.m5.2xlarge"
             ],
             "ConstraintDescription": "Must be a valid EC2 instance type."
         },
         "EngineVersion": {
             "AllowedValues": [
-              "10.1",
-              "10.3",
-              "10.4"
+              "10.9",
+              "10.10",
+              "10.12"
             ],
-            "Default": "10.3",
+            "Default": "10.12",
             "Description": "Select the PostgresDB engine version",
             "Type": "String"
         },
