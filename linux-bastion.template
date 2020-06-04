@@ -41,14 +41,8 @@
                 "BastionAMIOS": {
                     "default": "Bastion AMI Operating System"
                 },
-                "BastionBanner": {
-                    "default": "Bastion Banner"
-                },
                 "BastionInstanceType": {
                     "default": "Bastion Instance Type"
-                },
-                "EnableBanner": {
-                    "default": "Enable Banner"
                 },
                 "EnableTCPForwarding": {
                     "default": "Enable TCP Forwarding"
@@ -86,7 +80,7 @@
                 "Amazon-Linux-HVM",
                 "CentOS-7-HVM"
             ],
-            "Default": "Amazon-Linux-HVM",
+            "Default": "CentOS-7-HVM",
             "Description": "The Linux distribution for the AMI to be used for the bastion instances",
             "Type": "String"
         },
@@ -203,74 +197,34 @@
     "Mappings": {
         "AWSAMIRegionMap": {
             "AMI": {
-                "AMZNLINUXHVM": "amzn-ami-hvm-2018.03.0.20181129-x86_64-gp2",
-                "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS ENA 1805_01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-77ec9308.4"
-            },
-            "ap-northeast-1": {
-                "AMZNLINUXHVM": "ami-00a5245b4816c38e6",
-                "CENTOS7HVM": "ami-8e8847f1"
-            },
-            "ap-northeast-2": {
-                "AMZNLINUXHVM": "ami-00dc207f8ba6dc919",
-                "CENTOS7HVM": "ami-bf9c36d1"
-            },
-            "ap-south-1": {
-                "AMZNLINUXHVM": "ami-0ad42f4f66f6c1cc9",
-                "CENTOS7HVM": "ami-1780a878"
-            },
-            "ap-southeast-1": {
-                "AMZNLINUXHVM": "ami-05b3bcf7f311194b3",
-                "CENTOS7HVM": "ami-8e0205f2"
-            },
-            "ap-southeast-2": {
-                "AMZNLINUXHVM": "ami-02fd0b06f06d93dfc",
-                "CENTOS7HVM": "ami-d8c21dba"
-            },
-            "ca-central-1": {
-                "AMZNLINUXHVM": "ami-07423fb63ea0a0930",
-                "CENTOS7HVM": "ami-e802818c"
+                "CENTOS7HVM": "CentOS Linux 7 x86_64 HVM EBS ENA 2002_01-b7ee8a69-ee97-4a49-9e68-afaee216db2e-ami-0042af67f8e4dcc20.4"
             },
             "eu-central-1": {
-                "AMZNLINUXHVM": "ami-0cfbf4f6db41068ac",
-                "CENTOS7HVM": "ami-dd3c0f36"
+                "CENTOS7HVM": "ami-0e8286b71b81c3cc1"
             },
             "eu-west-1": {
-                "AMZNLINUXHVM": "ami-08935252a36e25f85",
-                "CENTOS7HVM": "ami-3548444c"
+                "CENTOS7HVM": "ami-0b850cf02cc00fdc8"
             },
             "eu-west-2": {
-                "AMZNLINUXHVM": "ami-01419b804382064e4",
-                "CENTOS7HVM": "ami-00846a67"
+                "CENTOS7HVM": "ami-09e5afc68eed60ef4"
             },
             "eu-west-3": {
-                "AMZNLINUXHVM": "ami-0dd7e7ed60da8fb83",
-                "CENTOS7HVM": "ami-262e9f5b"
-            },
-            "sa-east-1": {
-                "AMZNLINUXHVM": "ami-05145e0b28ad8e0b2",
-                "CENTOS7HVM": "ami-cb5803a7"
+                "CENTOS7HVM": "ami-0cb72d2e599cffbf9"
             },
             "us-east-1": {
-                "AMZNLINUXHVM": "ami-0080e4c5bc078760e",
-                "CENTOS7HVM": "ami-9887c6e7"
+                "CENTOS7HVM": "ami-0affd4508a5d2481b"
             },
             "us-east-2": {
-                "AMZNLINUXHVM": "ami-0cd3dfa4e37921605",
-                "CENTOS7HVM": "ami-9c0638f9"
+                "CENTOS7HVM": "ami-01e36b7901e884a10"
             },
             "us-west-1": {
-                "AMZNLINUXHVM": "ami-0ec6517f6edbf8044",
-                "CENTOS7HVM": "ami-4826c22b"
+                "CENTOS7HVM": "ami-098f55b4287a885ba"
             },
             "us-west-2": {
-                "AMZNLINUXHVM": "ami-01e24be29428c15b2",
-                "CENTOS7HVM": "ami-3ecc8f46"
+                "CENTOS7HVM": "ami-0bc06212a56393ee1"
             }
         },
         "LinuxAMINameMap": {
-            "Amazon-Linux-HVM": {
-                "Code": "AMZNLINUXHVM"
-            },
             "CentOS-7-HVM": {
                 "Code": "CENTOS7HVM"
             }
