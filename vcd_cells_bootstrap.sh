@@ -110,6 +110,9 @@ contentLibrary.item.sync.batch.size = 1
 database.pool.removeAbandoned = true
 database.pool.abandonWhenPercentageFull = 0
 database.pool.removeAbandonedTimeout = 43200
+
+#Allow 2 vCPUs to be used by console proxy process
+consoleproxy.cores.max = 2
 EOF
 
     #Set Custom vCD Java Heap Size
